@@ -31,7 +31,13 @@ public class Combination extends DbObject
 	private static final byte subtraction = 4;
 	private static final byte xor = 5;
 	private static final byte not = 6;
-	private static final byte identityMatrix = (byte)0377;
+        
+        // minus one stored as differnt length ints (indexed by wid)
+        private static final long[] identMatrix = { 0377L,
+                                                    0177777L,
+                                                    037777777777L,
+                                                    01777777777777777777777L };
+                                                    
 	
 	public Combination( DbExternal dbExt ) throws DbException
 	{
@@ -90,12 +96,12 @@ public class Combination extends DbObject
 				}
 				String name = new String( body, nameStart, nameEnd - nameStart );
 				pointer = nameEnd + 1;
-				byte matrixIndex = body[pointer];
-				pointer++;
+                                long matrixInd = BrlcadDb.getLong(body, pointer, length);
+				pointer += length;
 				Matrix mat = null;
-				if( matrixIndex != identityMatrix )
+				if( matrixInd != identMatrix[wid] )
 				{
-					mat = matrices[matrixIndex];
+					mat = matrices[(int)matrixInd];
 				}
 				Tree node = new Tree( name, mat );
 				list1.add( node );
@@ -152,13 +158,13 @@ public class Combination extends DbObject
 						}
 						String name = new String( body, nameStart, nameEnd - nameStart );
 						pointer = nameEnd + 1;
-						byte matrixIndex = body[pointer];
-						pointer++;
-						Matrix mat = null;
-						if( matrixIndex != identityMatrix )
-						{
-							mat = matrices[matrixIndex];
-						}
+                                                long matrixInd = BrlcadDb.getLong(body, pointer, length);
+                                                pointer += length;
+                                                Matrix mat = null;
+                                                if (matrixInd != identMatrix[wid])
+                                                {
+                                                    mat = matrices[(int) matrixInd];
+                                                }
 						node = new Tree( name, mat );
 						stack.push( node );
 						break;
