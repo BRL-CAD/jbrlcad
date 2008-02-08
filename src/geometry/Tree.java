@@ -212,5 +212,26 @@ public class Tree
 			
 		}
 	}
+
+    public Operator getOp() {
+        return op;
+    }
+
+    public Tree getLeft() {
+        return left;
+    }
+	
+    public Tree getRight() {
+        return right;
+    }
+
+    public Matrix getMat() {
+        return mat;
+    }
+
+    public String getLeafName() {
+        return leafName;
+    }
+
 }
 
