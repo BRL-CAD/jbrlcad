@@ -115,6 +115,17 @@ public class DbObject
 	}
 	
 	/**
+	 * Get all attribute values for this object
+	 *
+	 * @return   attribute values (Map<String, String>)
+	 *
+	 */
+	public Map<String, String> getAttributes()
+	{
+		return new HashMap<String, String>(this.attributes);
+	}
+	
+	/**
 	 * Method getName
 	 *
 	 * @return   a String
