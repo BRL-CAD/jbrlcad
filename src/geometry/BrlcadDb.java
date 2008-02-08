@@ -14,6 +14,8 @@ import java.io.IOException;
 import java.io.EOFException;
 import numerics.Tolerance;
 import java.util.BitSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class BrlcadDb
 {
@@ -139,7 +141,9 @@ public class BrlcadDb
 					}
 					else
 					{
-						System.out.println( name + ": " + offset );
+//						System.out.println( name + ": " + offset
+//							+ "; major " + dbExt.getMajorType()
+//							+ "; minor " + dbExt.getMinorType());
 						this.directory.put( name, offset );
 					}
 				}
@@ -428,4 +432,33 @@ public class BrlcadDb
 		if( h[7] != DB5HDR_MAGIC2 ) return false;
 		return true;
 	}
+    
+    
+    /**
+     * Method getObjectNames
+     * 
+     * @return  Set of object names in the file in alphabetical order
+     */
+    public Set<String> getObjectNames() {
+        return new TreeSet(directory.keySet());
+    }
+    
+    /**
+     * Method getDbExternal
+     * 
+     * @param   String which contains the name of the object to return
+     * 
+     * @return  DbExternal object for given name; null if it doesn't exist
+     */
+    public DbExternal getDbExternal(String name) {
+	Long offset = this.directory.get( name );
+	if( offset == null ) return null;
+        try {
+	    return new DbExternal( this, offset );
+        } catch (IOException ioe) {
+            return null;
+        }
+    }
+    
+    
 }
