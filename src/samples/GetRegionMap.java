@@ -49,6 +49,11 @@ public class GetRegionMap {
         
         String rootObject = (args.length == 1) ? rootObjName : args[1];
         
+        // Print command line parameters for verification
+        
+        System.err.println("Params:  .g_file: '" + args[0]
+                + "'; root object: '" + rootObject + "'"); 
+        
         // Now call other methods to read/process input and write output
         
         GetRegionMap grm = new GetRegionMap();
@@ -100,6 +105,9 @@ public class GetRegionMap {
             // then throw an exception and quit
             
             DbExternal rootDbExt = db.getDbExternal(rootObject);
+            if (rootDbExt == null) {
+                throw new DbException("'" + rootObject + "' is not a BRL-CAD top component.");
+            }
             if (debug) printRawInfo("    (pi)", rootDbExt);
             Combination rootCombo = new Combination(rootDbExt);
             
