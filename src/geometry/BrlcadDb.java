@@ -163,7 +163,7 @@ public class BrlcadDb
 			{
 				throw new DbException( "Db has no GLOBAL object " + e1);
 			}
-			System.out.println( "Completed scan, " +
+			System.err.println( "Completed scan, " +
 								   this.directory.size() +
 								   " objects" +
 								   ", title = " + this.title);
@@ -440,7 +440,7 @@ public class BrlcadDb
      * @return  Set of object names in the file in alphabetical order
      */
     public Set<String> getObjectNames() {
-        return new TreeSet(directory.keySet());
+        return new TreeSet<String>(directory.keySet());
     }
     
     /**
