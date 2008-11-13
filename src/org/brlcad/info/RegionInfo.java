@@ -1,5 +1,7 @@
 package org.brlcad.info;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import org.brlcad.geometry.BrlcadDb;
 import org.brlcad.geometry.Combination;
 import org.brlcad.geometry.DbException;
@@ -7,6 +9,7 @@ import org.brlcad.geometry.DbExternal;
 import org.brlcad.geometry.Operator;
 import org.brlcad.geometry.Tree;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -28,16 +31,17 @@ public class RegionInfo {
     private boolean debug = false;
 
     private Map<String, Map<String, String>> regionMap = null;
+    private Map<Integer,List<String>> identMap = null;
 
     public void writeOutput() {
 
-        if( this.regionMap == null ) {
+        if( this.getRegionMap() == null ) {
             System.out.println( "No data available, call \"processInput\" method first");
             return;
         }
 
         System.out.println("Final results:");
-        for (Map.Entry<String, Map<String, String>> me : regionMap.entrySet()) {
+        for (Map.Entry<String, Map<String, String>> me : getRegionMap().entrySet()) {
             if ( ! me.getValue().containsKey("aircode")) {
                 System.out.print(me.getKey());
                 for (Map.Entry<String, String> me_inside : me.getValue().entrySet()) {
@@ -45,6 +49,14 @@ public class RegionInfo {
                             + ": " + me_inside.getValue());
                 }
                 System.out.println();
+            }
+        }
+
+        System.out.println( "IdentMap:");
+        for( Map.Entry<Integer,List<String>> me : getIdentMap().entrySet()) {
+            System.out.println( "ident " + me.getKey() + ":");
+            for( String region : me.getValue() ) {
+                System.out.println( "\t" + region);
             }
         }
     }
@@ -67,6 +79,7 @@ public class RegionInfo {
         // the name of the region is the String part of Map<String, Map>
 
         this.regionMap = new TreeMap<String, Map<String, String>>();
+        this.identMap = new HashMap<Integer, List<String>>();
 
         try {
             // Open, read, and get pointers to objects in a BRL-CAD file
@@ -93,7 +106,7 @@ public class RegionInfo {
                 if (isDebug()) {
                     printComboInfo("    (pi->ph)", rootCombo, "");
                 }
-                processHierarchy(db, rootCombo.getTree(), objectName, regionMap);
+                processHierarchy(db, rootCombo.getTree(), objectName);
             }
 
         } catch (Exception e) {
@@ -103,7 +116,7 @@ public class RegionInfo {
 
         // If no exceptions (everything processed), then return create region map
 
-        return regionMap;
+        return getRegionMap();
     }
 
 
@@ -116,12 +129,11 @@ public class RegionInfo {
      * @param regionMap Map of regions' attributes as built up from processing
      * @throws geometry.DbException Thrown when there's an error in reading the file
      */
-    private void processHierarchy(BrlcadDb db, Tree tree, String parentPath,
-            Map<String, Map<String, String>> regionMap) throws DbException {
+    private void processHierarchy(BrlcadDb db, Tree tree, String parentPath) throws DbException {
 
         // If any parameter is null, return immediately
 
-        if (db == null || tree == null || parentPath == null || regionMap == null) {
+        if (db == null || tree == null || parentPath == null || getRegionMap() == null) {
             if (isDebug()) System.out.println("    (ph) return immed");
             return;
         }
@@ -132,7 +144,7 @@ public class RegionInfo {
 
         Set<String> nameSet = new HashSet<String>();
         if (isDebug()) printTreeInfo("    (ph->pt)", tree, parentPath);
-        processTree(db, tree, parentPath, regionMap, nameSet);
+        processTree(db, tree, parentPath, nameSet);
 
         // Process nameSet to move further down the region path name
 
@@ -140,7 +152,7 @@ public class RegionInfo {
             if (isDebug()) printRawInfo("    (ph)", db.getDbExternal(s));
             Combination combo = new Combination(db.getDbExternal(s));
             if (isDebug()) printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
-            processHierarchy(db, combo.getTree(), parentPath + delimiter + s, regionMap);
+            processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
         }
     }
 
@@ -159,11 +171,11 @@ public class RegionInfo {
      * @throws geometry.DbException
      */
     private void processTree(BrlcadDb db, Tree tree, String parentPath,
-            Map<String, Map<String, String>> regionMap, Set<String> nameSet) throws DbException {
+            Set<String> nameSet) throws DbException {
 
         // If any parameter is null, return immediately
 
-        if (db == null || tree == null || parentPath == null || regionMap == null
+        if (db == null || tree == null || parentPath == null || getRegionMap() == null
                 || nameSet == null) {
             if (isDebug()) System.out.println("    (pt) return immed");
             return;
@@ -173,9 +185,9 @@ public class RegionInfo {
 
         if (tree.getOp() != Operator.LEAF) {
             if (isDebug()) printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
-            processTree(db, tree.getLeft(), parentPath, regionMap, nameSet);
+            processTree(db, tree.getLeft(), parentPath, nameSet);
             if (isDebug()) printTreeInfo("    (pt->pt right)", tree.getRight(), parentPath);
-            processTree(db, tree.getRight(), parentPath, regionMap, nameSet);
+            processTree(db, tree.getRight(), parentPath, nameSet);
             return;
         }
 
@@ -198,8 +210,17 @@ public class RegionInfo {
                     + "; MatID: " + comboAttrs.get("material_id")
                     + "; AirCode: " + comboAttrs.get("aircode"));
             Map<String, String> attrs = new TreeMap<String, String>(comboAttrs);
-            attrs.put("regionPath", parentPath + delimiter + combo.getName());
-            regionMap.put(combo.getName(), attrs);
+            String path = parentPath + delimiter + combo.getName();
+            attrs.put("regionPath", path);
+            getRegionMap().put(combo.getName(), attrs);
+
+            Integer ident = Integer.parseInt( comboAttrs.get("region_id") );
+            List<String> regions = getIdentMap().get(ident);
+            if( regions == null ) {
+                regions = new ArrayList<String>();
+                getIdentMap().put(ident, regions);
+            }
+            regions.add(path);
 
         } else {
 
@@ -286,5 +307,19 @@ public class RegionInfo {
      */
     public void setDebug(boolean debug) {
         this.debug = debug;
+    }
+
+    /**
+     * @return the regionMap
+     */
+    public Map<String, Map<String, String>> getRegionMap() {
+        return regionMap;
+    }
+
+    /**
+     * @return the identMap
+     */
+    public Map<Integer, List<String>> getIdentMap() {
+        return identMap;
     }
 }
