@@ -1,0 +1,35 @@
+<project name="jbrlcad" default="build">
+
+<property name="srcdir" value="${basedir}/src"/>
+<property name="builddir" value="${basedir}/build"/>
+<property name="classdir" value="${builddir}/classes"/>
+<property name="distdir" value="${builddir}/dist"/>
+<property name="libdir" value="${basedir}/lib"/>
+
+<target name="clean">
+  <delete dir="build" quiet="true"/>
+  <delete dir="dist" quiet="true"/>
+</target>
+
+<target name="compile">
+  <mkdir dir="${builddir}"/>
+  <mkdir dir="${classdir}"/>
+  <javac srcdir="${srcdir}" destdir="${classdir}" classpath="${libdir}/jade.jar"/>
+</target>
+
+<target name="build" depends="clean,compile">
+  <mkdir dir="${distdir}"/>
+  <jar destfile="${distdir}/jbrlcad.jar" basedir="${classdir}"/>
+</target>
+
+<target name="test" depends="build">
+    <java classname="org.brlcad.samples.BrlcadJava">
+        <classpath>
+            <pathelement location="${distdir}/jbrlcad.jar"/>
+            <pathelement location="${libdir}/jade.jar"/>
+        </classpath>
+        <arg line="test/test.g r1"/>
+    </java>
+</target>
+
+</project>
