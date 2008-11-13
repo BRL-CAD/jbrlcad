@@ -15,8 +15,8 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
- *
- * @author jra
+ * A class useful for obtaining information about regions in a BRL-CAD ".g" file.
+ * 
  */
 public class RegionInfo {
 
@@ -30,9 +30,32 @@ public class RegionInfo {
      */
     private boolean debug = false;
 
+
+    /**
+     * A Map that holds a region's attributes as key-value pairs in Map<String, String>;
+     * the name of the region is the String part of Map<String, Map>
+     */
     private Map<String, Map<String, String>> regionMap = null;
+
+    /**
+     * A Map where keys are region idents and the values are lists of region path names
+     * for regions with that ident
+     */
     private Map<Integer,List<String>> identMap = null;
 
+    /**
+     * Constructor
+     *
+     * @param inFileName The name of a BRL-CAD ".g" file
+     * @param rootObjects The top level objects in the ".g" file that are to be processed
+     */
+    public RegionInfo(String inFileName, String... rootObjects) {
+        this.processInput(inFileName, rootObjects);
+    }
+
+    /**
+     * write all the region info that has been obtained to std out
+     */
     public void writeOutput() {
 
         if( this.getRegionMap() == null ) {
@@ -73,10 +96,7 @@ public class RegionInfo {
      * contains the full path name from the top of the hierarchy to the region,
      * and where Map<String, Map> is a map of the region name to it's attributes
      */
-    public Map<String, Map<String, String>> processInput(String inFileName, String... rootObjects) {
-
-        // The following holds a region's attributes as key-value pairs in Map<String, String>;
-        // the name of the region is the String part of Map<String, Map>
+    private void processInput(String inFileName, String... rootObjects) {
 
         this.regionMap = new TreeMap<String, Map<String, String>>();
         this.identMap = new HashMap<Integer, List<String>>();
@@ -111,12 +131,7 @@ public class RegionInfo {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.exit(2);
         }
-
-        // If no exceptions (everything processed), then return create region map
-
-        return getRegionMap();
     }
 
 
@@ -317,6 +332,8 @@ public class RegionInfo {
     }
 
     /**
+     * getIdentMap returns the map if region ident numbers to lists of path names for regions that have that ident number
+     * 
      * @return the identMap
      */
     public Map<Integer, List<String>> getIdentMap() {
