@@ -67,23 +67,23 @@ public class BoundingBox implements Serializable
 		{
 			return false;
 		}
-		Point min = bb.getMin();
-		Point max = bb.getMax();
-		if( min == null )
+		Point minOther = bb.getMin();
+		Point maxOther = bb.getMax();
+		if( minOther == null )
 		{
 			return false;
 		}
 		
-		if( min.getX() > this.max.getX() ||
-		    min.getY() > this.max.getY() ||
-		    min.getZ() > this.max.getZ() )
+		if( minOther.getX() > this.max.getX() ||
+		    minOther.getY() > this.max.getY() ||
+		    minOther.getZ() > this.max.getZ() )
 		{
 			return false;
 		}
 
-		if( max.getX() < this.min.getX() ||
-		    max.getY() < this.min.getY() ||
-		    max.getZ() < this.min.getZ() )
+		if( maxOther.getX() < this.min.getX() ||
+		    maxOther.getY() < this.min.getY() ||
+		    maxOther.getZ() < this.min.getZ() )
 		{
 			return false;
 		}
@@ -193,14 +193,14 @@ public class BoundingBox implements Serializable
 	{
 		if( this.min == null )
 		{
-			Point min = bb.getMin();
-			Point max = bb.getMax();
-			if( min == null )
+			Point minOther = bb.getMin();
+			Point maxOther = bb.getMax();
+			if( minOther == null )
 			{
 				return;
 			}
-			this.min = new Point( min );
-			this.max = new Point( max );
+			this.min = new Point( minOther );
+			this.max = new Point( maxOther );
 			return;
 		}
 		Point bbMin = bb.getMin();
@@ -246,56 +246,56 @@ public class BoundingBox implements Serializable
 		{
 			return;
 		}
-		Point min = bb.getMin();
-		Point max = bb.getMax();
-		if( min == null )
+		Point minOther = bb.getMin();
+		Point maxOther = bb.getMax();
+		if( minOther == null )
 		{
 			this.min = null;
 			this.max = null;
 			return;
 		}
 		
-		if( min.getX() > this.max.getX() ||
-		    min.getY() > this.max.getY() ||
-		    min.getZ() > this.max.getZ() )
+		if( minOther.getX() > this.max.getX() ||
+		    minOther.getY() > this.max.getY() ||
+		    minOther.getZ() > this.max.getZ() )
 		{
 			this.min = null;
 			this.max = null;
 			return;
 		}
 
-		if( max.getX() < this.min.getX() ||
-		    max.getY() < this.min.getY() ||
-		    max.getZ() < this.min.getZ() )
+		if( maxOther.getX() < this.min.getX() ||
+		    maxOther.getY() < this.min.getY() ||
+		    maxOther.getZ() < this.min.getZ() )
 		{
 			this.min = null;
 			this.max = null;
 			return;
 		}
 		
-		if( min.getX() > this.min.getX() )
+		if( minOther.getX() > this.min.getX() )
 		{
-			this.min.setX( min.getX() );
+			this.min.setX( minOther.getX() );
 		}
-		if( min.getY() > this.min.getY() )
+		if( minOther.getY() > this.min.getY() )
 		{
-			this.min.setY( min.getY() );
+			this.min.setY( minOther.getY() );
 		}
-		if( min.getZ() > this.min.getZ() )
+		if( minOther.getZ() > this.min.getZ() )
 		{
-			this.min.setZ( min.getZ() );
+			this.min.setZ( minOther.getZ() );
 		}
-		if( max.getX() < this.max.getX() )
+		if( maxOther.getX() < this.max.getX() )
 		{
-			this.max.setX( max.getX() );
+			this.max.setX( maxOther.getX() );
 		}
-		if( max.getY() < this.max.getY() )
+		if( maxOther.getY() < this.max.getY() )
 		{
-			this.max.setY( max.getY() );
+			this.max.setY( maxOther.getY() );
 		}
-		if( max.getZ() < this.max.getZ() )
+		if( maxOther.getZ() < this.max.getZ() )
 		{
-			this.max.setZ( max.getZ() );
+			this.max.setZ( maxOther.getZ() );
 		}
 	}
 	
@@ -323,8 +323,8 @@ public class BoundingBox implements Serializable
 		{
 			return null;
 		}
-		Double min = new Double(Double.POSITIVE_INFINITY);
-		Double max = new Double(Double.NEGATIVE_INFINITY);
+		Double minExtent = new Double(Double.POSITIVE_INFINITY);
+		Double maxExtent = new Double(Double.NEGATIVE_INFINITY);
 		List<Double> ret = new ArrayList<Double>();
 
 		// Check all 8 vertices of the bounding box
@@ -332,56 +332,57 @@ public class BoundingBox implements Serializable
 		// (xmin, ymin, zmin)
 		Vector3 vt = new Vector3( this.min.getX(), this.min.getY(), this.min.getZ() );
 		double dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmax, ymin, zmin)
 		vt.setX( this.max.getX() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmax, ymax, zmin )
 		vt.setY( this.max.getY() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmin, ymax, zmin )
 		vt.setX( this.min.getX() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmin, ymax, zmax )
 		vt.setZ( this.max.getZ() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmax, ymax, zmax )
 		vt.setX( this.max.getX() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmax, ymin, zmax )
 		vt.setY( this.min.getY() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
 		// (xmin, ymin, zmax )
 		vt.setX( this.min.getX() );
 		dot = vt.dotProduct( dir );
-		if( dot > max ) max = dot;
-		if( dot < min ) min = dot;
+		if( dot > maxExtent ) maxExtent = dot;
+		if( dot < minExtent ) minExtent = dot;
 
-		ret.add( min );
-		ret.add( max );
+		ret.add( minExtent );
+		ret.add( maxExtent );
 		return ret;
 	}
 	
+    @Override
 	public String toString()
 	{
 		return "BoundingBox: min=" + this.min + ", max=" + this.max;
