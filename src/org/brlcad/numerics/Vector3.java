@@ -22,13 +22,14 @@
 
 
 package org.brlcad.numerics;
-import jade.physics.Angle;
-import jade.units.SI;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+import javax.measure.quantity.Angle;
+import javax.measure.unit.SI;
+import org.jscience.physics.amount.Amount;
 
 
 /**
@@ -144,8 +145,8 @@ public class Vector3 implements Serializable
 	 * @param    elevation           an Angle
 	 *
 	 */
-	public Vector3( Angle azimuth, Angle elevation) {
-		this(Math.PI/2.0 - elevation.doubleValue(), azimuth.doubleValue() );
+	public Vector3( Amount<Angle> azimuth, Amount<Angle> elevation) {
+		this(Math.PI/2.0 - elevation.doubleValue(SI.RADIAN), azimuth.doubleValue(SI.RADIAN) );
 	}
 	
 	/**
@@ -157,9 +158,9 @@ public class Vector3 implements Serializable
 	 * @param    roll                an Angle
 	 *
 	 */
-	public Vector3( Angle yaw, Angle pitch, Angle roll )
+	public Vector3( Amount<Angle> yaw, Amount<Angle> pitch, Amount<Angle> roll )
 	{
-		this( (Angle)yaw.negate(), (Angle)pitch.negate() );
+		this( yaw.opposite(), pitch.opposite() );
 	}
 
 
@@ -690,7 +691,7 @@ public class Vector3 implements Serializable
 	 * i.e, the vector is pointing toward the origin, not away)
 	 *
 	 */
-	public static Angle getElevation( Vector3 v ) {
+	public static Amount<Angle> getElevation( Vector3 v ) {
 		double ang;
 		
 		if( v.z != 0.0 ) {
@@ -698,7 +699,7 @@ public class Vector3 implements Serializable
 		} else {
 			ang = 0.0;
 		}
-		return (Angle)Angle.valueOf( ang, Math.ulp( ang ) * 4.0, SI.RADIAN );
+		return Amount.valueOf( ang, Math.ulp( ang ) * 4.0, SI.RADIAN );
 	}
 
 	/**
@@ -711,10 +712,10 @@ public class Vector3 implements Serializable
 	 * i.e, the vector is pointing toward the origin, not away)
 	 *
 	 */
-	public static Angle getAzimuth( Vector3 v ) {
+	public static Amount<Angle> getAzimuth( Vector3 v ) {
 		Vector3 revDir = Vector3.negate( v );
 		double ang = Vector3.getPhi( revDir );
-		return (Angle)Angle.valueOf( ang, Math.ulp( ang ) * 2.0, SI.RADIAN );
+		return Amount.valueOf( ang, Math.ulp( ang ) * 2.0, SI.RADIAN );
 	}
 
 

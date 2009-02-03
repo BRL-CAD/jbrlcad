@@ -14,7 +14,7 @@
 <target name="compile">
   <mkdir dir="${builddir}"/>
   <mkdir dir="${classdir}"/>
-  <javac srcdir="${srcdir}" destdir="${classdir}" classpath="${libdir}/jade.jar"/>
+  <javac srcdir="${srcdir}" destdir="${classdir}" classpath="${libdir}/jscience.jar"/>
 </target>
 
 <target name="build" depends="clean,compile">
@@ -26,7 +26,7 @@
     <java classname="org.brlcad.samples.BrlcadJava">
         <classpath>
             <pathelement location="${distdir}/jbrlcad.jar"/>
-            <pathelement location="${libdir}/jade.jar"/>
+            <pathelement location="${libdir}/jscience.jar"/>
         </classpath>
         <arg line="test/test.g r1"/>
     </java>

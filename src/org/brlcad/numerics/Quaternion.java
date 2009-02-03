@@ -5,7 +5,10 @@
  */
 
 package org.brlcad.numerics;
-import jade.physics.Angle;
+
+import javax.measure.quantity.Angle;
+import javax.measure.unit.SI;
+import org.jscience.physics.amount.Amount;
 
 
 
@@ -31,13 +34,13 @@ public class Quaternion
 		q[3] = in.q[3];
 	}
 	
-	public Quaternion( Angle rot, Vector3 axis )
+	public Quaternion( Amount<Angle> rot, Vector3 axis )
 	{
 		q = new double[4];
 		
 		Vector3 copy = new Vector3( axis );
 		copy.normalize();
-		double halfAngle = rot.doubleValue() / 2.0 ;
+		double halfAngle = rot.doubleValue(SI.RADIAN) / 2.0 ;
 		double sin = Math.sin( halfAngle );
 		
 		q[0] = copy.getX() * sin;
@@ -46,13 +49,13 @@ public class Quaternion
 		q[3] = Math.cos( halfAngle );
 	}
 	
-	public Quaternion( Angle yaw, Angle pitch, Angle roll )
+	public Quaternion( Amount<Angle> yaw, Amount<Angle> pitch, Amount<Angle> roll )
 	{
 		q = new double[4];
 		
-		double halfYaw = yaw.doubleValue()/2.0;
-		double halfPitch = pitch.doubleValue()/2.0;
-		double halfRoll = roll.doubleValue()/2.0;
+		double halfYaw = yaw.doubleValue(SI.RADIAN)/2.0;
+		double halfPitch = pitch.doubleValue(SI.RADIAN)/2.0;
+		double halfRoll = roll.doubleValue(SI.RADIAN)/2.0;
 		
 		double siny = Math.sin( halfYaw );
 		double cosy = Math.cos( halfYaw );

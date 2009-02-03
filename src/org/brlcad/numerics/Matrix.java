@@ -18,7 +18,9 @@
 
 package org.brlcad.numerics;
 import java.io.*;
-import jade.physics.Angle;
+import javax.measure.quantity.Angle;
+import javax.measure.unit.SI;
+import org.jscience.physics.amount.Amount;
 
 /**
  * Two dimensional Matrix
@@ -180,19 +182,19 @@ public class Matrix implements Serializable
 	 * @param    location            the location of the origin of the transformed coordinate system
 	 *
 	 */
-	public Matrix( Angle yaw, Angle pitch, Angle roll, Point location )
+	public Matrix( Amount<Angle> yaw, Amount<Angle> pitch, Amount<Angle> roll, Point location )
 	{
 		rows = 4;
 		columns = 4;
 		
 		mat = new double[rows][columns];
 		
-		double cosy = Math.cos( yaw.doubleValue() );
-		double siny = Math.sin( yaw.doubleValue() );
-		double cosp = Math.cos( pitch.doubleValue() );
-		double sinp = Math.sin( pitch.doubleValue() );
-		double cosr = Math.cos( roll.doubleValue() );
-		double sinr = Math.sin( roll.doubleValue() );
+		double cosy = Math.cos( yaw.doubleValue(SI.RADIAN) );
+		double siny = Math.sin( yaw.doubleValue(SI.RADIAN) );
+		double cosp = Math.cos( pitch.doubleValue(SI.RADIAN) );
+		double sinp = Math.sin( pitch.doubleValue(SI.RADIAN) );
+		double cosr = Math.cos( roll.doubleValue(SI.RADIAN) );
+		double sinr = Math.sin( roll.doubleValue(SI.RADIAN) );
 		
 		mat[0][0] = cosp * cosy;
 		mat[0][1] = -cosp * siny;
@@ -222,19 +224,19 @@ public class Matrix implements Serializable
 	 * @param    roll                the roll angle of the transformed coordinate system
 	 *
 	 */
-	public Matrix( Angle yaw, Angle pitch, Angle roll )
+	public Matrix( Amount<Angle> yaw, Amount<Angle> pitch, Amount<Angle> roll )
 	{
 		rows = 4;
 		columns = 4;
 		
 		mat = new double[rows][columns];
 		
-		double cosy = Math.cos( yaw.doubleValue() );
-		double siny = Math.sin( yaw.doubleValue() );
-		double cosp = Math.cos( pitch.doubleValue() );
-		double sinp = Math.sin( pitch.doubleValue() );
-		double cosr = Math.cos( roll.doubleValue() );
-		double sinr = Math.sin( roll.doubleValue() );
+		double cosy = Math.cos( yaw.doubleValue(SI.RADIAN) );
+		double siny = Math.sin( yaw.doubleValue(SI.RADIAN) );
+		double cosp = Math.cos( pitch.doubleValue(SI.RADIAN) );
+		double sinp = Math.sin( pitch.doubleValue(SI.RADIAN) );
+		double cosr = Math.cos( roll.doubleValue(SI.RADIAN) );
+		double sinr = Math.sin( roll.doubleValue(SI.RADIAN) );
 		
 		mat[0][0] = cosp * cosy;
 		mat[0][1] = -cosp * siny;
@@ -288,11 +290,11 @@ public class Matrix implements Serializable
 	 * @param    location            the location of the origin of the transformed coordinate system
 	 *
 	 */
-	public static Matrix inverseYPR( Angle yaw, Angle pitch, Angle roll )
+	public static Matrix inverseYPR( Amount<Angle> yaw, Amount<Angle> pitch, Amount<Angle> roll )
 	{
-		Matrix my = new Matrix( (Angle)yaw.negate(), Angle.ZERO, Angle.ZERO );
-		Matrix mp = new Matrix( Angle.ZERO, (Angle)pitch.negate(), Angle.ZERO );
-		Matrix mr = new Matrix( Angle.ZERO, Angle.ZERO, (Angle)roll.negate() );
+		Matrix my = new Matrix( yaw.opposite(), Amount.valueOf(0, SI.RADIAN), Amount.valueOf(0, SI.RADIAN) );
+		Matrix mp = new Matrix( Amount.valueOf(0, SI.RADIAN), pitch.opposite(), Amount.valueOf(0, SI.RADIAN) );
+		Matrix mr = new Matrix( Amount.valueOf(0, SI.RADIAN), Amount.valueOf(0, SI.RADIAN), roll.opposite() );
 		
 		mr.mult( mp );
 		mr.mult( my );
