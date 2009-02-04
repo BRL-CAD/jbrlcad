@@ -213,7 +213,7 @@ public class PreppedArb8 extends PreppedObject
 				f = work.dotProduct( norm );
 				if( f < 0.0 )
 				{
-					norm.reverse();
+					norm.negate();
 					pa.clockwise[pa.faces] = 1;
 				}
 				else

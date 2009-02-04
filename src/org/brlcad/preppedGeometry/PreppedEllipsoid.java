@@ -108,15 +108,15 @@ public class PreppedEllipsoid extends PreppedObject
 			
 			Matrix rot = new Matrix( 4, 4 );
 			rot.unit();
-			rot.mat[0][0] = rowa.getX();
-			rot.mat[0][1] = rowa.getY();
-			rot.mat[0][2] = rowa.getZ();
-			rot.mat[1][0] = rowb.getX();
-			rot.mat[1][1] = rowb.getY();
-			rot.mat[1][2] = rowb.getZ();
-			rot.mat[2][0] = rowc.getX();
-			rot.mat[2][1] = rowc.getY();
-			rot.mat[2][2] = rowc.getZ();
+			rot.set(0,0,rowa.getX());
+			rot.set(0,1,rowa.getY());
+			rot.set(0,2,rowa.getZ());
+			rot.set(1,0,rowb.getX());
+			rot.set(1,1,rowb.getY());
+			rot.set(1,2,rowb.getZ());
+			rot.set(2,0,rowc.getX());
+			rot.set(2,1,rowc.getY());
+			rot.set(2,2,rowc.getZ());
 			Matrix invRot = Matrix.transpose( rot );
 			
 			this.invsq = new Vector3( 1.0 / aSquared,
@@ -125,21 +125,21 @@ public class PreppedEllipsoid extends PreppedObject
 			
 			Matrix ss = new Matrix(4,4);
 			ss.unit();
-			ss.mat[0][0] = invsq.getX();
-			ss.mat[1][1] = invsq.getY();
-			ss.mat[2][2] = invsq.getZ();
+			ss.set(0,0,invsq.getX());
+			ss.set(1,1,invsq.getY());
+			ss.set(2,2,invsq.getZ());
 			
 			this.scaleRot = new Matrix( 4, 4 );
 			this.scaleRot.unit();
-			this.scaleRot.mat[0][0] = a.getX() * invsq.getX();
-			this.scaleRot.mat[0][1] = a.getY() * invsq.getX();
-			this.scaleRot.mat[0][2] = a.getZ() * invsq.getX();
-			this.scaleRot.mat[1][0] = b.getX() * invsq.getY();
-			this.scaleRot.mat[1][1] = b.getY() * invsq.getY();
-			this.scaleRot.mat[1][2] = b.getZ() * invsq.getY();
-			this.scaleRot.mat[2][0] = c.getX() * invsq.getZ();
-			this.scaleRot.mat[2][1] = c.getY() * invsq.getZ();
-			this.scaleRot.mat[2][2] = c.getZ() * invsq.getZ();
+			this.scaleRot.set(0,0,a.getX() * invsq.getX());
+			this.scaleRot.set(0,1,a.getY() * invsq.getX());
+			this.scaleRot.set(0,2,a.getZ() * invsq.getX());
+			this.scaleRot.set(1,0,b.getX() * invsq.getY());
+			this.scaleRot.set(1,1,b.getY() * invsq.getY());
+			this.scaleRot.set(1,2,b.getZ() * invsq.getY());
+			this.scaleRot.set(2,0,c.getX() * invsq.getZ());
+			this.scaleRot.set(2,1,c.getY() * invsq.getZ());
+			this.scaleRot.set(2,2,c.getZ() * invsq.getZ());
 			
 			this.invScaleRot = new Matrix( 4, 4 );
 			this.invScaleRot.unit();

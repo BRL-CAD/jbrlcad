@@ -14,7 +14,7 @@
 <target name="compile">
   <mkdir dir="${builddir}"/>
   <mkdir dir="${classdir}"/>
-  <javac srcdir="${srcdir}" destdir="${classdir}" classpath="${libdir}/jscience.jar"/>
+  <javac srcdir="${srcdir}" destdir="${classdir}" classpath="${libdir}/jscience.jar" debug="on"/>
 </target>
 
 <target name="build" depends="clean,compile">

@@ -247,7 +247,7 @@ public class PreppedDb
 		norm1.set(imin, 1.0 );
 		if( norm1.dotProduct( ray.getDirection() ) > 0.0 )
 		{
-			norm1.reverse();
+			norm1.negate();
 		}
 		Point outHitPoint = new Point( ray.getStart() );
 		outHitPoint.join( rmax, ray.getDirection() );
