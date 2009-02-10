@@ -1,6 +1,5 @@
 package org.brlcad.samples;
 
-import java.util.Arrays;
 import org.brlcad.info.RegionInfo;
 
 /**
@@ -37,8 +36,12 @@ public class GetRegionMap {
                 + "'; root object: '" + rootObject + "'"); 
         
         // Now call other methods to read/process input and write output
-        
-        RegionInfo regInfo = new RegionInfo(args[0], Arrays.copyOfRange(args, 1, args.length));
+
+        String[] objects = new String[args.length-1];
+        for( int i=1 ; i<args.length ; i++ ) {
+            objects[i-1] = args[i];
+        }
+        RegionInfo regInfo = new RegionInfo(args[0], objects);
         regInfo.writeOutput();
     }
 }
