@@ -28,7 +28,7 @@ public class BoundingBox implements Serializable {
      * @param a Point describing corner of the box, opposite b.
      * @param b Point describing corner of the box, opposite a.
      */
-    public BoundingBox(Point a, Point b) {
+    public BoundingBox(Point a, Point b) throws IllegalArgumentException {
         if (a == null || !Point.isValidPoint(a)) {
             throw new IllegalArgumentException(
                     "Point a for BoundingBox constructor either null or not valid.");
@@ -218,7 +218,7 @@ public class BoundingBox implements Serializable {
      * @return The max value
      */
     public Point getMax() {
-        return max;
+        return new Point( max );
     }
 
     /**
@@ -226,7 +226,7 @@ public class BoundingBox implements Serializable {
      *
      * @param max The value to set
      */
-    public void setMax(Point max) {
+    public void setMax(Point max) throws IllegalArgumentException {
         if (max == null || !Point.isValidPoint(max)) {
             throw new IllegalArgumentException(
                     "setMax() called with Point that is either null or not valid");
@@ -240,7 +240,7 @@ public class BoundingBox implements Serializable {
      * @return The min value
      */
     public Point getMin() {
-        return min;
+        return new Point( min );
     }
 
     /**
@@ -248,7 +248,7 @@ public class BoundingBox implements Serializable {
      *
      * @param min The value to set
      */
-    public void setMin(Point min) {
+    public void setMin(Point min) throws IllegalArgumentException {
         if (min == null || !Point.isValidPoint(min)) {
             throw new IllegalArgumentException(
                     "setMin() called with Point that is either null or not valid");
@@ -263,7 +263,7 @@ public class BoundingBox implements Serializable {
      * @param p Point to test
      * @return true, if point is constrained inside of the bounding box
      */
-    public boolean bound(Point p) {
+    public boolean bound(Point p) throws IllegalArgumentException {
         if (p == null || !Point.isValidPoint(p)) {
             throw new IllegalArgumentException(
                     "bound() called with Point that is either null or not valid");
@@ -284,7 +284,7 @@ public class BoundingBox implements Serializable {
      *         the extent of this bounding box along a vector in the specified
      *         direction
      */
-    public List<Double> getExtentsInDirection(Vector3 dir) {
+    public List<Double> getExtentsInDirection(Vector3 dir) throws IllegalArgumentException {
         if (dir == null || !Vector3.isValidVector(dir)) {
             throw new IllegalArgumentException(
                     "getExtentsInDirection() called with Vector that is either null or not valid");
@@ -390,7 +390,7 @@ public class BoundingBox implements Serializable {
      * @param pl The plane
      * @return true, if the ray is in the plane.
      */
-    private boolean isInHit(Ray r, Plane3D pl) {
+    private boolean isInHit(Ray r, Plane3D pl) throws IllegalArgumentException {
         if (r == null || !Ray.isValidRay(r)) {
             throw new IllegalArgumentException("isInHit() called with Ray that is either null or not valid");
         }
@@ -413,7 +413,7 @@ public class BoundingBox implements Serializable {
      * @return Either null (no intersections) or an array of two doubles which
      *         are the intersections.
      */
-    public double[] intersect(Ray r) {
+    public double[] intersect(Ray r) throws IllegalArgumentException {
         if (r == null || !Ray.isValidRay(r)) {
             throw new IllegalArgumentException("intersect() called with Ray that is either null or not valid");
         }
@@ -485,5 +485,31 @@ public class BoundingBox implements Serializable {
     @Override
     public String toString() {
         return "BoundingBox: min=" + this.min + ", max=" + this.max;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BoundingBox other = (BoundingBox) obj;
+        if (this.min != other.min && (this.min == null || !this.min.equals(other.min))) {
+            return false;
+        }
+        if (this.max != other.max && (this.max == null || !this.max.equals(other.max))) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + (this.min != null ? this.min.hashCode() : 0);
+        hash = 23 * hash + (this.max != null ? this.max.hashCode() : 0);
+        return hash;
     }
 }

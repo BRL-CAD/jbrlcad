@@ -64,6 +64,10 @@ public class BrlcadDb
 		this.dbInput = new RandomAccessFile( this.dbFileName, "r" );
 		this.scan();
 	}
+
+    protected BrlcadDb() {
+        
+    }
 	
 	/**
 	 * Sets Tolerance
@@ -103,7 +107,7 @@ public class BrlcadDb
 	 * @exception   DbException
 	 *
 	 */
-	private void scan() throws IOException, DbException
+	protected void scan() throws IOException, DbException
 	{
 		// this will hold the 8 byte header at the start of the file
 		byte fileHeader[] = new byte[8];
@@ -129,7 +133,7 @@ public class BrlcadDb
 			while( true )
 			{
 				offset = this.dbInput.getFilePointer();
-				DbExternal dbExt = new DbExternal( this, offset );
+				DbExternalObject dbExt = new DbExternalObject( this, offset );
 				
 				// if this object has a name, add it to the directory
 				String name = dbExt.getName();
@@ -163,10 +167,6 @@ public class BrlcadDb
 			{
 				throw new DbException( "Db has no GLOBAL object " + e1);
 			}
-			System.err.println( "Completed scan, " +
-								   this.directory.size() +
-								   " objects" +
-								   ", title = " + this.title);
 			return;
 		}
 		
@@ -196,7 +196,7 @@ public class BrlcadDb
 		}
 		
 		// Read the object in external form
-		DbExternal dbExt = new DbExternal( this, offset );
+		DbExternalObject dbExt = new DbExternalObject( this, offset );
 		
 		// Import this object into its internal form (this will usually be a subclass of DbObject)
 		DbObject dbObj = this.importObj( dbExt );
@@ -210,7 +210,7 @@ public class BrlcadDb
 	 *
 	 * @return   a  dbObject or, more likely, a subclass of DbObject
 	 */
-	private DbObject importObj(DbExternal dbExt) throws DbException
+	private DbObject importObj(DbExternalObject dbExt) throws DbException
 	{
 		switch( dbExt.getMajorType() )
 		{
@@ -227,12 +227,14 @@ public class BrlcadDb
 						return new Bot( dbExt );
 					case Combination.minorType:
 						return new Combination( dbExt );
+                    case Tgc.minorType:
+                        return new Tgc( dbExt );
 					default:
 						throw new DbException( "Unrecognized minor type (" +
 												  dbExt.getMinorType() + ")" );
 				}
 			case 2:
-				return new DbObject( dbExt );
+				return new DbAttributeOnly( dbExt );
 				
 			default:
 				throw new DbException( "Unrecognized major type (" +
@@ -450,11 +452,11 @@ public class BrlcadDb
      * 
      * @return  DbExternal object for given name; null if it doesn't exist
      */
-    public DbExternal getDbExternal(String name) {
+    public DbExternalObject getDbExternal(String name) {
 	Long offset = this.directory.get( name );
 	if( offset == null ) return null;
         try {
-	    return new DbExternal( this, offset );
+	    return new DbExternalObject( this, offset );
         } catch (IOException ioe) {
             return null;
         }

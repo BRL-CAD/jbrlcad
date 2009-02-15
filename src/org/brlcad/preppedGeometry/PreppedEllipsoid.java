@@ -240,7 +240,7 @@ public class PreppedEllipsoid extends PreppedObject
 		{
 			Vector3 dprime = new Vector3( ray.getDirection() );
 			this.scaleRot.mult( dprime );
-			Vector3 pprime = ray.getStart().subtract( this.center );
+            Vector3 pprime = Vector3.minus(ray.getStart(), this.center);
 			this.scaleRot.mult( pprime );
 			
 			double dp = dprime.dotProduct(pprime);
@@ -266,10 +266,10 @@ public class PreppedEllipsoid extends PreppedObject
 			}
 			inPoint.join( k1, ray.getDirection() );
 			outPoint.join( k2, ray.getDirection() );
-			Vector3 inNormal = inPoint.subtract( this.center );
+			Vector3 inNormal = Vector3.minus(inPoint, this.center);
 			this.invScaleRot.mult( inNormal );
 			inNormal.normalize();
-			Vector3 outNormal = outPoint.subtract( this.center );
+			Vector3 outNormal = Vector3.minus(outPoint, this.center);
 			this.invScaleRot.mult( outNormal );
 			outNormal.normalize();
 			

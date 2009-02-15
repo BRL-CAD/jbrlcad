@@ -32,12 +32,12 @@ public class SimpleOverlapHandler implements OverlapHandler
 		{
 			Partition part2 = iter.next();
 			
-			if( part2.getIn_hit().getHit_dist() < part1.getOut_hit().getHit_dist() )
+			if( part2.getInHit().getHit_dist() < part1.getOutHit().getHit_dist() )
 			{
 				// we have an overlap
 				
 				
-				if( part2.getOut_hit().getHit_dist() < part1.getOut_hit().getHit_dist() )
+				if( part2.getOutHit().getHit_dist() < part1.getOutHit().getHit_dist() )
 				{
 					// part2 is entirely inside part1 (delete it)
 					if( part1.getFromRegion() != part2.getFromRegion() )
@@ -52,7 +52,7 @@ public class SimpleOverlapHandler implements OverlapHandler
 					if( part1.getFromRegion() == part2.getFromRegion() )
 					{
 						// not really an overlap, but handle it
-						part1.setOutHit( part2.getOut_hit(), false );
+						part1.setOutHit( part2.getOutHit(), false );
 						part1.setFlipOutNormal( part2.isFlipOutNormal() );
 						iter.remove();
 						continue;
@@ -61,7 +61,7 @@ public class SimpleOverlapHandler implements OverlapHandler
 					{
 						// two different regions, select part1
 						System.err.println( "OVERLAP:\n\t" + part1 + "\n\t" + part2 );
-						part2.setInHit( part1.getOut_hit(), false );
+						part2.setInHit( part1.getOutHit(), false );
 						part2.setFlipInNormal( !part1.isFlipOutNormal() );
 					}
 				}

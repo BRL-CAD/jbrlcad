@@ -72,7 +72,7 @@ public class PreppedArb8 extends PreppedObject
 			{
 				Vector3 work;
 				
-				work = vertices[j].subtract( vertices[i] );
+				work = Vector3.minus(vertices[j], vertices[i]);
 				if( work.magnitude() < BrlcadDb.tolerance.getDistSquared() )
 				{
 					equivPoints[i] = equivPoints[j];
@@ -166,7 +166,7 @@ public class PreppedArb8 extends PreppedObject
 				}
 				break;
 			case 1:
-				oface.u = vertex.subtract( aface.a );
+				oface.u = Vector3.minus(vertex, aface.a);
 				oface.uLen = oface.u.magnitude();
 				double scale = 1.0/oface.uLen;
 				if( scale == Double.POSITIVE_INFINITY || scale == Double.NEGATIVE_INFINITY )
@@ -177,7 +177,7 @@ public class PreppedArb8 extends PreppedObject
 				oface.u.scale( scale );
 				break;
 			case 2:
-				Vector3 p_a = vertex.subtract( aface.a );
+				Vector3 p_a = Vector3.minus(vertex, aface.a);
 				Vector3 norm = p_a.crossProduct( oface.u );
 				double f = norm.magnitude();
 				scale = 1.0 / f;
@@ -197,7 +197,7 @@ public class PreppedArb8 extends PreppedObject
 					scale = 1.0 / oface.vLen;
 					oface.v.scale( scale );
 					
-					p_a = vertex.subtract( oface.uvOrig );
+					p_a = Vector3.minus(vertex, oface.uvOrig);
 					f = p_a.dotProduct( oface.u );
 					if( f > oface.uLen )
 					{
@@ -209,7 +209,7 @@ public class PreppedArb8 extends PreppedObject
 						oface.uLen += (-f);
 					}
 				}
-				Vector3 work = aface.a.subtract( pa.center );
+				Vector3 work = Vector3.minus(aface.a, pa.center);
 				f = work.dotProduct( norm );
 				if( f < 0.0 )
 				{
@@ -225,7 +225,7 @@ public class PreppedArb8 extends PreppedObject
 			default:
 				if( pa.doOpt )
 				{
-					p_a = vertex.subtract( oface.uvOrig );
+					p_a = Vector3.minus(vertex, oface.uvOrig);
 					f = p_a.dotProduct( oface.u );
 					if( f > oface.uLen )
 					{
@@ -247,7 +247,7 @@ public class PreppedArb8 extends PreppedObject
 						oface.vLen += (-f);
 					}
 				}
-				p_a = vertex.subtract( aface.a );
+				p_a = Vector3.minus(vertex, aface.a);
 				p_a.normalize();
 				if( !aface.plane.liesIn( vertex, BrlcadDb.DEFAULT_TOL_DIST ) )
 				{

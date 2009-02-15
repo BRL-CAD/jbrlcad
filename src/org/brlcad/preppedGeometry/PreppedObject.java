@@ -41,6 +41,9 @@ public abstract class PreppedObject
 		this.name = name;
 		this.regions = new HashSet<PreppedCombination>();
 	}
+
+    protected PreppedObject() {
+    }
 	
 	/**
 	 * Sets Name
@@ -139,7 +142,7 @@ public abstract class PreppedObject
 	 */
 	public BoundingBox getBoundingBox()
 	{
-		return boundingBox;
+		return new BoundingBox( boundingBox );
 	}
 	
 	/**

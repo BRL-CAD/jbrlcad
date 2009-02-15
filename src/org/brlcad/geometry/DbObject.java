@@ -17,7 +17,7 @@ import org.brlcad.preppedGeometry.PreppedObject;
 import org.brlcad.numerics.Matrix;
 import org.brlcad.spacePartition.PreppedDb;
 
-public class DbObject
+public abstract class DbObject
 {
 	/** the name of this object */
 	String name;
@@ -83,11 +83,12 @@ public class DbObject
 	}
 	
 	/**
-	 * Method toString
+	 * Create a String representation of this class
 	 *
-	 * @return   a String
+	 * @return   a String representation of this class
 	 *
 	 */
+    @Override
 	public String toString()
 	{
 		StringBuffer desc = new StringBuffer();
@@ -136,10 +137,7 @@ public class DbObject
 		return this.name;
 	}
 	
-	public PreppedObject prep( PreppedCombination reg, PreppedDb preppedDb, Matrix matrix) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
-	{
-		System.out.println( "DbObject.prep()" );
-		return null;
-	}
+	public abstract PreppedObject prep( PreppedCombination reg, PreppedDb preppedDb, Matrix matrix) throws BadGeometryException, DbException, IOException, DbNameNotFoundException;
+
 }
 

@@ -177,7 +177,7 @@ public class Tree
 						parts = new TreeSet<Partition>();
 						for( Segment seg:segs )
 						{
-							parts.add( new Partition( seg, reg ) );
+							parts.add( new Partition( seg, reg.getName(), rayData ) );
 						}
 					}
 				}
@@ -187,16 +187,17 @@ public class Tree
 		return parts;
 	}
 	
+    @Override
 	public String toString()
 	{
-		String left = null;
-		String right = null;
+		String leftNode = null;
+		String rightNode = null;
 		
 		if( this.op == Operator.NOT )
 		{
 			// unary operator
-			right = this.right.toString();
-			return  this.op.toString() + "( " + right + " )";
+			rightNode = this.right.toString();
+			return  this.op.toString() + "( " + rightNode + " )";
 		}
 		else if( this.op == Operator.LEAF )
 		{
@@ -204,11 +205,11 @@ public class Tree
 		}
 		else
 		{
-			left = this.left.toString();
-			right = this.right.toString();
-			return (left.contains( " " ) ? "( " + left + " )" : left) +
+			leftNode = this.left.toString();
+			rightNode = this.right.toString();
+			return (leftNode.contains( " " ) ? "( " + leftNode + " )" : leftNode) +
 				" " + this.op.toString() + " " +
-				(right.contains( " " ) ? "( " + right + " )" : right);
+				(rightNode.contains( " " ) ? "( " + rightNode + " )" : rightNode);
 			
 		}
 	}

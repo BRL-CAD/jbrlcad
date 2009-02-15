@@ -53,15 +53,15 @@ public class PreppedTriangle
 		this.boundingBox.extend( B );
 		this.boundingBox.extend( C );
 		
-		this.BA = B.subtract( this.A );
-		this.CA = C.subtract( this.A );
+		this.BA = Vector3.minus(B, this.A);
+		this.CA = Vector3.minus(C, this.A);
 		this.normal = this.BA.crossProduct( this.CA );
 		this.surfaceNumber = faceNumber;
 		
 		// get lengths of the three sides of the triangle
 		double m1 = this.BA.magnitude();
 		double m2 = this.CA.magnitude();
-		double m3 = B.subtract(C).magnitude();
+		double m3 = Vector3.minus(B,C).magnitude();
 		
 		// and the length of the normal
 		double m4 = this.normal.magnitude();
@@ -117,7 +117,7 @@ public class PreppedTriangle
 		double tolDist = rayData.getTolerance().getDist();
 		double dn_plus_tol = abs_dn + tolDist;
 		
-		Vector3 wxb = this.A.subtract( ray.getStart() );
+		Vector3 wxb = Vector3.minus(this.A, ray.getStart());
 		Vector3 xp = wxb.crossProduct( ray.getDirection() );
 		
 		double alpha = this.CA.dotProduct( xp );

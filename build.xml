@@ -1,10 +1,14 @@
 <project name="jbrlcad" default="build">
 
 <property name="srcdir" value="${basedir}/src"/>
+<property name="testdir" value="${basedir}/test"/>
 <property name="builddir" value="${basedir}/build"/>
+<property name="docdir" value="${builddir}/docs"/>
 <property name="classdir" value="${builddir}/classes"/>
+<property name="testclassdir" value="${builddir}/testclasses"/>
 <property name="distdir" value="${builddir}/dist"/>
 <property name="libdir" value="${basedir}/lib"/>
+<property name="testResults" value="${builddir}/testResults"/>
 
 <target name="clean">
   <delete dir="build" quiet="true"/>
@@ -17,19 +21,94 @@
   <javac srcdir="${srcdir}" destdir="${classdir}" classpath="${libdir}/jscience.jar" debug="on"/>
 </target>
 
+<target name="compileTests" depends="compile">
+    <mkdir dir="${testclassdir}"/>
+    <javac srcdir="${testdir}" debug="on" destdir="${testclassdir}">
+        <classpath refid="testclasspath"/>
+    </javac>
+</target>
+
+<target name="debug" depends="compileTests">
+    <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+    <nbjpdastart addressproperty="jpda.address" name="jbrlcad" transport="dt_socket">
+        <classpath refid="testclasspath"/>
+    </nbjpdastart>
+    <java classname="org.brlcad.samples.rt">
+        <classpath refid="testclasspath"/>
+        <jvmarg value="-Xdebug"/>
+        <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
+        <arg line=" -s 512 -o test.pix test/test.g r1"/>
+    </java>
+</target>
+
+<target name="unitTest" depends="compileTests">
+    <mkdir dir="${testResults}/raw"/>
+    <junit printsummary="yes" haltonfailure="no" showoutput="yes" >
+        <classpath refid="testclasspath"/>
+
+        <batchtest fork="yes" todir="${testResults}/raw">
+                <formatter type="xml"/>
+                <fileset dir="${testdir}">
+                        <include name="**/*Test*.java"/>
+                </fileset>
+        </batchtest>
+    </junit>
+    <junitreport todir="${testResults}">
+        <fileset dir="${testResults}/raw">
+            <include name="TEST-*.xml"/>
+        </fileset>
+        <report todir="${testResults}"
+            format="frames">
+    </report>
+
+    </junitreport>
+</target>
+
+<path id="testclasspath" >
+    <pathelement location="${libdir}/jscience.jar"/>
+    <pathelement location="${libdir}/junit-4.5.jar"/>
+    <pathelement location="${classdir}"/>
+    <pathelement location="${testclassdir}"/>
+</path>
+
 <target name="build" depends="clean,compile">
   <mkdir dir="${distdir}"/>
   <jar destfile="${distdir}/jbrlcad.jar" basedir="${classdir}"/>
 </target>
 
 <target name="test" depends="build">
-    <java classname="org.brlcad.samples.BrlcadJava">
+    <java classname="org.brlcad.samples.rt">
         <classpath>
             <pathelement location="${distdir}/jbrlcad.jar"/>
             <pathelement location="${libdir}/jscience.jar"/>
         </classpath>
-        <arg line="test/test.g r1"/>
+        <arg line=" -s 512 -o test.pix test/test.g r1"/>
     </java>
+</target>
+
+<target name="profile" depends="build" description="Profile Project">
+    <fail unless="netbeans.home">This target can only run inside the NetBeans IDE.</fail>
+
+    <nbprofiledirect>
+        <classpath>
+            <pathelement location="${distdir}/jbrlcad.jar"/>
+            <pathelement location="${libdir}/jscience.jar"/>
+        </classpath>
+    </nbprofiledirect>
+
+    <java classname="org.brlcad.samples.rt">
+        <classpath>
+            <pathelement location="${distdir}/jbrlcad.jar"/>
+            <pathelement location="${libdir}/jscience.jar"/>
+        </classpath>
+        <jvmarg value="${profiler.info.jvmargs.agent}"/>
+        <arg line=" -s 1024 -o test.pix test/test.g r1"/>
+    </java>
+</target>
+
+<target name="javadoc">
+    <mkdir dir="${docdir}"/>
+    <javadoc sourcepath="${srcdir}" destdir="${docdir}"/>
 </target>
 
 </project>

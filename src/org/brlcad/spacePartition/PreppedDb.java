@@ -22,7 +22,9 @@ import org.brlcad.geometry.Segment;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
@@ -39,6 +41,7 @@ public class PreppedDb
 	private BrlcadDb db;
 	private List<String> topLevelObjects;
 	private List<PreppedCombination> regions;
+    private Map<String,PreppedCombination> combinations;
 	private Node spacePartition;
 	private BoundingBox boundingBox;
 	private BoxNode initialBox;
@@ -52,15 +55,14 @@ public class PreppedDb
 		Matrix m = new Matrix( 4, 4 );
 		this.db = db;
 		this.topLevelObjects = new ArrayList<String>();
+        this.combinations = new HashMap<String,PreppedCombination>();
 		for( String obj:objs )
 		{
 			this.topLevelObjects.add( obj );
 			DbObject dbObject = null;
 			try
 			{
-				System.out.println( "db.getInternal on " + obj);
 				dbObject = db.getInternal( obj );
-				System.out.println( "dbObject: " + dbObject);
 			}
 			catch (DbException e) {
 				e.printStackTrace();
@@ -80,6 +82,9 @@ public class PreppedDb
 		//start cutting initialBox
 		this.spacePartition = this.cut( this.initialBox );
 	}
+
+    protected PreppedDb() {
+    }
 	
 	private Node cut( BoxNode box)
 	{
@@ -90,7 +95,7 @@ public class PreppedDb
 		
 		Point max = box.getBoundingBox().getMax();
 		Point min = box.getBoundingBox().getMin();
-		Vector3 diff = max.subtract( min );
+        Vector3 diff = Vector3.minus(max, min);
 		
 		double x = Math.abs( diff.getX() );
 		double y = Math.abs( diff.getY() );
@@ -194,7 +199,16 @@ public class PreppedDb
 	{
 		this.regions.add( this.preppedRegionCount, reg );
 		reg.setIndex( this.preppedRegionCount++ );
+        this.combinations.put(reg.getName(), reg);
 	}
+
+    public void addPreppedCombination(PreppedCombination pc) {
+        this.combinations.put(pc.getName(), pc);
+    }
+
+    public PreppedCombination getCombination( String name ) {
+        return this.combinations.get(name);
+    }
 	
 	public BrlcadDb getDb()
 	{
@@ -268,7 +282,6 @@ public class PreppedDb
 		
 		if( seg == null )
 		{
-			System.out.println( "Missed" );
 			return new TreeSet<Partition>();
 		}
 
@@ -299,12 +312,6 @@ public class PreppedDb
 		}
 		
 		parts = overlapHandler.handleOverlaps( parts );
-		
-		System.out.println(  parts.size() + " Partitions:" );
-		for( Partition part:parts )
-		{
-			System.out.println( part );
-		}
 		
 		return parts;
 	}

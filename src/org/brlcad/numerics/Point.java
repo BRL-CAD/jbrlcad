@@ -56,18 +56,18 @@ public class Point implements Serializable {
      * @param z_in The Z coordinate in millimeters
      */
     public Point(double x_in, double y_in, double z_in) {
-        if (Double.isInfinite(x_in) || Double.isNaN(x_in)) {
-            throw new IllegalArgumentException(
-                    "Illegal x value for Point coordinates: " + x_in);
-        }
-        if (Double.isInfinite(y_in) || Double.isNaN(y_in)) {
-            throw new IllegalArgumentException(
-                    "Illegal y value for Point coordinates: " + y_in);
-        }
-        if (Double.isInfinite(z_in) || Double.isNaN(z_in)) {
-            throw new IllegalArgumentException(
-                    "Illegal z value for Point coordinates: " + z_in);
-        }
+//        if (Double.isInfinite(x_in) || Double.isNaN(x_in)) {
+//            throw new IllegalArgumentException(
+//                    "Illegal x value for Point coordinates: " + x_in);
+//        }
+//        if (Double.isInfinite(y_in) || Double.isNaN(y_in)) {
+//            throw new IllegalArgumentException(
+//                    "Illegal y value for Point coordinates: " + y_in);
+//        }
+//        if (Double.isInfinite(z_in) || Double.isNaN(z_in)) {
+//            throw new IllegalArgumentException(
+//                    "Illegal z value for Point coordinates: " + z_in);
+//        }
 
         x = x_in;
         y = y_in;
@@ -84,10 +84,10 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot construct a Point from a null Point");
         }
-        if (!isValidPoint(p)) {
-            throw new IllegalArgumentException(
-                    "Cannot construct a Point from Point with illegal coordinates");
-        }
+//        if (!isValidPoint(p)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot construct a Point from Point with illegal coordinates");
+//        }
 
         x = p.x;
         y = p.y;
@@ -121,8 +121,16 @@ public class Point implements Serializable {
         return true;
     }
 
-    public Vector3 subtract(Point p) {
-        return new Vector3( this.x - p.getX(), this.y - p.getY(), this.z - p.getZ() );
+    public void subtract(Point p) {
+        this.x -= p.getX();
+        this.y -= p.getY();
+        this.z -= p.getZ();
+    }
+
+    public void subtract(Vector3 p) {
+        this.x -= p.getX();
+        this.y -= p.getY();
+        this.z -= p.getZ();
     }
 
     /**
@@ -139,6 +147,7 @@ public class Point implements Serializable {
      *
      * @return The output String
      */
+    @Override
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
     }
@@ -154,10 +163,10 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot calculate distance to a null Point");
         }
-        if (!isValidPoint(p)) {
-            throw new IllegalArgumentException(
-                    "Cannot calculate distance from Point with illegal coordinates");
-        }
+//        if (!isValidPoint(p)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot calculate distance from Point with illegal coordinates");
+//        }
 
         return sqrt(((x - p.x) * (x - p.x)) + ((y - p.y) * (y - p.y))
                 + ((z - p.z) * (z - p.z)));
@@ -269,10 +278,10 @@ public class Point implements Serializable {
         if (v == null) {
             throw new IllegalArgumentException("plus() called with null Vector");
         }
-        if (!Vector3.isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "plus() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "plus() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         x += v.getX();
         y += v.getY();
@@ -290,10 +299,10 @@ public class Point implements Serializable {
         if (v == null) {
             throw new IllegalArgumentException("plus() called with null Vector");
         }
-        if (!Point.isValidPoint(v)) {
-            throw new IllegalArgumentException(
-                    "plus() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (!Point.isValidPoint(v)) {
+//            throw new IllegalArgumentException(
+//                    "plus() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         x += v.getX();
         y += v.getY();
@@ -364,6 +373,7 @@ public class Point implements Serializable {
      * @return true if 'o' is a point and the points are in the same place,
      *         within the tolerance of 'this'.
      */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Point) {
             return isEqual((Point) o);
@@ -434,10 +444,10 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot join with a null direction vector");
         }
-        if (!Vector3.isValidVector(dir)) {
-            throw new IllegalArgumentException(
-                    "Cannot join using Vector3 with illegal coordinates");
-        }
+//        if (!Vector3.isValidVector(dir)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot join using Vector3 with illegal coordinates");
+//        }
 
         if (Double.isInfinite(dist) || Double.isNaN(dist)) {
             throw new IllegalArgumentException("Illegal value of dist: " + dist);
@@ -462,10 +472,10 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "rotate() called with null upVector");
         }
-        if (!Vector3.isValidVector(upVector)) {
-            throw new IllegalArgumentException(
-                    "rotate() called with upVector containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(upVector)) {
+//            throw new IllegalArgumentException(
+//                    "rotate() called with upVector containing NaN/Infinity coordinates");
+//        }
 
         if (Double.isInfinite(angle) || Double.isNaN(angle)) {
             throw new IllegalArgumentException(

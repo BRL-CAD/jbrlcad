@@ -159,6 +159,7 @@ public class Ellipsoid extends DbObject
 		return c;
 	}
 	
+    @Override
 	public PreppedEllipsoid prep( PreppedCombination reg, PreppedDb preppedDb, Matrix matrix) throws BadGeometryException
 	{
 		PreppedEllipsoid prepped = new PreppedEllipsoid( this, matrix );
@@ -176,6 +177,7 @@ public class Ellipsoid extends DbObject
 	 * @return   a String
 	 *
 	 */
+    @Override
 	public String toString()
 	{
 		return super.toString() + " Ellipsoid, V=" + this.center +

@@ -64,6 +64,7 @@ public class Bot extends DbObject
 			this.humanReadable = hrs;
 		}
 		
+        @Override
 		public String toString()
 		{
 			return this.humanReadable;
@@ -88,6 +89,7 @@ public class Bot extends DbObject
 			this.humanReadable = hrs;
 		}
 		
+        @Override
 		public String toString()
 		{
 			return this.humanReadable;
@@ -121,10 +123,8 @@ public class Bot extends DbObject
 		int pointer = 0;
 		
 		int numVertices = (int)BrlcadDb.getLong( body, pointer, 4 );
-		System.out.println( "numVertices = " + numVertices );
 		pointer += 4;
 		int numFaces = (int)BrlcadDb.getLong( body, pointer, 4 );
-		System.out.println( "numFaces = " + numFaces );
 		pointer += 4;
 		int tmp = body[pointer++];
 		switch( tmp ) {

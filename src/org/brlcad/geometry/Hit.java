@@ -19,6 +19,7 @@ public class Hit implements Comparable
 	private Vector3 hit_normal;
 	private int hit_surfno;
 	private RayData rayData;
+
 	
 	public Hit( double dist, Point pt, Vector3 norm, int surfno, RayData rayData )
 	{
@@ -28,6 +29,14 @@ public class Hit implements Comparable
 		this.hit_surfno = surfno;
 		this.rayData = rayData;
 	}
+
+    public Hit(Hit hit) {
+        this.hit_dist = hit.getHit_dist();
+        this.hit_normal = hit.getHit_normal();
+        this.hit_pt = hit.getHit_pt();
+        this.hit_surfno = hit.getHit_surfno();
+        this.rayData = hit.getRayData();
+    }
 	
 	/**
 	 * Sets Hit_dist
@@ -180,10 +189,10 @@ public class Hit implements Comparable
 		
 		if( diff < -this.rayData.getTolerance().getDist() ) return -1;
 		
-		if( diff > this.rayData.getTolerance().getDist() ) return 1;
+		if( diff > this.getRayData().getTolerance().getDist() ) return 1;
 		
-		double thisDot = this.hit_normal.dotProduct( this.rayData.getTheRay().getDirection() );
-		double hDot = h.hit_normal.dotProduct( this.rayData.getTheRay().getDirection() );
+		double thisDot = this.hit_normal.dotProduct( this.getRayData().getTheRay().getDirection() );
+		double hDot = h.hit_normal.dotProduct( this.getRayData().getTheRay().getDirection() );
 		
 		if( thisDot < 0.0 && hDot > 0.0 )
 		{
@@ -197,5 +206,54 @@ public class Hit implements Comparable
 		
 		return 0;
 	}
+
+    /**
+     * @return the rayData
+     */
+    public RayData getRayData() {
+        return rayData;
+    }
+
+    /**
+     * @param rayData the rayData to set
+     */
+    public void setRayData(RayData rayData) {
+        this.rayData = rayData;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Hit other = (Hit) obj;
+        if (this.hit_dist != other.hit_dist) {
+            return false;
+        }
+        if (this.hit_pt != other.hit_pt && (this.hit_pt == null || !this.hit_pt.equals(other.hit_pt))) {
+            return false;
+        }
+        if (this.hit_normal != other.hit_normal && (this.hit_normal == null || !this.hit_normal.equals(other.hit_normal))) {
+            return false;
+        }
+        if (this.hit_surfno != other.hit_surfno) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 53 * hash + (int) (Double.doubleToLongBits(this.hit_dist) ^ (Double.doubleToLongBits(this.hit_dist) >>> 32));
+        hash = 53 * hash + (this.hit_pt != null ? this.hit_pt.hashCode() : 0);
+        hash = 53 * hash + (this.hit_normal != null ? this.hit_normal.hashCode() : 0);
+        hash = 53 * hash + this.hit_surfno;
+        return hash;
+    }
+
 }
 

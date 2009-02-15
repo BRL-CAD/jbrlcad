@@ -80,7 +80,6 @@ public class PreppedBot extends PreppedObject
 	 */
 	public List<Segment> shoot(Ray ray, RayData rayData)
 	{
-		System.out.println( "intersect ray: " + ray + " with " + this.getName() );
 		Set<Hit> hits = new TreeSet<Hit>();
 		
 		// intersect with each triangle of the Bot
@@ -98,7 +97,10 @@ public class PreppedBot extends PreppedObject
 			return null;
 		}
 		
-		return this.makeSegs( hits, ray, rayData );
+		List<Segment> segs =  this.makeSegs( hits, ray, rayData );
+        rayData.addSegs(this, segs);
+
+        return segs;
 	}
 	
 	/**

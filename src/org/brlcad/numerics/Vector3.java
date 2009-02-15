@@ -70,21 +70,21 @@ public class Vector3 implements Serializable {
      * @throws IllegalArgumentException if any input is NaN or Infinite.
      */
     public Vector3(double x1, double y1, double z1) {
-        if (Double.isInfinite(x1) || Double.isNaN(x1)) {
-            throw new IllegalArgumentException(
-                    "Cannot construct Vector3 from NaN/Infinite value for x: "
-                            + x1);
-        }
-        if (Double.isInfinite(y1) || Double.isNaN(y1)) {
-            throw new IllegalArgumentException(
-                    "Cannot construct Vector3 from NaN/Infinite value for y: "
-                            + y1);
-        }
-        if (Double.isInfinite(z1) || Double.isNaN(z1)) {
-            throw new IllegalArgumentException(
-                    "Cannot construct Vector3 from NaN/Infinite value for z: "
-                            + z1);
-        }
+//        if (Double.isInfinite(x1) || Double.isNaN(x1)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot construct Vector3 from NaN/Infinite value for x: "
+//                            + x1);
+//        }
+//        if (Double.isInfinite(y1) || Double.isNaN(y1)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot construct Vector3 from NaN/Infinite value for y: "
+//                            + y1);
+//        }
+//        if (Double.isInfinite(z1) || Double.isNaN(z1)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot construct Vector3 from NaN/Infinite value for z: "
+//                            + z1);
+//        }
 
         x = x1;
         y = y1;
@@ -101,14 +101,14 @@ public class Vector3 implements Serializable {
      *                                  coordinates is NaN or Infinite.
      */
     public Vector3(Vector3 v) {
-        if (v == null) {
-            throw new IllegalArgumentException(
-                    "Cannot construct a Vector3 from a null Vector3");
-        }
-        if (!isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "Cannot construct a Vector3 from Vector3 containing NaN/Infinite coordinates");
-        }
+//        if (v == null) {
+//            throw new IllegalArgumentException(
+//                    "Cannot construct a Vector3 from a null Vector3");
+//        }
+//        if (!isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "Cannot construct a Vector3 from Vector3 containing NaN/Infinite coordinates");
+//        }
 
         x = v.x;
         y = v.y;
@@ -269,6 +269,12 @@ public class Vector3 implements Serializable {
         z = tempz;
 
         findMagnitude();
+    }
+
+    public void join(double d, Vector3 v) {
+        this.x += d * v.getX();
+        this.y += d * v.getY();
+        this.z += d * v.getZ();
     }
 
     /**
@@ -761,13 +767,13 @@ public class Vector3 implements Serializable {
      *                                  one of its coordinates is either NaN or Infinite.
      */
     public void plus(Vector3 v) {
-        if (v == null) {
-            throw new IllegalArgumentException("plus() called with null Vector");
-        }
-        if (!Vector3.isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "plus() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (v == null) {
+//            throw new IllegalArgumentException("plus() called with null Vector");
+//        }
+//        if (!Vector3.isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "plus() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         x += v.x;
         y += v.y;
@@ -784,14 +790,14 @@ public class Vector3 implements Serializable {
      *                                  one of its coordinates is either NaN or Infinite.
      */
     public void minus(Vector3 v) {
-        if (v == null) {
-            throw new IllegalArgumentException(
-                    "minus() called with null Vector");
-        }
-        if (!Vector3.isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "minus() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (v == null) {
+//            throw new IllegalArgumentException(
+//                    "minus() called with null Vector");
+//        }
+//        if (!Vector3.isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "minus() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         x -= v.x;
         y -= v.y;
@@ -821,14 +827,14 @@ public class Vector3 implements Serializable {
      *                                  one of its coordinates is either NaN or Infinite.
      */
     public double dotProduct(Vector3 v) {
-        if (v == null) {
-            throw new IllegalArgumentException(
-                    "dotProduct() called with null Vector");
-        }
-        if (!Vector3.isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "dotProduct() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (v == null) {
+//            throw new IllegalArgumentException(
+//                    "dotProduct() called with null Vector");
+//        }
+//        if (!Vector3.isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "dotProduct() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         return (x * v.x) + (y * v.y) + (z * v.z);
     }
@@ -842,14 +848,14 @@ public class Vector3 implements Serializable {
      *                                  one of its coordinates is either NaN or Infinite.
      */
     public Vector3 crossProduct(Vector3 v) {
-        if (v == null) {
-            throw new IllegalArgumentException(
-                    "crossProduct() called with null Vector");
-        }
-        if (!Vector3.isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "crossProduct() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (v == null) {
+//            throw new IllegalArgumentException(
+//                    "crossProduct() called with null Vector");
+//        }
+//        if (!Vector3.isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "crossProduct() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         Vector3 result = new Vector3();
 
@@ -975,6 +981,7 @@ public class Vector3 implements Serializable {
      *
      * @return String of the format "(x.xx, y.yy, z.zz)"
      */
+    @Override
     public String toString() {
         return ("(" + x + ", " + y + ", " + z + ")");
     }
@@ -1235,14 +1242,14 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "crossProduct() called with null Vector v2");
         }
-        if (!Vector3.isValidVector(v1)) {
-            throw new IllegalArgumentException(
-                    "crossProduct() called with Vector v1 containing NaN/Infinity coordinates");
-        }
-        if (!Vector3.isValidVector(v2)) {
-            throw new IllegalArgumentException(
-                    "crossProduct() called with Vector v2 containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v1)) {
+//            throw new IllegalArgumentException(
+//                    "crossProduct() called with Vector v1 containing NaN/Infinity coordinates");
+//        }
+//        if (!Vector3.isValidVector(v2)) {
+//            throw new IllegalArgumentException(
+//                    "crossProduct() called with Vector v2 containing NaN/Infinity coordinates");
+//        }
 
         Vector3 result = new Vector3();
 
@@ -1272,14 +1279,14 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "dotProduct() called with null Vector v2");
         }
-        if (!Vector3.isValidVector(v1)) {
-            throw new IllegalArgumentException(
-                    "dotProduct() called with Vector v1 containing NaN/Infinity coordinates");
-        }
-        if (!Vector3.isValidVector(v2)) {
-            throw new IllegalArgumentException(
-                    "dotProduct() called with Vector v2 containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v1)) {
+//            throw new IllegalArgumentException(
+//                    "dotProduct() called with Vector v1 containing NaN/Infinity coordinates");
+//        }
+//        if (!Vector3.isValidVector(v2)) {
+//            throw new IllegalArgumentException(
+//                    "dotProduct() called with Vector v2 containing NaN/Infinity coordinates");
+//        }
 
         return (v1.x * v2.x) + (v1.y * v2.y) + (v1.z * v2.z);
     }
@@ -1303,14 +1310,14 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "plus() called with null Vector v2");
         }
-        if (!Vector3.isValidVector(v1)) {
-            throw new IllegalArgumentException(
-                    "plus() called with Vector v1 containing NaN/Infinity coordinates");
-        }
-        if (!Vector3.isValidVector(v2)) {
-            throw new IllegalArgumentException(
-                    "plus() called with Vector v2 containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v1)) {
+//            throw new IllegalArgumentException(
+//                    "plus() called with Vector v1 containing NaN/Infinity coordinates");
+//        }
+//        if (!Vector3.isValidVector(v2)) {
+//            throw new IllegalArgumentException(
+//                    "plus() called with Vector v2 containing NaN/Infinity coordinates");
+//        }
 
         Vector3 result = new Vector3();
 
@@ -1340,14 +1347,14 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "minus() called with null Vector v2");
         }
-        if (!Vector3.isValidVector(v1)) {
-            throw new IllegalArgumentException(
-                    "minus() called with Vector v1 containing NaN/Infinity coordinates");
-        }
-        if (!Vector3.isValidVector(v2)) {
-            throw new IllegalArgumentException(
-                    "minus() called with Vector v2 containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v1)) {
+//            throw new IllegalArgumentException(
+//                    "minus() called with Vector v1 containing NaN/Infinity coordinates");
+//        }
+//        if (!Vector3.isValidVector(v2)) {
+//            throw new IllegalArgumentException(
+//                    "minus() called with Vector v2 containing NaN/Infinity coordinates");
+//        }
 
         Vector3 result = new Vector3();
 
@@ -1371,10 +1378,10 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "negate() called with null Vector");
         }
-        if (!Vector3.isValidVector(v)) {
-            throw new IllegalArgumentException(
-                    "negate() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v)) {
+//            throw new IllegalArgumentException(
+//                    "negate() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         Vector3 result = new Vector3();
 
@@ -1404,14 +1411,14 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "minus() called with null Point p2");
         }
-        if (!Point.isValidPoint(p1)) {
-            throw new IllegalArgumentException(
-                    "minus() called with Point p1 containing NaN/Infinity coordinates");
-        }
-        if (!Point.isValidPoint(p2)) {
-            throw new IllegalArgumentException(
-                    "minus() called with Point p2 containing NaN/Infinity coordinates");
-        }
+//        if (!Point.isValidPoint(p1)) {
+//            throw new IllegalArgumentException(
+//                    "minus() called with Point p1 containing NaN/Infinity coordinates");
+//        }
+//        if (!Point.isValidPoint(p2)) {
+//            throw new IllegalArgumentException(
+//                    "minus() called with Point p2 containing NaN/Infinity coordinates");
+//        }
 
         return new Vector3(p1.getX() - p2.getX(), p1.getY() - p2.getY(), p1
                 .getZ()
@@ -1452,10 +1459,10 @@ public class Vector3 implements Serializable {
             throw new IllegalArgumentException(
                     "scale() called with null Vector");
         }
-        if (!Vector3.isValidVector(v1)) {
-            throw new IllegalArgumentException(
-                    "scale() called with Vector containing NaN/Infinity coordinates");
-        }
+//        if (!Vector3.isValidVector(v1)) {
+//            throw new IllegalArgumentException(
+//                    "scale() called with Vector containing NaN/Infinity coordinates");
+//        }
 
         if (Double.isInfinite(scale) || Double.isNaN(scale)) {
             throw new IllegalArgumentException(
@@ -1603,6 +1610,7 @@ public class Vector3 implements Serializable {
      * @return true, if 'o' is a point and the points are in the same place,
      *         within the tolerance of 'this'.
      */
+    @Override
     public boolean equals(Object o) {
         if (o instanceof Vector3) {
             return isEqual((Vector3) o);
@@ -1615,6 +1623,7 @@ public class Vector3 implements Serializable {
      *
      * @return An int containing the hash code.
      */
+    @Override
     public int hashCode() {
 
         int result = 11;

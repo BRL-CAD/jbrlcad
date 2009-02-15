@@ -5,6 +5,7 @@ package org.brlcad.geometry;
 
 
 
+import java.awt.Color;
 import java.util.Stack;
 import org.brlcad.numerics.Matrix;
 import org.brlcad.spacePartition.PreppedDb;
@@ -16,9 +17,12 @@ import java.util.Iterator;
 
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.preppedGeometry.PreppedObject;
+import org.brlcad.shading.Material;
+import org.brlcad.shading.Phong;
 
 public class Combination extends DbObject
 {
+    private Material material;
 	private int index;
 	private Tree tree;
 	
@@ -52,7 +56,7 @@ public class Combination extends DbObject
 		int pointer = 0;
 		byte wid = body[0];
 		pointer += 1;
-		int length = DbExternal.fieldLength[ wid ];
+		int length = DbExternalObject.fieldLength[ wid ];
 		int numMatrices = (int)BrlcadDb.getLong( body, pointer, length );
 		pointer += length;
 		int numLeaves = (int)BrlcadDb.getLong( body, pointer, length );
@@ -94,16 +98,16 @@ public class Combination extends DbObject
 				{
 					nameEnd++;
 				}
-				String name = new String( body, nameStart, nameEnd - nameStart );
+				String nodeName = new String( body, nameStart, nameEnd - nameStart );
 				pointer = nameEnd + 1;
-                                long matrixInd = BrlcadDb.getLong(body, pointer, length);
+                long matrixInd = BrlcadDb.getLong(body, pointer, length);
 				pointer += length;
 				Matrix mat = null;
 				if( matrixInd != identMatrix[wid] )
 				{
 					mat = matrices[(int)matrixInd];
 				}
-				Tree node = new Tree( name, mat );
+				Tree node = new Tree( nodeName, mat );
 				list1.add( node );
 			}
 			
@@ -156,7 +160,7 @@ public class Combination extends DbObject
 						{
 							nameEnd++;
 						}
-						String name = new String( body, nameStart, nameEnd - nameStart );
+						String nodeName = new String( body, nameStart, nameEnd - nameStart );
 						pointer = nameEnd + 1;
                                                 long matrixInd = BrlcadDb.getLong(body, pointer, length);
                                                 pointer += length;
@@ -165,7 +169,7 @@ public class Combination extends DbObject
                                                 {
                                                     mat = matrices[(int) matrixInd];
                                                 }
-						node = new Tree( name, mat );
+						node = new Tree( nodeName, mat );
 						stack.push( node );
 						break;
 					case union:
@@ -203,6 +207,20 @@ public class Combination extends DbObject
 			}
 			this.tree = (Tree)stack.pop();
 		}
+
+        String oshader = this.getAttribute("oshader");
+        String rgbString = this.getAttribute("rgb");
+        if( rgbString != null ) {
+            String[] rgbs = rgbString.split("/");
+            if( rgbs.length == 3 ) {
+                float[] rgb = new float[3];
+                for( int i=0 ; i<3 ; i++ ) {
+                    rgb[i] = Float.valueOf(rgbs[i]) / 255.0f;
+                    Color color = new Color(rgb[0], rgb[1], rgb[2]);
+                    this.material = new Material( oshader, color );
+                }
+            }
+        }
 	}
 	
 	/**
@@ -247,6 +265,7 @@ public class Combination extends DbObject
 		{
 			boundingBox = this.tree.prep( reg, preppedDb, matrix );
 			pc =  new PreppedCombination( this );
+            preppedDb.addPreppedCombination(pc);
 		}
 		pc.setBoundingBox( boundingBox );
 		
@@ -272,5 +291,19 @@ public class Combination extends DbObject
 	{
 		return super.toString() + " Combination:\n" + this.tree;
 	}
+
+    /**
+     * @return the material
+     */
+    public Material getMaterial() {
+        return material;
+    }
+
+    /**
+     * @param material the material to set
+     */
+    public void setMaterial(Material material) {
+        this.material = material;
+    }
 }
 
