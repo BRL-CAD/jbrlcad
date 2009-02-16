@@ -246,17 +246,17 @@ public class rt {
                 bytes[index+1] = (byte) color.getGreen();
                 bytes[index+2] = (byte) color.getBlue();
             }
-            synchronized( lock ) {
-                if( buffer != null ) {
+            if (buffer != null) {
+                synchronized (lock) {
                     buffer.position(row * size * 3);
                     buffer.put(bytes);
                 }
-                if( fbOs != null ) {
-                    try {
-                        writeLineToFrameBuffer(fbOs, row, bytes);
-                    } catch (IOException ex) {
-                        Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+            }
+            if (fbOs != null) {
+                try {
+                    writeLineToFrameBuffer(fbOs, row, bytes);
+                } catch (IOException ex) {
+                    Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
