@@ -6,6 +6,7 @@ package org.brlcad.preppedGeometry;
 
 
 
+import java.io.Serializable;
 import org.brlcad.numerics.*;import org.brlcad.geometry.Hit;
 import org.brlcad.geometry.Segment;
 
@@ -16,7 +17,7 @@ import org.brlcad.numerics.BoundingBox;
 import org.brlcad.spacePartition.RayData;
 import java.util.HashSet;
 
-public abstract class PreppedObject
+public abstract class PreppedObject implements Serializable
 {
 	/** name of the primitive this was produced from */
 	protected String name;

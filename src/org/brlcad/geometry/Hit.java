@@ -7,11 +7,12 @@ package org.brlcad.geometry;
 
 
 
+import java.io.Serializable;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Vector3;
 import org.brlcad.spacePartition.RayData;
 
-public class Hit implements Comparable
+public class Hit implements Comparable,Serializable
 {
 	
 	private double hit_dist;

@@ -5,6 +5,7 @@ package org.brlcad.geometry;
  *
  * @author Created by Omnicore CodeGuide
  */
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.brlcad.numerics.Vector3;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.spacePartition.RayData;
 
-public class Partition implements Comparable {
+public class Partition implements Comparable,Serializable {
 
     private static final  Logger logger = Logger.getLogger(Partition.class.getName());
     private Hit in_hit;

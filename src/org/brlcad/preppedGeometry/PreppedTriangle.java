@@ -5,6 +5,7 @@ package org.brlcad.preppedGeometry;
 
 
 
+import java.io.Serializable;
 import org.brlcad.geometry.BadGeometryException;
 import org.brlcad.geometry.Bot;
 import org.brlcad.geometry.Face;
@@ -16,7 +17,7 @@ import org.brlcad.numerics.Ray;
 import org.brlcad.numerics.BoundingBox;
 import org.brlcad.numerics.Matrix;
 
-public class PreppedTriangle
+public class PreppedTriangle implements Serializable
 {
 	public static final double MIN_DOT_NORMAL = 1.0E-9;
 	private Point A;			// triangle vertex (A)

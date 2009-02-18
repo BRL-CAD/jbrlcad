@@ -5,6 +5,7 @@
  */
 
 package org.brlcad.spacePartition;
+import java.io.Serializable;
 import org.brlcad.geometry.Hit;
 import org.brlcad.geometry.Segment;
 import org.brlcad.preppedGeometry.PreppedObject;
@@ -22,7 +23,7 @@ import org.brlcad.numerics.Tolerance;
 
 
 
-public class RayData
+public class RayData implements Serializable
 {
 	private Ray theRay;
 	private Point locator;

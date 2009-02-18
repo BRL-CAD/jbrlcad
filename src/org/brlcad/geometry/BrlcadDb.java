@@ -461,6 +461,12 @@ public class BrlcadDb
             return null;
         }
     }
-    
+
+    /**
+     * @return the title
+     */
+    public String getTitle() {
+        return title;
+    }
     
 }

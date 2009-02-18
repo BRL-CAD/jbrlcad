@@ -7,6 +7,7 @@ package org.brlcad.preppedGeometry;
 
 
 
+import java.io.Serializable;
 import org.brlcad.spacePartition.RayData;
 import org.brlcad.numerics.Ray;
 import org.brlcad.geometry.Arb8;
@@ -350,18 +351,19 @@ public class PreppedArb8 extends PreppedObject
 		return null;
 	}
 	
-	private class ArbFace
+	private class ArbFace implements Serializable
 	{
 		Point a;
 		Plane3D plane;
 		
+        @Override
 		public String toString()
 		{
 			return "ArbFace: a=" + a + ", plane=" + plane;
 		}
 	}
 	
-	private class Oface
+	private class Oface implements Serializable
 	{
 		Point uvOrig;
 		Vector3 u;
@@ -369,6 +371,7 @@ public class PreppedArb8 extends PreppedObject
 		double uLen;
 		double vLen;
 		
+        @Override
 		public String toString()
 		{
 			return "Oface: uvOrig=" + uvOrig + ", u=" + u + ", v=" + v +
@@ -376,7 +379,7 @@ public class PreppedArb8 extends PreppedObject
 		}
 	}
 	
-	private static class ArbInfo
+	private static class ArbInfo implements Serializable
 	{
 		String faceName;
 		int[] faceVertices;
@@ -412,7 +415,7 @@ public class PreppedArb8 extends PreppedObject
 		}
 	}
 	
-	private class PrepArb
+	private class PrepArb implements Serializable
 	{
 		Point center;
 		int faces;
@@ -440,6 +443,7 @@ public class PreppedArb8 extends PreppedObject
 			doOpt = false;
 		}
 		
+        @Override
 		public String toString()
 		{
 			StringBuilder str = new StringBuilder();

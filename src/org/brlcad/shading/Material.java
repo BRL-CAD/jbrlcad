@@ -6,12 +6,13 @@
 package org.brlcad.shading;
 
 import java.awt.Color;
+import java.io.Serializable;
 
 /**
  *
  * @author jra
  */
-public class Material {
+public class Material implements Serializable {
     private String name;
     private Color color;
     private double ks;  // specular reflection constant, the ratio of reflection of the specular term of incoming light

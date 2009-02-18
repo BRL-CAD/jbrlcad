@@ -14,6 +14,8 @@
 
 package org.brlcad.numerics;
 
+import java.io.Serializable;
+
 /*
  * $Header
  */
@@ -32,7 +34,7 @@ package org.brlcad.numerics;
  *         http://www.iesd.dmu.ac.uk/~pcc/dls/docs/intro.htm
  * @version 1.0 March 2001
  */
-public class Plane3D {
+public class Plane3D implements Serializable {
     /**
      * The plane is represented by 4 parameters: a, b, c, d. The first three
      * parameters define a normal to the plane and the third is the distance

@@ -5,6 +5,7 @@ package org.brlcad.geometry;
 
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -18,7 +19,7 @@ import org.brlcad.numerics.Point;
 import org.brlcad.spacePartition.PreppedDb;
 import org.brlcad.spacePartition.RayData;
 
-public class Tree
+public class Tree implements Serializable
 {
 	/** the operator for this node (union, subtraction, leaf, ...) */
 	private Operator op;

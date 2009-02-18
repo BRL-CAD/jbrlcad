@@ -1,11 +1,14 @@
 package org.brlcad.geometry;
+
+import java.io.Serializable;
+
 /**
  * Represents an intersection of a ray with an object. The intersection starts at
  * inHit and ends at outHit.
  */
 
 
-public class Segment
+public class Segment implements Serializable
 {
 	// The entrance hit 
 	private Hit inHit;
@@ -64,6 +67,7 @@ public class Segment
 		return outHit;
 	}
 	
+    @Override
 	public String toString()
 	{
 		return "Segment:\ninHit: " + inHit + "\noutHit: " + outHit;

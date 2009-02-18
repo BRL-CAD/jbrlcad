@@ -6,7 +6,9 @@
 
 package org.brlcad.numerics;
 
-public class Tolerance
+import java.io.Serializable;
+
+public class Tolerance implements Serializable
 {
 	private double dist;
 	private double distSquared;

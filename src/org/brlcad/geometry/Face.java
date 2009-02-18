@@ -1,10 +1,13 @@
 package org.brlcad.geometry;
+
+import java.io.Serializable;
+
 /**
  * A simple containiner class for the indices of a triangular face
  */
 
 
-public class Face
+public class Face implements Serializable
 {
 	/**
 	 * Array of indices. These are indices into an array of vertices
@@ -25,6 +28,7 @@ public class Face
 		this.v[2] = i3;
 	}
 	
+    @Override
 	public String toString()
 	{
 		return "(" + v[0] + ", " + v[1] + ", " + v[2] + ")";

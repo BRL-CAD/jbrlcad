@@ -1,11 +1,14 @@
 package org.brlcad.geometry;
+
+import java.io.Serializable;
+
 /**
  * Operators.java
  *
  */
 
 
-public enum Operator
+public enum Operator implements Serializable
 {
 		LEAF ( "l" ),
 		UNION ( "u" ),
@@ -21,6 +24,7 @@ public enum Operator
 		this.name = name;
 	}
 	
+    @Override
 	public String toString()
 	{
 		return this.name;
