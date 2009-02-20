@@ -22,19 +22,18 @@ import org.brlcad.spacePartition.PreppedDb;
 
 public class BrlcadJava
 {
-	/**
-	 * This method is called after start up.
-	 *
-	 * @param args   The command-line arguments.
-	 *               They can be changed in the
-	 *               "Project Settings" dialog in CodeGuide.
-	 */
+    private static final String usage = "Usage:\n\tjava -cp build/dist/jbrlcad.jar:lib/jscience.jar" +
+            " [-p x y z] [-d x y z] file.g obj1 [ obj2 obj3 ...]";
 	public static void main(String[] args)
 	{
         Point start = new Point(0,0,0);
         Vector3 dir = new Vector3(1,0,0);
         String[] tlos = null;
         int argNo = 0;
+        if( args.length < 2 ) {
+            System.err.println( usage );
+            return;
+        }
         while( argNo < args.length ) {
             String arg = args[argNo];
             if( "-p".equals(arg) ) {
@@ -56,6 +55,11 @@ public class BrlcadJava
             } else {
                 break;
             }
+        }
+
+        if( (args.length - argNo) < 2 ) {
+            System.err.println( usage );
+            return;
         }
 		
 		try
