@@ -6,6 +6,7 @@ package org.brlcad.geometry;
 
 
 import java.util.SortedSet;
+import org.brlcad.numerics.Ray;
 
 public interface OverlapHandler
 {
@@ -15,6 +16,6 @@ public interface OverlapHandler
 	 * @param parts	A SortedSet of Partitions with possible overlaps
 	 * @return	A SortedSet of Partitions with no overlaps
 	 */
-	public SortedSet<Partition> handleOverlaps( SortedSet<Partition> parts );
+	public SortedSet<Partition> handleOverlaps( SortedSet<Partition> parts, Ray ray );
 }
 

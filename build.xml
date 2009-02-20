@@ -33,11 +33,11 @@
     <nbjpdastart addressproperty="jpda.address" name="jbrlcad" transport="dt_socket">
         <classpath refid="testclasspath"/>
     </nbjpdastart>
-    <java classname="org.brlcad.samples.rt">
+    <java classname="org.brlcad.samples.BrlcadJava">
         <classpath refid="testclasspath"/>
         <jvmarg value="-Xdebug"/>
         <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-        <arg line=" -s 512 -o test.pix test/test.g r1"/>
+        <arg line=" -p 100 250 -700 -d -1 0 0 /home/jra/Projects/brlcad/db/kman.g jra"/>
     </java>
 </target>
 

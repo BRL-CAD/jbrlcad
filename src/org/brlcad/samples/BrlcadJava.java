@@ -8,6 +8,7 @@ package org.brlcad.samples;
  */
 
 
+import java.util.Arrays;
 import org.brlcad.geometry.BrlcadDb;
 import org.brlcad.geometry.Partition;
 import org.brlcad.geometry.SimpleOverlapHandler;
@@ -30,29 +31,39 @@ public class BrlcadJava
 	 */
 	public static void main(String[] args)
 	{
-		// Print application prompt to console.
-		System.out.println("brlcadJava");
-		
-		// Print available command-line arguments to console.
-		printArguments(args);
-		
-		if( args.length < 1 )
-		{
-			System.err.println( "no BRL-CAD database specified" );
-			System.err.println( "on the command line, specify a BRL-CAD database and optional object names" );
-		}
+        Point start = new Point(0,0,0);
+        Vector3 dir = new Vector3(1,0,0);
+        String[] tlos = null;
+        int argNo = 0;
+        while( argNo < args.length ) {
+            String arg = args[argNo];
+            if( "-p".equals(arg) ) {
+                // get start point
+                for( int i=0 ; i<3 ; i++ ) {
+                    argNo++;
+                    start.set(i, Double.valueOf(args[argNo]));
+                }
+                argNo++;
+                continue;
+            } else if( "-d".equals(arg) ) {
+                // get direction
+                for( int i=0 ; i<3 ; i++ ) {
+                    argNo++;
+                    dir.set(i, Double.valueOf(args[argNo]));
+                }
+                argNo++;
+                continue;
+            } else {
+                break;
+            }
+        }
 		
 		try
 		{
-			BrlcadDb brlcadDb = new BrlcadDb( args[0] );
-			for( int i=1 ; i<args.length ; i++ )
-			{
-				System.out.println( brlcadDb.describe( args[i] ) );
-			}
-			PreppedDb prepped = new PreppedDb( brlcadDb, args[1] );
-			System.out.println( "BoundingBox: " + prepped.getBoundingBox() );
-			Point start = new Point( 10000.0, 0.0, 0.0 );
-			Vector3 dir = new Vector3( -1.0, 0.0, 0.0 );
+			BrlcadDb brlcadDb = new BrlcadDb( args[argNo++] );
+            tlos = new String[args.length - argNo];
+            tlos = Arrays.copyOfRange(args, argNo, args.length);
+			PreppedDb prepped = new PreppedDb( brlcadDb, tlos );
 			Ray ray = new Ray( start, dir );
 			SortedSet<Partition> parts = prepped.shootRay( ray, new SimpleOverlapHandler() );
 			System.out.println( "partitions (" + parts.size() + "):");

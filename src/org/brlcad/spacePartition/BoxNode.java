@@ -45,7 +45,7 @@ public class BoxNode extends Node
 		this.preppedPieces.add( obj );
 		this.boundingBox.extend( obj.getBoundingBox() );
 	}
-	
+
 	public BoundingBox getBoundingBox()
 	{
 		return this.boundingBox;

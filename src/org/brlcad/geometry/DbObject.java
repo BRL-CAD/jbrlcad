@@ -52,7 +52,6 @@ public abstract class DbObject implements Serializable
 		StringBuffer attrValue = new StringBuffer();
 		
 		// process the entire array of bytes
-        System.out.println( this.name + ": ");
 		int i=0;
 		while( attrBytes[i] != (byte)0 ) // a zero byte signls the end of the array
 		{
@@ -80,7 +79,6 @@ public abstract class DbObject implements Serializable
 			if( attrName.length() > 0 && attrValue.length() > 0 )
 			{
 				this.attributes.put( attrName.toString(), attrValue.toString() );
-                System.out.println( "    " + attrName.toString() + " = " + attrValue.toString());
 			}
 		}
 	}

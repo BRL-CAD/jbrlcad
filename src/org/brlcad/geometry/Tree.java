@@ -168,7 +168,7 @@ public class Tree implements Serializable
 				if( this.leaf instanceof PreppedCombination )
 				{
 					PreppedCombination region = (PreppedCombination)this.leaf;
-					return region.evaluate( reg, rayData );
+					parts = region.evaluate( region, rayData );
 				}
 				else
 				{

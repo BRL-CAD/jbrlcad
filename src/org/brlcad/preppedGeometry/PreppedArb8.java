@@ -23,7 +23,9 @@ import org.brlcad.numerics.Plane3D;
 import org.brlcad.numerics.Vector3;
 import org.brlcad.numerics.BoundingBox;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Set;
+import org.brlcad.numerics.Constants;
 
 public class PreppedArb8 extends PreppedObject
 {
@@ -66,23 +68,24 @@ public class PreppedArb8 extends PreppedObject
 		pa.center.scale( 1.0 / 8.0 );
 		
 		int[] equivPoints = { -1, -1, -1, -1, -1, -1, -1, -1 };
-		
-		for( int i=0 ; i<8 ; i++ )
+        equivPoints[0] = 0;
+		for( int i=1 ; i<8 ; i++ )
 		{
 			for( int j=i-1 ; j>=0 ; j-- )
 			{
 				Vector3 work;
 				
-				work = Vector3.minus(vertices[j], vertices[i]);
+				work = Vector3.minus(vertices[i], vertices[j]);
 				if( work.magnitude() < BrlcadDb.tolerance.getDistSquared() )
 				{
 					equivPoints[i] = equivPoints[j];
+                    break;
 				}
 			}
 			if( equivPoints[i] == -1 )
 			{
-				equivPoints[i] = i;
-			}
+                equivPoints[i] = i;
+            }
 		}
 		
 		for( int i=0 ; i<6 ; i++ )
@@ -91,14 +94,14 @@ public class PreppedArb8 extends PreppedObject
 			
 			for( int j=0 ; j<4 ; j++ )
 			{
-				int index = arbInfo[i].faceVertices[j];
-				index = equivPoints[index];
+				int pt_index = arbInfo[i].faceVertices[j];
+				pt_index = equivPoints[pt_index];
 				
 				boolean skip = false;
 				
 				for( int k = numPoints-1 ; k>0 ; k-- )
 				{
-					if( pa.pindex[k][pa.faces] == index )
+					if( pa.pindex[k][pa.faces] == pt_index )
 					{
 						// skip this point
 						skip = true;
@@ -107,10 +110,10 @@ public class PreppedArb8 extends PreppedObject
 				}
 				if( !skip )
 				{
-					if( arbAddPoint( vertices[index], arbInfo[i].faceName,
+					if( arbAddPoint( vertices[pt_index], arbInfo[i].faceName,
 									pa, numPoints, name ) )
 					{
-						pa.pindex[numPoints][pa.faces] = index;
+						pa.pindex[numPoints][pa.faces] = pt_index;
 						numPoints++;
 					}
 				}
@@ -127,8 +130,8 @@ public class PreppedArb8 extends PreppedObject
 			throw new BadGeometryException( "Arb8 has illegal number of faces (" + pa.faces + ")" );
 		}
 		
-		this.aface = pa.aface;
-		this.oface = pa.oface;
+		this.aface = Arrays.copyOf(pa.aface, pa.faces);
+		this.oface = Arrays.copyOf(pa.oface, pa.faces);
 		this.boundingBox = new BoundingBox();
 		for( int i=0 ; i<8 ; i++ )
 		{
@@ -154,32 +157,32 @@ public class PreppedArb8 extends PreppedObject
 	{
 		boolean returnVal = true;
 
-		ArbFace aface = pa.aface[pa.faces];
-		Oface oface = pa.oface[pa.faces];
+		ArbFace paface = pa.aface[pa.faces];
+		Oface poface = pa.oface[pa.faces];
 		
 		switch( numPoints )
 		{
 			case 0:
-				aface.a = vertex;
+				paface.a = vertex;
 				if( pa.doOpt )
 				{
-					oface.uvOrig = vertex;
+					poface.uvOrig = vertex;
 				}
 				break;
 			case 1:
-				oface.u = Vector3.minus(vertex, aface.a);
-				oface.uLen = oface.u.magnitude();
-				double scale = 1.0/oface.uLen;
+				poface.u = Vector3.minus(vertex, paface.a);
+				poface.uLen = poface.u.magnitude();
+				double scale = 1.0/poface.uLen;
 				if( scale == Double.POSITIVE_INFINITY || scale == Double.NEGATIVE_INFINITY )
 				{
 					returnVal = false;
 					break;
 				}
-				oface.u.scale( scale );
+				poface.u.scale( scale );
 				break;
 			case 2:
-				Vector3 p_a = Vector3.minus(vertex, aface.a);
-				Vector3 norm = p_a.crossProduct( oface.u );
+				Vector3 p_a = Vector3.minus(vertex, paface.a);
+				Vector3 norm = p_a.crossProduct( poface.u );
 				double f = norm.magnitude();
 				scale = 1.0 / f;
 				if( scale == Double.POSITIVE_INFINITY || scale == Double.NEGATIVE_INFINITY )
@@ -190,27 +193,27 @@ public class PreppedArb8 extends PreppedObject
 				norm.scale( scale );
 				if( pa.doOpt )
 				{
-					oface.v = norm.crossProduct( oface.u );
-					oface.v.normalize();
-					f = oface.v.dotProduct( p_a );
-					oface.v.scale( f );
-					oface.vLen = oface.v.magnitude();
-					scale = 1.0 / oface.vLen;
-					oface.v.scale( scale );
+					poface.v = norm.crossProduct( poface.u );
+					poface.v.normalize();
+					f = poface.v.dotProduct( p_a );
+					poface.v.scale( f );
+					poface.vLen = poface.v.magnitude();
+					scale = 1.0 / poface.vLen;
+					poface.v.scale( scale );
 					
-					p_a = Vector3.minus(vertex, oface.uvOrig);
-					f = p_a.dotProduct( oface.u );
-					if( f > oface.uLen )
+					p_a = Vector3.minus(vertex, poface.uvOrig);
+					f = p_a.dotProduct( poface.u );
+					if( f > poface.uLen )
 					{
-						oface.uLen = f;
+						poface.uLen = f;
 					}
 					else if( f < 0.0 )
 					{
-						oface.uvOrig.join( f, oface.u );
-						oface.uLen += (-f);
+						poface.uvOrig.join( f, poface.u );
+						poface.uLen += (-f);
 					}
 				}
-				Vector3 work = Vector3.minus(aface.a, pa.center);
+				Vector3 work = Vector3.minus(paface.a, pa.center);
 				f = work.dotProduct( norm );
 				if( f < 0.0 )
 				{
@@ -221,36 +224,36 @@ public class PreppedArb8 extends PreppedObject
 				{
 					pa.clockwise[pa.faces] = 0;
 				}
-				aface.plane = new Plane3D( norm, aface.a );
+				paface.plane = new Plane3D( norm, paface.a );
 				break;
 			default:
 				if( pa.doOpt )
 				{
-					p_a = Vector3.minus(vertex, oface.uvOrig);
-					f = p_a.dotProduct( oface.u );
-					if( f > oface.uLen )
+					p_a = Vector3.minus(vertex, poface.uvOrig);
+					f = p_a.dotProduct( poface.u );
+					if( f > poface.uLen )
 					{
-						oface.uLen = f;
+						poface.uLen = f;
 					}
 					else if( f < 0.0 )
 					{
-						oface.uvOrig.join( f, oface.u );
-						oface.uLen += (-f);
+						poface.uvOrig.join( f, poface.u );
+						poface.uLen += (-f);
 					}
-					f = p_a.dotProduct( oface.v );
-					if( f > oface.vLen )
+					f = p_a.dotProduct( poface.v );
+					if( f > poface.vLen )
 					{
-						oface.vLen = f;
+						poface.vLen = f;
 					}
 					else if( f < 0.0 )
 					{
-						oface.uvOrig.join( f, oface.v );
-						oface.vLen += (-f);
+						poface.uvOrig.join( f, poface.v );
+						poface.vLen += (-f);
 					}
 				}
-				p_a = Vector3.minus(vertex, aface.a);
+				p_a = Vector3.minus(vertex, paface.a);
 				p_a.normalize();
-				if( !aface.plane.liesIn( vertex, BrlcadDb.DEFAULT_TOL_DIST ) )
+				if( !paface.plane.liesIn( vertex, BrlcadDb.DEFAULT_TOL_DIST ) )
 				{
 					returnVal = false;
 				}
@@ -298,7 +301,7 @@ public class PreppedArb8 extends PreppedObject
 			}
 			else
 			{
-				if( dn < 0.0 )
+				if( dn < -Constants.SQRT_SMALL_FASTF )
 				{
 					if( outdist > s )
 					{
@@ -307,7 +310,7 @@ public class PreppedArb8 extends PreppedObject
 						outSurfNum = j;
 					}
 				}
-				else
+				else if( dn > Constants.SQRT_SMALL_FASTF )
 				{
 					if( indist < s )
 					{
@@ -315,7 +318,18 @@ public class PreppedArb8 extends PreppedObject
 						inPlane = af.plane;
 						inSurfNum = j;
 					}
-				}
+				}  else  {
+                    /* ray is parallel to plane when dir.N == 0.
+                     * If it is outside the solid, stop now.
+                     * Allow very small amount of slop, to catch
+                     * rays that lie very nearly in the plane of a face.
+                     */
+                    if (dxbdn > Constants.SQRT_SMALL_FASTF)
+                        return segs;	/* MISS */
+                }
+                if( indist > outdist ) {
+                    return segs;
+                }
 			}
 		}
 				

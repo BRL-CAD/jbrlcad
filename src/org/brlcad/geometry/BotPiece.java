@@ -17,6 +17,8 @@ import org.brlcad.preppedGeometry.PreppedObjectPiece;
 import org.brlcad.preppedGeometry.PreppedTriangle;
 
 import org.brlcad.numerics.Ray;
+import org.brlcad.numerics.Vector3;
+import org.brlcad.spacePartition.PreppedDb;
 import org.brlcad.spacePartition.RayData;
 
 public class BotPiece extends PreppedObjectPiece
@@ -45,6 +47,12 @@ public class BotPiece extends PreppedObjectPiece
 		this.triangles.add( tri );
 		this.boundingBox.extend( tri.getBoundingBox() );
 	}
+
+    public void addTriangles( List<PreppedTriangle> tris ) {
+        for( PreppedTriangle pt : tris ) {
+            addTriangle(pt);
+        }
+    }
 	
 	/**
 	 * Shoot a ray at this BotPiece
@@ -66,5 +74,95 @@ public class BotPiece extends PreppedObjectPiece
 		
 		return hits;
 	}
+
+    void subDivide(PreppedDb preppedDb) {
+        subdivide( this, preppedDb );
+        List<PreppedObjectPiece> pieces = preppedDb.getPieces();
+        System.out.println( pieces.size() + " Pieces");
+
+        int min = Integer.MAX_VALUE;
+        int max = Integer.MIN_VALUE;
+        int total = 0;
+        int count = 0;
+        for( PreppedObjectPiece pop : pieces ) {
+            if( pop instanceof BotPiece ) {
+                BotPiece bp = (BotPiece) pop;
+                int triCount = bp.triangles.size();
+                total += triCount;
+                if( triCount < min ) {
+                    min = triCount;
+                }
+                if( triCount > max ) {
+                    max = triCount;
+                }
+                count++;
+            }
+        }
+
+        System.out.println( count + " pieces");
+        System.out.println( "min=" + min);
+        System.out.println( "max=" + max);
+        System.out.println( "tris=" + total);
+        System.out.println( "ave=" + (total/count));
+        System.out.println( "BB=" + preppedDb.getBoundingBox());
+    }
+
+    private static void subdivide(BotPiece bp, PreppedDb preppedDb) {
+        if( bp.triangles.size() <= BrlcadDb.BOT_FACES_PER_PIECE ) {
+            preppedDb.addPreppedObjectPieceToInitialBox(bp);
+            return;
+        }
+
+        Vector3 diag = Vector3.minus(bp.boundingBox.getMax(), bp.boundingBox.getMin());
+        int axis = -1;
+        double bbLength = Double.NEGATIVE_INFINITY;
+        for( int i=0 ; i<3 ; i++ ) {
+            double length = diag.get(i);
+            if( length > bbLength ) {
+                axis = i;
+                bbLength = length;
+            }
+        }
+        double cutCoord = bp.boundingBox.getMin().get(axis) + bbLength/2.0;
+//        System.out.println( "Conside cut: " + bp + " on axis=" + axis + " at " + cutCoord);
+
+        BotPiece bp1 = new BotPiece(bp.getName(), (PreppedBot)bp.getPreppedObject());
+        BotPiece bp2 = new BotPiece(bp.getName(), (PreppedBot)bp.getPreppedObject());
+
+        for( PreppedTriangle pt : bp.triangles ) {
+            double maxCoord = pt.getBoundingBox().getMax().get(axis);
+            double minCoord = pt.getBoundingBox().getMin().get(axis);
+            if( maxCoord < cutCoord ) {
+                bp1.addTriangle(pt);
+            } else if( minCoord > cutCoord ) {
+                bp2.addTriangle(pt);
+            } else {
+                int count1 = bp1.triangles.size();
+                int count2 = bp2.triangles.size();
+                if( count1 < count2 ) {
+                    bp1.addTriangle(pt);
+                } else {
+                    bp2.addTriangle(pt);
+                }
+            }
+        }
+
+        if( bp1.triangles.size() == bp.triangles.size() ||
+             bp2.triangles.size() == bp.triangles.size() ) {
+            preppedDb.addPreppedObjectPieceToInitialBox(bp);
+            return;
+        }
+
+//        System.out.println( "after cut:");
+//        System.out.println( "bp1: " + bp1);
+//        System.out.println( "bp2: " + bp2);
+        subdivide(bp1, preppedDb);
+        subdivide(bp2, preppedDb);
+    }
+
+    @Override
+    public String toString() {
+        return this.boundingBox.toString() + " with " + this.triangles.size() + " triangles";
+    }
 }
 

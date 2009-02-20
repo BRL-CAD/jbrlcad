@@ -47,6 +47,7 @@ public class PreppedDb
 	private BoxNode initialBox;
 	private int preppedSolidCount = 0;
 	private int preppedRegionCount = 0;
+    private List<PreppedObjectPiece> pieces = new ArrayList<PreppedObjectPiece>();
 	
 	public PreppedDb( BrlcadDb db, String ... objs ) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
 	{
@@ -193,7 +194,12 @@ public class PreppedDb
 	{
 		this.initialBox.addPreppedObjectPieceAndExtendBB( pbp );
 		pbp.setIndex( this.preppedSolidCount++ );
+        this.pieces.add(pbp);
 	}
+
+    public List<PreppedObjectPiece> getPieces() {
+        return this.pieces;
+    }
 	
 	public void addPreppedRegion( PreppedCombination reg )
 	{
@@ -311,7 +317,7 @@ public class PreppedDb
 			}
 		}
 		
-		parts = overlapHandler.handleOverlaps( parts );
+		parts = overlapHandler.handleOverlaps( parts, ray );
 		
 		return parts;
 	}

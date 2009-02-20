@@ -54,10 +54,10 @@ public class Polynomial {
             throw new IllegalArgumentException( "Polynomial of degree " + degree +
                     " must have " + (degree+1) + " coefficients, but " + coeffs.length +
                     " were specified" );
-        } else if( coeffs.length > (degree + 1) ) {
-            Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                    "Polynomial of degree " + degree + " was provided too many coefficients (" +
-                    coeffs.length + "), ignoring excess" );
+//        } else if( coeffs.length > (degree + 1) ) {
+//            Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
+//                    "Polynomial of degree " + degree + " was provided too many coefficients (" +
+//                    coeffs.length + "), ignoring excess" );
         }
         this.degree = degree;
         this.coeff = coeffs;

@@ -7,6 +7,7 @@ package org.brlcad.geometry;
 
 import java.util.SortedSet;
 import java.util.Iterator;
+import org.brlcad.numerics.Ray;
 
 public class SimpleOverlapHandler implements OverlapHandler
 {
@@ -19,7 +20,7 @@ public class SimpleOverlapHandler implements OverlapHandler
 	 * @return   a SortedSet	a SortedSet of Partitions without overlaps
 	 *
 	 */
-	public SortedSet<Partition> handleOverlaps(SortedSet<Partition> parts)
+	public SortedSet<Partition> handleOverlaps(SortedSet<Partition> parts, Ray ray)
 	{
 		if( parts == null || parts.size() < 2 )
 		{
@@ -40,16 +41,16 @@ public class SimpleOverlapHandler implements OverlapHandler
 				if( part2.getOutHit().getHit_dist() < part1.getOutHit().getHit_dist() )
 				{
 					// part2 is entirely inside part1 (delete it)
-					if( part1.getFromRegion() != part2.getFromRegion() )
+					if( !part1.getFromRegion().equals(part2.getFromRegion()) )
 					{
-						System.err.println( "OVERLAP:\n\t" + part1 + "\n\t" + part2 );
+						System.err.println( "OVERLAP on Ray: " + ray + "\n\t" + part1 + "\n\t" + part2 );
 					}
 					iter.remove();
 					continue;
 				}
 				else
 				{
-					if( part1.getFromRegion() == part2.getFromRegion() )
+					if( part1.getFromRegion().equals(part2.getFromRegion()) )
 					{
 						// not really an overlap, but handle it
 						part1.setOutHit( part2.getOutHit(), false );
@@ -60,7 +61,7 @@ public class SimpleOverlapHandler implements OverlapHandler
 					else
 					{
 						// two different regions, select part1
-						System.err.println( "OVERLAP:\n\t" + part1 + "\n\t" + part2 );
+						System.err.println( "OVERLAP on Ray: " + ray + "\n\t" + part1 + "\n\t" + part2 );
 						part2.setInHit( part1.getOutHit(), false );
 						part2.setFlipInNormal( !part1.isFlipOutNormal() );
 					}

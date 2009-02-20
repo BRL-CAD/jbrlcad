@@ -55,18 +55,29 @@ public class PreppedCombination extends PreppedObject
 	
 	public SortedSet<Partition> evaluate( PreppedCombination reg, RayData rayData )
 	{
+        SortedSet<Partition> parts = null;
 		if( reg != null )
 		{
-			return this.tree.evaluate( reg, rayData );
+            parts = rayData.getPartitions(reg);
+            if( parts == null ) {
+                parts = this.tree.evaluate(reg, rayData);
+                rayData.addPartitions(reg, parts);
+            }
 		}
 		else if( this.isRegion )
 		{
-			return this.tree.evaluate( this, rayData );
+            parts = rayData.getPartitions(this);
+            if( parts == null ) {
+                parts = this.tree.evaluate(this, rayData);
+                rayData.addPartitions(this, parts);
+            }
 		}
 		else
 		{
-			return this.tree.evaluate( null, rayData );
+			parts = this.tree.evaluate( null, rayData );
 		}
+
+        return parts;
 	}
 	
 	/**

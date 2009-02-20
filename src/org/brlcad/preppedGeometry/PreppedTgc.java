@@ -368,19 +368,16 @@ public class PreppedTgc extends PreppedObject {
         cf[1] = 2.0 * dprime.getX() * cor_pprime.getX();
         cf[2] = cor_pprime.getX() * cor_pprime.getX();
         Xsqr = new Polynomial(2, cf);
-        System.out.println("Xsqr: " + Xsqr);
 
         cf[0] = dprime.getY() * dprime.getY();
         cf[1] = 2.0 * dprime.getY() * cor_pprime.getY();
         cf[2] = cor_pprime.getY() * cor_pprime.getY();
         Ysqr = new Polynomial(2, cf);
-        System.out.println("Ysqr: " + Ysqr);
 
         cf[0] = dprime.getZ() * tgc_CdAm1;
         /* A vector is unitized (tgc->tgc_A == 1.0) */
         cf[1] = (cor_pprime.getZ() * tgc_CdAm1) + 1.0;
         R = new Polynomial(1, cf);
-        System.out.println("R: " + R);
 
         /* (void) rt_poly_mul(&Rsqr, &R, &R); */
         double[] cfsq = new double[3];
@@ -388,7 +385,6 @@ public class PreppedTgc extends PreppedObject {
         cfsq[1] = cf[0] * cf[1] * 2;
         cfsq[2] = cf[1] * cf[1];
         Rsqr = new Polynomial(2, cfsq);
-        System.out.println("Rsqr: " + Rsqr);
 
         /*
          *  If the eccentricities of the two ellipses are the same,
@@ -429,14 +425,12 @@ public class PreppedTgc extends PreppedObject {
             /* B vector is unitized (tgc->tgc_B == 1.0) */
             cf[1] = (cor_pprime.getZ() * tgc_DdBm1) + 1.0;
             Q = new Polynomial(1, cf);
-            System.out.println( "Q: " + Q);
 
             /* (void) bn_poly_mul( &Qsqr, &Q, &Q ); */
             cf[0] = Q.getCoeff(0) * Q.getCoeff(0);
             cf[1] = Q.getCoeff(0) * Q.getCoeff(1) * 2;
             cf[2] = Q.getCoeff(1) * Q.getCoeff(1);
             Qsqr = new Polynomial(2, cf);
-            System.out.println( "Qsqr: " + Qsqr);
 
             /*
              * (void) bn_poly_mul( &T1, &Qsqr, &Xsqr );
@@ -464,7 +458,6 @@ public class PreppedTgc extends PreppedObject {
                     Rsqr.getCoeff(2) * Ysqr.getCoeff(2) -
                     (Rsqr.getCoeff(2) * Qsqr.getCoeff(2));
             C = new Polynomial(4, cf);
-            System.out.println( "C: " + C );
 
             /*  The equation is 4th order, so we expect 0 to 4 roots */
             val = C.roots();
@@ -478,7 +471,6 @@ public class PreppedTgc extends PreppedObject {
              *  of 't' for the intersections
              */
             for (l = 0; l < val.length; l++) {
-                System.out.println( "val[" + l + "] = " + val[l]);
                 if( val[l] == null ) {
                     continue;
                 }

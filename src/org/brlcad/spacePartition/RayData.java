@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import java.util.SortedSet;
+import org.brlcad.geometry.Partition;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Ray;
 import org.brlcad.numerics.Tolerance;
@@ -31,6 +33,7 @@ public class RayData implements Serializable
 	private BitSet solidBits;
 	private BitSet regbits;
 	private Tolerance tolerance;
+    private Map<PreppedCombination,SortedSet<Partition>>  partitions;
 	private Map<PreppedObject,List<Segment>> segs;
 	private Map<PreppedObject,Set<Hit>> hits;
 	
@@ -42,9 +45,18 @@ public class RayData implements Serializable
 		this.regbits = regbits;
 		this.tolerance = tol;
 		this.theRay = ray;
+        this.partitions = new HashMap<PreppedCombination,SortedSet<Partition>>();
 		this.segs = new HashMap<PreppedObject,List<Segment>>();
 		this.hits = new HashMap<PreppedObject,Set<Hit>>();
 	}
+
+    public void addPartitions( PreppedCombination comb, SortedSet<Partition> parts ) {
+        this.partitions.put(comb, parts);
+    }
+
+    public SortedSet<Partition> getPartitions( PreppedCombination comb ) {
+        return this.partitions.get(comb);
+    }
 	
 	/**
 	 * Method addHits

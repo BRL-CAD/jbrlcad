@@ -18,7 +18,6 @@ import java.util.Iterator;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.preppedGeometry.PreppedObject;
 import org.brlcad.shading.Material;
-import org.brlcad.shading.Phong;
 
 public class Combination extends DbObject
 {

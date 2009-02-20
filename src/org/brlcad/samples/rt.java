@@ -130,6 +130,7 @@ public class rt {
             brlcadDb = new BrlcadDb(dbFileName);
 			prepped = new PreppedDb( brlcadDb, tlos );
             BoundingBox bb = prepped.getBoundingBox();
+            System.out.println( "BB=" + bb);
             Vector3 tmp = new Vector3(0, 0, 1);
             xDir = rayDir.crossProduct(tmp);;
             xDir.normalize();
@@ -146,9 +147,9 @@ public class rt {
             gridStart.join(-radius, xDir);
             double delta = radius * 2.0 / size;
             Set<Light> lights = new HashSet<Light>();
-            Light light = new Light( new Point( 5000, 5000, 5000), new Color(255, 255, 255), new Color(200, 100, 0) );
+            Light light = new Light( gridCenter, new Color(255, 255, 255), new Color(200, 100, 0) );
             lights.add(light);
-            Color backGround = new Color( 1, 1, 1 );
+            Color backGround = new Color( 200, 200, 200 );
             ByteBuffer buffer = null;
             if( outputFile != null ) {
                 buffer = ByteBuffer.allocate(3 * size * size);

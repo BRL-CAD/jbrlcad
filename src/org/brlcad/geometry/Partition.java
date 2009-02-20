@@ -226,11 +226,15 @@ public class Partition implements Comparable,Serializable {
             return null;
         }
 
+        if( partsL.size() == 0 || partsR.size() == 0 ) {
+            return null;
+        }
+
         SortedSet<Partition> parts = new TreeSet<Partition>();
 
         for (Partition part1 : partsL) {
             double inDist1 = part1.in_hit.getHit_dist();
-            double outDist1 = part1.out_hit.getHit_dist();;
+            double outDist1 = part1.out_hit.getHit_dist();
             float inObliquity1 = part1.getInObliquity();
             float outObliquity1 = part1.getOutObliquity();
             Hit inHit;
@@ -331,22 +335,27 @@ public class Partition implements Comparable,Serializable {
                     continue;
                 }
 
+                if( inDist2 <= inDist1 && outDist2 >= outDist1 ) {
+                    // part1 goes away completely
+                    result.remove(index);
+                    index--;
+                    break;
+                }
+
                 if (inDist2 > inDist1 && outDist2 < outDist1) {
                     Partition newPart = new Partition(part1);
                     newPart.setInHit(part2.out_hit, true);
                     result.add(index+1, newPart);
                     part1.setOutHit(part2.in_hit, true);
-                    continue;
+                    break;
                 }
 
                 if (inDist2 > inDist1) {
                     part1.setOutHit(part2.in_hit, true);
-                    continue;
                 }
 
                 if (outDist2 < outDist1) {
                     part1.setInHit(part2.out_hit, true);
-                    continue;
                 }
             }
             index++;
