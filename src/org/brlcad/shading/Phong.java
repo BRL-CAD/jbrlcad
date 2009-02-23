@@ -6,7 +6,6 @@
 package org.brlcad.shading;
 
 import java.awt.Color;
-import java.awt.color.ColorSpace;
 import java.util.HashSet;
 import java.util.Set;
 import org.brlcad.geometry.Hit;
@@ -17,11 +16,11 @@ import org.brlcad.numerics.Vector3;
  *
  * @author jra
  */
-public class Phong {
-//    public static final ColorSpace colorSpace = ColorSpace.getInstance(ColorSpace.CS_LINEAR_RGB);
+public class Phong implements Shader {
     private static final Material defaultMaterial = new Material("default", new Color(55, 55, 55));
     private Point eye_pt;
     private Set<Light> lights;
+    private double ambientIntensity = 0.7;
 
     public Phong( Point eye_pt ) {
         this.eye_pt = new Point( eye_pt );
@@ -40,12 +39,25 @@ public class Phong {
         if( mat == null ) {
             mat = defaultMaterial;
         }
-        Color color = scale(mat.getColor(), (float)mat.getKa());
+        double scale = -hit.getRayData().getTheRay().getDirection().dotProduct(hit.getHit_normal());
+        if( scale < 0.0 ) {
+            scale = 0.0;
+        }
+        if( scale > 1.0 ) {
+            scale = 1.0;
+        }
+        scale *= ambientIntensity;
+        Color color = scale(mat.getColor(), (float)(mat.getKa()*scale));
         for( Light light : lights ) {
-            Vector3 toLight = Vector3.minus(light.getLocation(), eye_pt);
+            Vector3 toLight = Vector3.minus(light.getLocation(), hit.getHit_pt());
             toLight.normalize();
             double cosine = toLight.dotProduct(hit.getHit_normal());
-            color = add( color, scale(light.getDiffuse(), (float)(mat.getKd()*cosine)) );
+            if( cosine < 0.0 ) {
+                continue;
+            } else if( cosine > 1.0 ) {
+                cosine = 1.0;
+            }
+            color = add( color, scale(light.getDiffuse(), (float)(3.0*mat.getKd()*cosine/lights.size())) );
             Vector3 reflected = Vector3.scale(hit.getHit_normal(), 2.0*cosine);
             reflected.minus(toLight);
             reflected.normalize();

@@ -47,6 +47,9 @@ public class BrlcadDb
 	
 	/** number of triangles per Bot piece */
 	public static int BOT_FACES_PER_PIECE = 4;
+
+    public static final String COLOR_TABLE_KEY = "regionid_colortable";
+    public static final String REGION_ID_KEY = "region_id";
 	
 	/**
 	 * Constructor

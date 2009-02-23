@@ -215,9 +215,9 @@ public class Combination extends DbObject
                 float[] rgb = new float[3];
                 for( int i=0 ; i<3 ; i++ ) {
                     rgb[i] = Float.valueOf(rgbs[i]) / 255.0f;
-                    Color color = new Color(rgb[0], rgb[1], rgb[2]);
-                    this.material = new Material( oshader, color );
                 }
+                Color color = new Color(rgb[0], rgb[1], rgb[2]);
+                this.material = new Material(oshader, color);
             }
         }
 	}

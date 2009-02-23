@@ -51,6 +51,7 @@ public class PreppedDb
 	
 	public PreppedDb( BrlcadDb db, String ... objs ) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
 	{
+        this.boundingBox = new BoundingBox();
 		this.regions = new ArrayList<PreppedCombination>();
 		this.initialBox = new BoxNode();
 		Matrix m = new Matrix( 4, 4 );
@@ -76,9 +77,10 @@ public class PreppedDb
 			}
 			
 			m.unit();
-			dbObject.prep( null, this, m );
+			PreppedObject po = dbObject.prep( null, this, m );
+            this.boundingBox.extend(po.getBoundingBox());
 		}
-		this.boundingBox = new BoundingBox( this.initialBox.getBoundingBox() );
+//		this.boundingBox = new BoundingBox( this.initialBox.getBoundingBox() );
 		
 		//start cutting initialBox
 		this.spacePartition = this.cut( this.initialBox );

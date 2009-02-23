@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 
+import org.brlcad.geometry.BrlcadDb;
 import org.brlcad.numerics.Ray;
 import org.brlcad.shading.Material;
 import org.brlcad.spacePartition.RayData;
@@ -25,6 +26,7 @@ public class PreppedCombination extends PreppedObject
 {
 	private Tree tree;
 	private boolean isRegion;
+    private int regionID;
     private Material material;
 	
 	public PreppedCombination( Combination comb )
@@ -33,10 +35,19 @@ public class PreppedCombination extends PreppedObject
 		this.tree = comb.getTree();
 		this.index = comb.getIndex();
 		this.isRegion = comb.getAttribute( "region" ) != null;
+        if( this.isRegion ) {
+            this.regionID = Integer.valueOf(comb.getAttribute(BrlcadDb.REGION_ID_KEY));
+        } else {
+            this.regionID = Integer.MIN_VALUE;
+        }
         this.material = comb.getMaterial();
 	}
 
     protected PreppedCombination() {
+    }
+
+    public int getID() {
+        return this.regionID;
     }
 	
 	/**

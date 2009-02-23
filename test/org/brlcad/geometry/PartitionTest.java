@@ -53,7 +53,7 @@ public class PartitionTest {
         Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         Segment seg = new Segment(inHit, outHit);
-        Partition part = new Partition(seg, reg1.getName(), rayData);
+        Partition part = new Partition(seg, reg1.getName(), 123, rayData);
         segs1.add(part);
 
         dist = 3.0;
@@ -68,7 +68,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg2.getName(), rayData);
+        part = new Partition(seg, reg2.getName(), 345, rayData);
         segs1.add(part);
 
         dist = 1.25;
@@ -83,7 +83,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg3.getName(), rayData);
+        part = new Partition(seg, reg3.getName(), 567, rayData);
         segs2.add(part);
 
         dist = 2.5;
@@ -98,7 +98,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg4.getName(), rayData);
+        part = new Partition(seg, reg4.getName(), 789, rayData);
         segs2.add(part);
 
         SortedSet<Partition> result = Partition.intersect(null, null);
@@ -150,7 +150,7 @@ public class PartitionTest {
         Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         Segment seg = new Segment(inHit, outHit);
-        Partition part = new Partition(seg, reg1.getName(), rayData);
+        Partition part = new Partition(seg, reg1.getName(), 123, rayData);
         segs1.add(part);
 
         dist = 3.0;
@@ -165,7 +165,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg2.getName(), rayData);
+        part = new Partition(seg, reg2.getName(), 345, rayData);
         segs1.add(part);
 
         dist = 1.25;
@@ -180,7 +180,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg3.getName(), rayData);
+        part = new Partition(seg, reg3.getName(), 567, rayData);
         segs2.add(part);
 
         dist = 2.5;
@@ -195,7 +195,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg4.getName(), rayData);
+        part = new Partition(seg, reg4.getName(), 789, rayData);
         segs2.add(part);
 
         SortedSet<Partition> result = Partition.subtract(null, null);
@@ -256,7 +256,7 @@ public class PartitionTest {
         Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         Segment seg = new Segment(inHit, outHit);
-        Partition part = new Partition(seg, reg1.getName(), rayData);
+        Partition part = new Partition(seg, reg1.getName(), 123, rayData);
         segs1.add(part);
 
         dist = 3.0;
@@ -271,7 +271,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg2.getName(), rayData);
+        part = new Partition(seg, reg2.getName(), 456, rayData);
         segs1.add(part);
 
         dist = 1.25;
@@ -286,7 +286,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg3.getName(), rayData);
+        part = new Partition(seg, reg3.getName(), 567, rayData);
         segs2.add(part);
 
         dist = 2.5;
@@ -301,7 +301,7 @@ public class PartitionTest {
         outHit = new Hit(dist, hitPoint, norm, 1, rayData);
 
         seg = new Segment(inHit, outHit);
-        part = new Partition(seg, reg4.getName(), rayData);
+        part = new Partition(seg, reg4.getName(), 789, rayData);
         segs2.add(part);
 
         SortedSet<Partition> result = Partition.union(null, null);

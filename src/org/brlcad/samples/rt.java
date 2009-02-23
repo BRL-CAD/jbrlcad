@@ -24,16 +24,21 @@ import javax.measure.quantity.Angle;
 import javax.measure.unit.NonSI;
 import org.brlcad.geometry.BadGeometryException;
 import org.brlcad.geometry.BrlcadDb;
+import org.brlcad.geometry.DbAttributeOnly;
 import org.brlcad.geometry.DbException;
 import org.brlcad.geometry.DbNameNotFoundException;
+import org.brlcad.geometry.DbObject;
 import org.brlcad.geometry.Partition;
 import org.brlcad.geometry.SimpleOverlapHandler;
 import org.brlcad.numerics.BoundingBox;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Ray;
 import org.brlcad.numerics.Vector3;
+import org.brlcad.shading.ColorTable;
 import org.brlcad.shading.Light;
 import org.brlcad.shading.Material;
+import org.brlcad.shading.NormalShader;
+import org.brlcad.shading.Shader;
 import org.brlcad.shading.Phong;
 import org.brlcad.spacePartition.PreppedDb;
 import org.jscience.physics.amount.Amount;
@@ -147,18 +152,29 @@ public class rt {
             gridStart.join(-radius, xDir);
             double delta = radius * 2.0 / size;
             Set<Light> lights = new HashSet<Light>();
-            Light light = new Light( gridCenter, new Color(255, 255, 255), new Color(200, 100, 0) );
+            Light light = new Light( gridCenter, new Color(255, 255, 255), new Color(255, 255, 255) );
             lights.add(light);
             Color backGround = new Color( 200, 200, 200 );
             ByteBuffer buffer = null;
             if( outputFile != null ) {
                 buffer = ByteBuffer.allocate(3 * size * size);
             }
+
+            // get colortable from _GLOBAL
+            DbObject dbo = brlcadDb.getInternal("_GLOBAL");
+            ColorTable colorTable = null;
+            if( dbo instanceof DbAttributeOnly ) {
+                DbAttributeOnly global = (DbAttributeOnly) dbo;
+                String colortab = global.getAttribute(BrlcadDb.COLOR_TABLE_KEY);
+                if( colortab != null ) {
+                    colorTable = new ColorTable(colortab);
+                }
+            }
             ExecutorService executor = Executors.newFixedThreadPool(cpus);
             Object lock = new Object();
             for( int row = 0 ; row < size ; row++ ) {
                 executor.submit(new RowTask(row, size, gridStart, xDir, yDir, rayDir,
-                        delta, lights, backGround, prepped, buffer, fbOs, lock));
+                        delta, lights, backGround, prepped, colorTable, buffer, fbOs, lock));
             }
             executor.shutdown();
             while( !executor.awaitTermination(10, TimeUnit.SECONDS));
@@ -203,13 +219,14 @@ public class rt {
         private ByteBuffer buffer;
         private Vector3 rayDir;
         private Color backGround;
+        private ColorTable colorTable;
         private PreppedDb prepped;
         private final Object lock;
         private OutputStream fbOs;
 
         public RowTask(int row, int size, Point gridStart, Vector3 xDir, Vector3 yDir, Vector3 rayDir,
                 double delta, Set<Light> lights, Color backGround, PreppedDb prepped,
-                ByteBuffer buffer, OutputStream fbOs, Object lock) {
+                ColorTable colorTable, ByteBuffer buffer, OutputStream fbOs, Object lock) {
             this.row = row;
             this.size = size;
             this.gridStart = gridStart;
@@ -221,6 +238,7 @@ public class rt {
             this.backGround = backGround;
             this.buffer = buffer;
             this.prepped = prepped;
+            this.colorTable = colorTable;
             this.lock = lock;
             this.fbOs = fbOs;
         }
@@ -232,13 +250,18 @@ public class rt {
                 start.join(delta * row, yDir);
                 start.join(delta * col, xDir);
                 Ray ray = new Ray(start, rayDir);
-                Phong phong = new Phong(start, lights);
+                Shader shader = new Phong(start, lights);
+//                Shader shader = new NormalShader(start);
                 SortedSet<Partition> parts = prepped.shootRay(ray, new SimpleOverlapHandler());
                 Color color = null;
                 if (parts.size() > 0) {
                     Partition first = parts.first();
                     Material material = prepped.getCombination(first.getFromRegion()).getMaterial();
-                    color = phong.shade(first.getInHit(), material);
+                    if( material == null && colorTable != null ) {
+                        Color matColor = colorTable.getColor(first.getRegionID());
+//                        System.out.println( "Setting color of " + first.getFromRegion() + " to " + matColor);
+                    }
+                    color = shader.shade(first.getInHit(), material);
                 } else {
                     color = backGround;
                 }

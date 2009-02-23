@@ -122,7 +122,7 @@ public class Tree implements Serializable
 				}
 				break;
 		}
-		
+
 		return bb;
 	}
 	
@@ -178,7 +178,7 @@ public class Tree implements Serializable
 						parts = new TreeSet<Partition>();
 						for( Segment seg:segs )
 						{
-							parts.add( new Partition( seg, reg.getName(), rayData ) );
+							parts.add( new Partition( seg, reg.getName(), reg.getID(), rayData ) );
 						}
 					}
 				}

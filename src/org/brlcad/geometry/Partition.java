@@ -29,8 +29,9 @@ public class Partition implements Comparable,Serializable {
     private float outObliquity;
     private String fromRegion;
     private double los;
+    private int regionID;
 
-    public Partition(Segment seg, String reg, RayData rayData) {
+    public Partition(Segment seg, String reg, int regionid, RayData rayData) {
         this.in_hit = seg.getInHit();
         this.out_hit = seg.getOutHit();
         this.fromRegion = reg;
@@ -38,10 +39,11 @@ public class Partition implements Comparable,Serializable {
         this.flipOutNormal = false;
         this.los = out_hit.getHit_pt().dist(in_hit.getHit_pt());
         this.calcObliquities(rayData);
+        this.regionID = regionid;
     }
 
     public Partition(Hit inHit, boolean inFlip, Hit outHit, boolean outFlip,
-            float enterObl, float exitObl, String reg) {
+            float enterObl, float exitObl, String reg, int regionid) {
         this.in_hit = inHit;
         this.flipInNormal = inFlip;
         this.inObliquity = enterObl;
@@ -50,6 +52,7 @@ public class Partition implements Comparable,Serializable {
         this.outObliquity = exitObl;
         this.fromRegion = reg;
         this.los = out_hit.getHit_pt().dist(in_hit.getHit_pt());
+        this.regionID = regionid;
     }
 
     public Partition(Partition part) {
@@ -61,6 +64,11 @@ public class Partition implements Comparable,Serializable {
         this.inObliquity = part.inObliquity;
         this.outObliquity = part.outObliquity;
         this.los = part.los;
+        this.regionID = part.regionID;
+    }
+
+    public int getRegionID() {
+        return this.regionID;
     }
 
     private void calcObliquities( RayData rayData ) {
@@ -282,7 +290,7 @@ public class Partition implements Comparable,Serializable {
                 if (inHit != null && outHit != null) {
                     if (inHit.getHit_dist() < outHit.getHit_dist()) {
                         parts.add(new Partition(inHit, false, outHit, false,
-                                inObliquity, outObliquity, part1.fromRegion));
+                                inObliquity, outObliquity, part1.fromRegion, part1.regionID));
                     }
                 }
             }
