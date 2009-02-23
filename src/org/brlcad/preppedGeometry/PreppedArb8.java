@@ -268,7 +268,7 @@ public class PreppedArb8 extends PreppedObject
 	 *
 	 * @param    ray                 a  Ray
 	 *
-	 * @return   number of hits
+	 * @return   List of Segments
 	 *
 	 */
 	public List<Segment> shoot(Ray ray, RayData rayData)
@@ -295,8 +295,7 @@ public class PreppedArb8 extends PreppedObject
 				// if ray is on the outside of this face, then we missed the entire arb8
 				if( dxbdn > Double.MIN_VALUE )
 				{
-					done = true;
-					break;
+                    return new ArrayList<Segment>();
 				}
 			}
 			else
@@ -345,7 +344,6 @@ public class PreppedArb8 extends PreppedObject
 				Hit outhit = new Hit( outdist, outPoint, outPlane.getNormal(), outSurfNum, rayData );
 				Segment seg = new Segment( inhit, outhit );
 				segs.add( seg );
-				rayData.addSegs( this, segs );
 			}
 		}
 		
