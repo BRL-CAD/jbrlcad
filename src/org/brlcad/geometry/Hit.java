@@ -119,6 +119,7 @@ public class Hit implements Comparable,Serializable
 		return hit_surfno;
 	}
 	
+    @Override
 	public String toString()
 	{
 		return "Hit: dist_pt=" + hit_dist +
