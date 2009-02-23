@@ -22,10 +22,10 @@ public class Partition implements Comparable,Serializable {
 
     private static final  Logger logger = Logger.getLogger(Partition.class.getName());
     private Hit in_hit;
-    private boolean flipInNormal;
+    private boolean flipInNormal = false;
     private float inObliquity;
     private Hit out_hit;
-    private boolean flipOutNormal;
+    private boolean flipOutNormal = false;
     private float outObliquity;
     private String fromRegion;
     private double los;
@@ -65,6 +65,14 @@ public class Partition implements Comparable,Serializable {
         this.outObliquity = part.outObliquity;
         this.los = part.los;
         this.regionID = part.regionID;
+    }
+
+    private void reverseInHitNormal() {
+        this.flipInNormal = !this.flipInNormal;
+    }
+
+    private void reverseOutHitNormal() {
+        this.flipOutNormal = !this.flipOutNormal;
     }
 
     public int getRegionID() {
@@ -182,14 +190,14 @@ public class Partition implements Comparable,Serializable {
     public void setInHit(Hit hit, boolean flip) {
         this.in_hit = hit;
         if (flip) {
-            this.flipInNormal = !this.flipInNormal;
+            this.reverseInHitNormal();
         }
     }
 
     public void setOutHit(Hit hit, boolean flip) {
         this.out_hit = hit;
         if (flip) {
-            this.flipOutNormal = !this.flipOutNormal;
+            this.reverseOutHitNormal();
         }
     }
 
@@ -249,6 +257,8 @@ public class Partition implements Comparable,Serializable {
             Hit outHit;
             float inObliquity;
             float outObliquity;
+            boolean inflip1 = part1.isFlipInNormal();
+            boolean outflip1 = part1.isFlipOutNormal();
 
             logger.log(Level.FINEST, "Starting seg: <" + inDist1 + " - " + outDist1 + ">");
 
@@ -259,6 +269,10 @@ public class Partition implements Comparable,Serializable {
                 double outDist2 = part2.out_hit.getHit_dist();
                 float inObliquity2 = part2.getInObliquity();
                 float outObliquity2 = part2.getOutObliquity();
+                boolean inflip2 = part2.isFlipInNormal();
+                boolean outflip2 = part2.isFlipOutNormal();
+                boolean inflip;
+                boolean outflip;
 
                 logger.log(Level.FINEST, "intersect seg: <" + inDist2 + " - " + outDist2 + ">");
 
@@ -271,25 +285,33 @@ public class Partition implements Comparable,Serializable {
                     outHit = part2.out_hit;
                     inObliquity = inObliquity2;
                     outObliquity = outObliquity2;
+                    inflip = inflip2;
+                    outflip = outflip2;
                 } else if (inDist2 > inDist1) {
                     inHit = part2.in_hit;
                     outHit = part1.out_hit;
                     inObliquity = inObliquity2;
                     outObliquity = outObliquity1;
+                    inflip = inflip2;
+                    outflip = outflip1;
                 } else if (outDist2 < outDist1) {
                     inHit = part1.in_hit;
                     outHit = part2.out_hit;
                     inObliquity = inObliquity1;
                     outObliquity = outObliquity2;
+                    inflip = inflip1;
+                    outflip = outflip2;
                 } else {
                     inHit = part1.in_hit;
                     outHit = part1.out_hit;
                     inObliquity = inObliquity1;
                     outObliquity = outObliquity1;
+                    inflip = inflip1;
+                    outflip = outflip1;
                 }
                 if (inHit != null && outHit != null) {
                     if (inHit.getHit_dist() < outHit.getHit_dist()) {
-                        parts.add(new Partition(inHit, false, outHit, false,
+                        parts.add(new Partition(inHit, inflip, outHit, outflip,
                                 inObliquity, outObliquity, part1.fromRegion, part1.regionID));
                     }
                 }

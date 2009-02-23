@@ -6,12 +6,13 @@
 package org.brlcad.shading;
 
 import java.awt.Color;
-import org.brlcad.geometry.Hit;
+import org.brlcad.geometry.Partition;
+import org.brlcad.numerics.Point;
 
 /**
  *
  * @author jra
  */
 public interface Shader {
-    public Color shade( Hit hit, Material mat );
+    public Color shade( Partition part, Material mat, Point eye_pt );
 }

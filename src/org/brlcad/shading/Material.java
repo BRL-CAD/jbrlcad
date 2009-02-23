@@ -25,7 +25,7 @@ public class Material implements Serializable {
         this.color = new Color(color.getRGB());
         this.ks = 0.7;
         this.kd = 0.2;
-        this.ka = 0.5;
+        this.ka = 1.0;
         this.alpha = 10;
     }
 

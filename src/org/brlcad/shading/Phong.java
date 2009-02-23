@@ -8,7 +8,7 @@ package org.brlcad.shading;
 import java.awt.Color;
 import java.util.HashSet;
 import java.util.Set;
-import org.brlcad.geometry.Hit;
+import org.brlcad.geometry.Partition;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Vector3;
 
@@ -17,29 +17,28 @@ import org.brlcad.numerics.Vector3;
  * @author jra
  */
 public class Phong implements Shader {
-    private static final Material defaultMaterial = new Material("default", new Color(55, 55, 55));
-    private Point eye_pt;
+    private static final Material defaultMaterial = new Material("default", new Color(200, 200, 200));
     private Set<Light> lights;
     private double ambientIntensity = 0.7;
 
-    public Phong( Point eye_pt ) {
-        this.eye_pt = new Point( eye_pt );
+    public Phong() {
         this.lights = new HashSet<Light>();
     }
 
-    public Phong( Point eye_pt, Set<Light> lights ) {
-        this.eye_pt = new Point( eye_pt );
+    public Phong( Set<Light> lights ) {
         this.lights = new HashSet<Light>();
         this.lights.addAll(lights);
     }
 
-    public Color shade( Hit hit, Material mat ) {
-        Vector3 toEye = Vector3.minus(eye_pt, hit.getHit_pt());
+    public Color shade( Partition part, Material mat, Point eye_pt ) {
+        Vector3 toEye = Vector3.minus(eye_pt, part.getInHit().getHit_pt());
         toEye.normalize();
         if( mat == null ) {
             mat = defaultMaterial;
         }
-        double scale = -hit.getRayData().getTheRay().getDirection().dotProduct(hit.getHit_normal());
+        Point hit_pt = part.getInHit().getHit_pt();
+        Vector3 hit_normal = part.getInHitNormal();
+        double scale = -part.getInHit().getRayData().getTheRay().getDirection().dotProduct(hit_normal);
         if( scale < 0.0 ) {
             scale = 0.0;
         }
@@ -49,26 +48,34 @@ public class Phong implements Shader {
         scale *= ambientIntensity;
         Color color = scale(mat.getColor(), (float)(mat.getKa()*scale));
         for( Light light : lights ) {
-            Vector3 toLight = Vector3.minus(light.getLocation(), hit.getHit_pt());
+            Vector3 toLight = Vector3.minus(light.getLocation(), hit_pt);
             toLight.normalize();
-            double cosine = toLight.dotProduct(hit.getHit_normal());
+            double cosine = toLight.dotProduct(hit_normal);
             if( cosine < 0.0 ) {
                 continue;
             } else if( cosine > 1.0 ) {
                 cosine = 1.0;
             }
             color = add( color, scale(light.getDiffuse(), (float)(3.0*mat.getKd()*cosine/lights.size())) );
-            Vector3 reflected = Vector3.scale(hit.getHit_normal(), 2.0*cosine);
+            Vector3 reflected = Vector3.scale(hit_normal, 2.0*cosine);
             reflected.minus(toLight);
             reflected.normalize();
             cosine = reflected.dotProduct(toEye);
-            double spec = Math.pow(cosine, mat.getAlpha());
-            color = add( color, scale(light.getSpecular(), (float)(mat.getKs()*spec)));
+            if( cosine > 1.0 ) {
+                cosine = 1.0;
+            }
+            if( cosine > 0.0 ) {
+                double spec = Math.pow(cosine, mat.getAlpha());
+                color = add(color, scale(light.getSpecular(), (float) (mat.getKs() * spec)));
+            }
         }
         float[] rgb = color.getRGBColorComponents(null);
         for (int i = 0; i < 3; i++) {
             if (rgb[i] > 1.0) {
                 rgb[i] = 1.0f;
+            }
+            if( rgb[i] < 0.0 ) {
+                rgb[i] = 0.0f;
             }
         }
         return new Color(rgb[0], rgb[1], rgb[2]);
@@ -107,20 +114,6 @@ public class Phong implements Shader {
 
     public void addLight( Light l ) {
         this.lights.add(l);
-    }
-
-    /**
-     * @return the eye_pt
-     */
-    public Point getEye_pt() {
-        return eye_pt;
-    }
-
-    /**
-     * @param eye_pt the eye_pt to set
-     */
-    public void setEye_pt(Point eye_pt) {
-        this.eye_pt = eye_pt;
     }
 
     /**

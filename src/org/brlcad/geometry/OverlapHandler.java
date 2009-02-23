@@ -17,5 +17,17 @@ public interface OverlapHandler
 	 * @return	A SortedSet of Partitions with no overlaps
 	 */
 	public SortedSet<Partition> handleOverlaps( SortedSet<Partition> parts, Ray ray );
+
+    /**
+     * Set this OverlapHandler to be quite (do not report overlaps)
+     * @param quiet boolean value (true means do not report)
+     */
+    public void setQuiet( boolean quiet );
+
+    /**
+     * Get the quiet value for this OverlapHandler. True means do not report overlaps
+     * @return the boolean quiet value
+     */
+    public boolean isQuiet();
 }
 

@@ -6,7 +6,7 @@
 package org.brlcad.shading;
 
 import java.awt.Color;
-import org.brlcad.geometry.Hit;
+import org.brlcad.geometry.Partition;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Vector3;
 
@@ -16,18 +16,16 @@ import org.brlcad.numerics.Vector3;
  */
 public class NormalShader implements Shader {
 
-    private Point eye_pt;
-
-    public NormalShader( Point eye_pt ) {
-        this.eye_pt = new Point( eye_pt );
+    public NormalShader() {
     }
 
 
-    public Color shade(Hit hit, Material mat) {
-        Vector3 toEye = Vector3.minus(eye_pt, hit.getHit_pt());
+    public Color shade(Partition part, Material mat, Point eye_pt) {
+        Point hit_pt = part.getInHit().getHit_pt();
+        Vector3 hit_norm = part.getInHitNormal();
+        Vector3 toEye = Vector3.minus(eye_pt, hit_pt);
         toEye.normalize();
-        Vector3 norm = hit.getHit_normal();
-        float dot = (float) norm.dotProduct(toEye);
+        float dot = (float) hit_norm.dotProduct(toEye);
         if( dot < 0.0 ) {
             dot = 0.0f;
         }

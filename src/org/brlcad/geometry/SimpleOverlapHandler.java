@@ -11,6 +11,7 @@ import org.brlcad.numerics.Ray;
 
 public class SimpleOverlapHandler implements OverlapHandler
 {
+    private boolean quiet = false;
 	
 	/**
 	 * Method to reconcile overlaps along a ray trace.
@@ -41,7 +42,7 @@ public class SimpleOverlapHandler implements OverlapHandler
 				if( part2.getOutHit().getHit_dist() < part1.getOutHit().getHit_dist() )
 				{
 					// part2 is entirely inside part1 (delete it)
-					if( !part1.getFromRegion().equals(part2.getFromRegion()) )
+					if( !quiet && !part1.getFromRegion().equals(part2.getFromRegion()) )
 					{
 						System.err.println( "OVERLAP on Ray: " + ray + "\n\t" + part1 + "\n\t" + part2 );
 					}
@@ -54,16 +55,16 @@ public class SimpleOverlapHandler implements OverlapHandler
 					{
 						// not really an overlap, but handle it
 						part1.setOutHit( part2.getOutHit(), false );
-						part1.setFlipOutNormal( part2.isFlipOutNormal() );
 						iter.remove();
 						continue;
 					}
 					else
 					{
 						// two different regions, select part1
-						System.err.println( "OVERLAP on Ray: " + ray + "\n\t" + part1 + "\n\t" + part2 );
-						part2.setInHit( part1.getOutHit(), false );
-						part2.setFlipInNormal( !part1.isFlipOutNormal() );
+                        if( !quiet ) {
+                            System.err.println("OVERLAP on Ray: " + ray + "\n\t" + part1 + "\n\t" + part2);
+                        }
+						part2.setInHit( part1.getOutHit(), true );
 					}
 				}
 			}
@@ -73,6 +74,14 @@ public class SimpleOverlapHandler implements OverlapHandler
 		}
 		return parts;
 	}
+
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
+    }
+
+    public boolean isQuiet() {
+        return this.quiet;
+    }
 	
 }
 

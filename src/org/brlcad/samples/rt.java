@@ -28,6 +28,7 @@ import org.brlcad.geometry.DbAttributeOnly;
 import org.brlcad.geometry.DbException;
 import org.brlcad.geometry.DbNameNotFoundException;
 import org.brlcad.geometry.DbObject;
+import org.brlcad.geometry.OverlapHandler;
 import org.brlcad.geometry.Partition;
 import org.brlcad.geometry.SimpleOverlapHandler;
 import org.brlcad.numerics.BoundingBox;
@@ -61,6 +62,7 @@ public class rt {
         String dbFileName = null;
         String[] tlos = null;
         int fbPort = -1;
+        boolean reportOverlaps = true;
 
         if (args.length < 2) {
             System.err.println(usage);
@@ -88,6 +90,10 @@ public class rt {
                 } else if( "-e".equals(arg)) {
                     argNo++;
                     el = Amount.valueOf(Double.valueOf(args[argNo]), NonSI.DEGREE_ANGLE);
+                } else if( "-r".equals(arg)) {
+                    reportOverlaps = true;
+                } else if( "-R".equals(arg)) {
+                    reportOverlaps = false;
                 } else {
                     endOfOptions = true;
                     continue;
@@ -170,11 +176,13 @@ public class rt {
                     colorTable = new ColorTable(colortab);
                 }
             }
+            OverlapHandler oh = new SimpleOverlapHandler();
+            oh.setQuiet(!reportOverlaps);
             ExecutorService executor = Executors.newFixedThreadPool(cpus);
             Object lock = new Object();
             for( int row = 0 ; row < size ; row++ ) {
                 executor.submit(new RowTask(row, size, gridStart, xDir, yDir, rayDir,
-                        delta, lights, backGround, prepped, colorTable, buffer, fbOs, lock));
+                        delta, lights, oh, backGround, prepped, colorTable, buffer, fbOs, lock));
             }
             executor.shutdown();
             while( !executor.awaitTermination(10, TimeUnit.SECONDS));
@@ -223,9 +231,10 @@ public class rt {
         private PreppedDb prepped;
         private final Object lock;
         private OutputStream fbOs;
+        private OverlapHandler oh;
 
         public RowTask(int row, int size, Point gridStart, Vector3 xDir, Vector3 yDir, Vector3 rayDir,
-                double delta, Set<Light> lights, Color backGround, PreppedDb prepped,
+                double delta, Set<Light> lights, OverlapHandler oh, Color backGround, PreppedDb prepped,
                 ColorTable colorTable, ByteBuffer buffer, OutputStream fbOs, Object lock) {
             this.row = row;
             this.size = size;
@@ -235,6 +244,7 @@ public class rt {
             this.rayDir = rayDir;
             this.delta = delta;
             this.lights = lights;
+            this.oh = oh;
             this.backGround = backGround;
             this.buffer = buffer;
             this.prepped = prepped;
@@ -250,9 +260,9 @@ public class rt {
                 start.join(delta * row, yDir);
                 start.join(delta * col, xDir);
                 Ray ray = new Ray(start, rayDir);
-                Shader shader = new Phong(start, lights);
-//                Shader shader = new NormalShader(start);
-                SortedSet<Partition> parts = prepped.shootRay(ray, new SimpleOverlapHandler());
+                Shader shader = new Phong(lights);
+//                Shader shader = new NormalShader();
+                SortedSet<Partition> parts = prepped.shootRay(ray, oh);
                 Color color = null;
                 if (parts.size() > 0) {
                     Partition first = parts.first();
@@ -261,7 +271,7 @@ public class rt {
                         Color matColor = colorTable.getColor(first.getRegionID());
 //                        System.out.println( "Setting color of " + first.getFromRegion() + " to " + matColor);
                     }
-                    color = shader.shade(first.getInHit(), material);
+                    color = shader.shade(first, material, start);
                 } else {
                     color = backGround;
                 }
