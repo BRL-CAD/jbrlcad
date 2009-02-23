@@ -234,7 +234,6 @@ public class PreppedEllipsoid extends PreppedObject
 			
 			Segment seg = new Segment( hit1, hit2 );
 			segments.add( seg );
-			rayData.addSegs( this, segments );
 		}
 		else
 		{
@@ -278,7 +277,6 @@ public class PreppedEllipsoid extends PreppedObject
 			
 			Segment seg = new Segment( inHit, outHit );
 			segments.add( seg );
-			rayData.addSegs( this, segments );
 		}
 		
 		return segments;

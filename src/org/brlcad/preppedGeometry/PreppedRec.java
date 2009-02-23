@@ -290,7 +290,6 @@ public class PreppedRec extends PreppedObject {
         }
 
         List<Segment> segs = makeSegs(hits, ray, rayData);
-        rayData.addSegs(this, segs);
 
         return segs;
     }

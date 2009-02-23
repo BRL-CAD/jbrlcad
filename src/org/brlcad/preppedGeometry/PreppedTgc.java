@@ -601,7 +601,6 @@ public class PreppedTgc extends PreppedObject {
             hits.add(hit);
         }
         List<Segment> segs = this.makeSegs(hits, ray, rayData);
-        rayData.addSegs(this, segs);
 
         return segs;
     }
