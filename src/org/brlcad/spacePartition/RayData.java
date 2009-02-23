@@ -92,8 +92,8 @@ public class RayData implements Serializable
 		
 		for( PreppedObject obj : pos )
 		{
-			List<Segment> segs = obj.makeSegs( this.hits.get( obj ), this.theRay, this );
-			this.addSegs( obj, segs );
+			List<Segment> objSegs = obj.makeSegs( this.hits.get( obj ), this.theRay, this );
+			this.addSegs( obj, objSegs );
 		}
 	}
 	
