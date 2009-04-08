@@ -30,6 +30,7 @@ public class Partition implements Comparable,Serializable {
     private String fromRegion;
     private double los;
     private int regionID;
+    private int airCode;
 
     public Partition(Segment seg, String reg, int regionid, RayData rayData) {
         this.in_hit = seg.getInHit();
@@ -43,7 +44,7 @@ public class Partition implements Comparable,Serializable {
     }
 
     public Partition(Hit inHit, boolean inFlip, Hit outHit, boolean outFlip,
-            float enterObl, float exitObl, String reg, int regionid) {
+            float enterObl, float exitObl, String reg, int regionid, int aircode) {
         this.in_hit = inHit;
         this.flipInNormal = inFlip;
         this.inObliquity = enterObl;
@@ -53,6 +54,7 @@ public class Partition implements Comparable,Serializable {
         this.fromRegion = reg;
         this.los = out_hit.getHit_pt().dist(in_hit.getHit_pt());
         this.regionID = regionid;
+        this.airCode = aircode;
     }
 
     public Partition(Partition part) {
@@ -312,7 +314,7 @@ public class Partition implements Comparable,Serializable {
                 if (inHit != null && outHit != null) {
                     if (inHit.getHit_dist() < outHit.getHit_dist()) {
                         parts.add(new Partition(inHit, inflip, outHit, outflip,
-                                inObliquity, outObliquity, part1.fromRegion, part1.regionID));
+                                inObliquity, outObliquity, part1.fromRegion, part1.regionID, part1.airCode));
                     }
                 }
             }
@@ -519,7 +521,7 @@ public class Partition implements Comparable,Serializable {
 
     @Override
     public String toString() {
-        return this.fromRegion +
+        return this.fromRegion + " id=" + this.regionID + " air code=" + this.airCode +
                 "\n\tin hit: " + this.in_hit.toString(this.flipInNormal) +
                 "\n\tout hit: " + this.out_hit.toString(this.flipOutNormal);
     }
@@ -564,6 +566,20 @@ public class Partition implements Comparable,Serializable {
      */
     public void setLos(double los) {
         this.los = los;
+    }
+
+    /**
+     * @return the airCode
+     */
+    public int getAirCode() {
+        return airCode;
+    }
+
+    /**
+     * @param airCode the airCode to set
+     */
+    public void setAirCode(int airCode) {
+        this.airCode = airCode;
     }
 }
 
