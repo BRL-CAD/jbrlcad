@@ -476,6 +476,10 @@ public class BoundingBox implements Serializable {
         }
     }
 
+    public boolean doesIntersect( Ray ray ) {
+        return (intersect(ray) != null);
+    }
+
     /**
      * toString() for a BoundingBox
      *
