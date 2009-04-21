@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Set;
 import org.brlcad.numerics.Constants;
+import org.brlcad.utils.ArrayCopy;
 
 public class PreppedArb8 extends PreppedObject
 {
@@ -130,8 +131,8 @@ public class PreppedArb8 extends PreppedObject
 			throw new BadGeometryException( "Arb8 has illegal number of faces (" + pa.faces + ")" );
 		}
 		
-		this.aface = Arrays.copyOf(pa.aface, pa.faces);
-		this.oface = Arrays.copyOf(pa.oface, pa.faces);
+		this.aface = ArrayCopy.copyOf(pa.aface, pa.faces);
+		this.oface = ArrayCopy.copyOf(pa.oface, pa.faces);
 		this.boundingBox = new BoundingBox();
 		for( int i=0 ; i<8 ; i++ )
 		{

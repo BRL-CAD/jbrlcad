@@ -19,6 +19,7 @@ import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Ray;
 import org.brlcad.numerics.Vector3;
 import org.brlcad.spacePartition.PreppedDb;
+import org.brlcad.utils.ArrayCopy;
 
 public class BrlcadJava
 {
@@ -66,7 +67,7 @@ public class BrlcadJava
 		{
 			BrlcadDb brlcadDb = new BrlcadDb( args[argNo++] );
             tlos = new String[args.length - argNo];
-            tlos = Arrays.copyOfRange(args, argNo, args.length);
+            tlos = ArrayCopy.copyOfRange(args, argNo, args.length);
 			PreppedDb prepped = new PreppedDb( brlcadDb, tlos );
 			Ray ray = new Ray( start, dir );
 			SortedSet<Partition> parts = prepped.shootRay( ray, new SimpleOverlapHandler() );
