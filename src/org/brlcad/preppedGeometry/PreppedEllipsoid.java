@@ -223,14 +223,14 @@ public class PreppedEllipsoid extends PreppedObject
 			pt1.join( dist1, ray.getDirection() );
 			Vector3 norm1 = Vector3.minus( pt1, this.center );
 			norm1.normalize();
-			Hit hit1 = new Hit( dist1, pt1, norm1, 1, rayData );
+			Hit hit1 = new Hit( dist1, pt1, norm1, 1, rayData, this.name );
 			
 			double dist2 = dot + root;
 			Point pt2 = new Point( ray.getStart() );
 			pt2.join( dist2, ray.getDirection() );
 			Vector3 norm2 = Vector3.minus( pt2, this.center );
 			norm2.normalize();
-			Hit hit2 = new Hit( dist2, pt2, norm2, 1, rayData );
+			Hit hit2 = new Hit( dist2, pt2, norm2, 1, rayData, this.name );
 			
 			Segment seg = new Segment( hit1, hit2 );
 			segments.add( seg );
@@ -272,8 +272,8 @@ public class PreppedEllipsoid extends PreppedObject
 			this.invScaleRot.mult( outNormal );
 			outNormal.normalize();
 			
-			Hit inHit = new Hit( k1, inPoint, inNormal, 1, rayData );
-			Hit outHit = new Hit( k2, outPoint, outNormal, 1, rayData );
+			Hit inHit = new Hit( k1, inPoint, inNormal, 1, rayData, this.name );
+			Hit outHit = new Hit( k2, outPoint, outNormal, 1, rayData, this.name );
 			
 			Segment seg = new Segment( inHit, outHit );
 			segments.add( seg );

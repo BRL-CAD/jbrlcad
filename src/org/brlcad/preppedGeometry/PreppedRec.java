@@ -207,7 +207,7 @@ public class PreppedRec extends PreppedObject {
                 Point hitPoint = new Point(ray.getStart());
                 hitPoint.translate(Vector3.scale(ray.getDirection(), k1));
                 Vector3 norm = Vector3.negate(rec_Hunit);
-                Hit hit = new Hit(k1, hitPoint, norm, Tgc.BOTTOM, rayData);
+                Hit hit = new Hit(k1, hitPoint, norm, Tgc.BOTTOM, rayData, this.name);
                 hits.add(hit);
             }
         }
@@ -218,7 +218,7 @@ public class PreppedRec extends PreppedObject {
                 Point hitPoint = new Point(ray.getStart());
                 hitPoint.translate(Vector3.scale(ray.getDirection(), k2));
                 Vector3 norm = new Vector3(rec_Hunit);
-                Hit hit = new Hit(k2, hitPoint, norm, Tgc.TOP, rayData);
+                Hit hit = new Hit(k2, hitPoint, norm, Tgc.TOP, rayData, this.name);
                 hits.add(hit);
             }
         }
@@ -271,7 +271,7 @@ public class PreppedRec extends PreppedObject {
                 vpriv.setZ(0.0);
                 rec_invRoS.mult(vpriv);
                 vpriv.normalize();
-                Hit hit = new Hit(k1, hitPoint, vpriv, Tgc.BODY, rayData);
+                Hit hit = new Hit(k1, hitPoint, vpriv, Tgc.BODY, rayData, this.name);
                 hits.add(hit);
             }
         }
@@ -284,7 +284,7 @@ public class PreppedRec extends PreppedObject {
                 vpriv.setZ(0.0);
                 rec_invRoS.mult(vpriv);
                 vpriv.normalize();
-                Hit hit = new Hit(k2, hitPoint, vpriv, Tgc.BODY, rayData);
+                Hit hit = new Hit(k2, hitPoint, vpriv, Tgc.BODY, rayData, this.name);
                 hits.add(hit);
             }
         }
@@ -326,10 +326,10 @@ public class PreppedRec extends PreppedObject {
             int surfno = hit.getHit_surfno();
             if (surfno == Tgc.BODY) {
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                        "One intersection with body of primitive " + this.name);
+                        "One intersection with body of primitive " + this.name + " on ray " + ray);
             } else {
                 Logger.getLogger(this.getClass().getName()).log(Level.WARNING,
-                        "One intersection with top or bottom of primitive " + this.name);
+                        "One intersection with top or bottom of primitive " + this.name + " on ray " + ray);
             }
             /*
              *  Ray is tangent to body of cylinder,

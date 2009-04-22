@@ -146,7 +146,7 @@ public class PreppedTriangle implements Serializable
 		double hitDist = wxb.dotProduct( this.normal ) / dn;
 		Point hitPoint = new Point( ray.getStart() );
 		hitPoint.join( hitDist, ray.getDirection() );
-		return new Hit( hitDist, hitPoint, this.norm, this.surfaceNumber, rayData );
+		return new Hit( hitDist, hitPoint, this.norm, this.surfaceNumber, rayData, this.parent.name );
 	}
 }
 

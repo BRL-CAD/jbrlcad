@@ -48,6 +48,7 @@ public class PreppedDb
 	private int preppedSolidCount = 0;
 	private int preppedRegionCount = 0;
     private List<PreppedObjectPiece> pieces = new ArrayList<PreppedObjectPiece>();
+    public static final String DbBoundingBoxName = "DB BoundingBox";
 	
 	public PreppedDb( BrlcadDb db, String ... objs ) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
 	{
@@ -273,9 +274,9 @@ public class PreppedDb
 		}
 		Point outHitPoint = new Point( ray.getStart() );
 		outHitPoint.join( rmax, ray.getDirection() );
-		Hit inHit = new Hit( rmin, inHitPoint, norm1, imin, null );
+		Hit inHit = new Hit( rmin, inHitPoint, norm1, imin, null, PreppedDb.DbBoundingBoxName );
 		Vector3 norm2 = Vector3.negate( norm1 );
-		Hit outHit = new Hit( rmax, outHitPoint, norm2, imax, null );
+		Hit outHit = new Hit( rmax, outHitPoint, norm2, imax, null, PreppedDb.DbBoundingBoxName );
 		
 		return new Segment( inHit, outHit );
 	}

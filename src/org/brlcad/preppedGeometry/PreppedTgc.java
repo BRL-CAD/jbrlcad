@@ -597,7 +597,7 @@ public class PreppedTgc extends PreppedObject {
                     norm.negate();
                     break;
             }
-            Hit hit = new Hit(k[i], hit_pt, norm, hit_type[i], rayData);
+            Hit hit = new Hit(k[i], hit_pt, norm, hit_type[i], rayData, this.name);
             hits.add(hit);
         }
         List<Segment> segs = this.makeSegs(hits, ray, rayData);

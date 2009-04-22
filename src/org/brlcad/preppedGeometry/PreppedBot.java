@@ -137,7 +137,7 @@ public class PreppedBot extends PreppedObject
 					Vector3 inNorm = new Vector3( outHit.getHit_normal() );
 					inNorm.negate();
 					inHit = new Hit( outHit.getHit_dist(), outHit.getHit_pt(), inNorm,
-									outHit.getHit_surfno(), rayData );
+									outHit.getHit_surfno(), rayData, this.name );
 				}
 				else
 				{
@@ -146,7 +146,7 @@ public class PreppedBot extends PreppedObject
 					Vector3 outNorm = new Vector3( inHit.getHit_normal() );
 					outNorm.negate();
 					outHit = new Hit( inHit.getHit_dist(), inHit.getHit_pt(), outNorm,
-									 inHit.getHit_surfno(), rayData );
+									 inHit.getHit_surfno(), rayData, this.name );
 				}
 				segs.add( new Segment( inHit, outHit ));
 			}
@@ -184,7 +184,7 @@ public class PreppedBot extends PreppedObject
 					double outDist = hit.getHit_dist() + los;
 					Point hitPoint = new Point( ray.getStart() );
 					hitPoint.join( outDist, ray.getDirection() );
-					Hit outHit = new Hit( outDist, hitPoint, outNorm, hit.getHit_surfno(), rayData );
+					Hit outHit = new Hit( outDist, hitPoint, outNorm, hit.getHit_surfno(), rayData, this.name );
 					
 					Segment seg = new Segment( hit, outHit );
 					segs.add( seg );
@@ -201,7 +201,7 @@ public class PreppedBot extends PreppedObject
 					outPoint.join( outDist, ray.getDirection() );
 					Vector3 outNorm = new Vector3( hit.getHit_normal() );
 					outNorm.negate();
-					Hit outHit = new Hit( outDist, outPoint, outNorm, hit.getHit_surfno(), rayData );
+					Hit outHit = new Hit( outDist, outPoint, outNorm, hit.getHit_surfno(), rayData, this.name );
 					
 					Segment seg = new Segment( hit, outHit );
 					segs.add( seg );

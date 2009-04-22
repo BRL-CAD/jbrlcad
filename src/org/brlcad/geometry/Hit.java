@@ -20,15 +20,17 @@ public class Hit implements Comparable,Serializable
 	private Vector3 hit_normal;
 	private int hit_surfno;
 	private RayData rayData;
+    private String primitiveName;
 
 	
-	public Hit( double dist, Point pt, Vector3 norm, int surfno, RayData rayData )
+	public Hit( double dist, Point pt, Vector3 norm, int surfno, RayData rayData, String primName )
 	{
 		this.hit_dist = dist;
 		this.hit_pt = pt;
 		this.hit_normal = norm;
 		this.hit_surfno = surfno;
 		this.rayData = rayData;
+        this.primitiveName = primName;
 	}
 
     public Hit(Hit hit) {
@@ -37,6 +39,7 @@ public class Hit implements Comparable,Serializable
         this.hit_pt = hit.getHit_pt();
         this.hit_surfno = hit.getHit_surfno();
         this.rayData = hit.getRayData();
+        this.primitiveName = hit.getPrimitiveName();
     }
 	
 	/**
@@ -125,7 +128,8 @@ public class Hit implements Comparable,Serializable
 		return "Hit: dist_pt=" + hit_dist +
 			", point=" + hit_pt +
 			", norm=" + hit_normal +
-			", surf=" + hit_surfno;
+			", surf=" + hit_surfno +
+            ", on " + this.primitiveName;
 	}
 	public String toString( boolean flipNormal )
 	{
@@ -137,7 +141,8 @@ public class Hit implements Comparable,Serializable
 		return "Hit: dist_pt=" + hit_dist +
 			", point=" + hit_pt +
 			", norm=" + norm +
-			", surf=" + hit_surfno;
+			", surf=" + hit_surfno +
+            ", on " + this.primitiveName;
 	}
 	
 	/**
@@ -255,6 +260,20 @@ public class Hit implements Comparable,Serializable
         hash = 53 * hash + (this.hit_normal != null ? this.hit_normal.hashCode() : 0);
         hash = 53 * hash + this.hit_surfno;
         return hash;
+    }
+
+    /**
+     * @return the primitiveName
+     */
+    public String getPrimitiveName() {
+        return primitiveName;
+    }
+
+    /**
+     * @param primitiveName the primitiveName to set
+     */
+    public void setPrimitiveName(String primitiveName) {
+        this.primitiveName = primitiveName;
     }
 
 }

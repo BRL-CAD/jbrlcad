@@ -325,10 +325,10 @@ public class PreppedArb8 extends PreppedObject
                      * rays that lie very nearly in the plane of a face.
                      */
                     if (dxbdn > Constants.SQRT_SMALL_FASTF)
-                        return segs;	/* MISS */
+                        return new ArrayList<Segment>();	/* MISS */
                 }
                 if( indist > outdist ) {
-                    return segs;
+                    return new ArrayList<Segment>();
                 }
 			}
 		}
@@ -339,10 +339,10 @@ public class PreppedArb8 extends PreppedObject
 			{
 				Point inPoint = new Point( ray.getStart() );
 				inPoint.join( indist, ray.getDirection() );
-				Hit inhit = new Hit( indist, inPoint, inPlane.getNormal(), inSurfNum, rayData );
+				Hit inhit = new Hit( indist, inPoint, inPlane.getNormal(), inSurfNum, rayData, this.name );
 				Point outPoint = new Point( ray.getStart() );
 				outPoint.join( outdist, ray.getDirection() );
-				Hit outhit = new Hit( outdist, outPoint, outPlane.getNormal(), outSurfNum, rayData );
+				Hit outhit = new Hit( outdist, outPoint, outPlane.getNormal(), outSurfNum, rayData, this.name );
 				Segment seg = new Segment( inhit, outhit );
 				segs.add( seg );
 			}
