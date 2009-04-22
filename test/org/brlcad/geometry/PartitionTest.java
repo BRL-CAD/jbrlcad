@@ -45,12 +45,12 @@ public class PartitionTest {
         Point hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         Vector3 norm = Vector3.negate(dir);
-        Hit inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        Hit inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 2.0;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         Segment seg = new Segment(inHit, outHit);
         Partition part = new Partition(seg, reg1.getName(), 123, rayData);
@@ -60,12 +60,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 4.0;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg2.getName(), 345, rayData);
@@ -75,12 +75,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 1.75;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg3.getName(), 567, rayData);
@@ -90,12 +90,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 3.5;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg4.getName(), 789, rayData);
@@ -142,12 +142,12 @@ public class PartitionTest {
         Point hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         Vector3 norm = Vector3.negate(dir);
-        Hit inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        Hit inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 2.0;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         Segment seg = new Segment(inHit, outHit);
         Partition part = new Partition(seg, reg1.getName(), 123, rayData);
@@ -157,12 +157,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 4.0;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg2.getName(), 345, rayData);
@@ -172,12 +172,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 1.75;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg3.getName(), 567, rayData);
@@ -187,12 +187,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 3.5;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg4.getName(), 789, rayData);
@@ -248,12 +248,12 @@ public class PartitionTest {
         Point hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         Vector3 norm = Vector3.negate(dir);
-        Hit inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        Hit inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 2.0;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        Hit outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         Segment seg = new Segment(inHit, outHit);
         Partition part = new Partition(seg, reg1.getName(), 123, rayData);
@@ -263,12 +263,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 4.0;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg2.getName(), 456, rayData);
@@ -278,12 +278,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 1.75;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg3.getName(), 567, rayData);
@@ -293,12 +293,12 @@ public class PartitionTest {
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = Vector3.negate(dir);
-        inHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        inHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
         dist = 3.5;
         hitPoint = new Point(start);
         hitPoint.join(dist, dir);
         norm = new Vector3(dir);
-        outHit = new Hit(dist, hitPoint, norm, 1, rayData);
+        outHit = new Hit(dist, hitPoint, norm, 1, rayData, "test");
 
         seg = new Segment(inHit, outHit);
         part = new Partition(seg, reg4.getName(), 789, rayData);

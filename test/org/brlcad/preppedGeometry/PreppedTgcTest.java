@@ -352,7 +352,7 @@ public class PreppedTgcTest {
             hit_norm = new Vector3(1, 0, 0);
             hit_surf = Tgc.BODY;
             dist = hit_pt.dist(ray.getStart());
-            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData);
+            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData, "test");
             hits.add(hit);
             Hit expectedExitHit = hit;
 
@@ -360,7 +360,7 @@ public class PreppedTgcTest {
             hit_norm = new Vector3(-1, 0, 0);
             hit_surf = Tgc.BODY;
             dist = hit_pt.dist(ray.getStart());
-            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData);
+            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData, "test");
             hits.add(hit);
             Hit expectedEntranceHit = hit;
 
@@ -368,14 +368,14 @@ public class PreppedTgcTest {
             hit_norm = new Vector3(-1, 0, 0);
             hit_surf = Tgc.BODY;
             dist = hit_pt.dist(ray.getStart());
-            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData);
+            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData, "test");
             hits.add(hit);
 
             hit_pt = new Point(5, 2, 3);
             hit_norm = new Vector3(1, 0, 0);
             hit_surf = Tgc.BODY;
             dist = hit_pt.dist(ray.getStart());
-            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData);
+            hit = new Hit(dist, hit_pt, hit_norm, hit_surf, rayData, "test");
             hits.add(hit);
 
             List<Segment> segs = preppedTgc.makeSegs(hits, ray, rayData);
