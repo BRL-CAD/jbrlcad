@@ -191,16 +191,12 @@ public class Partition implements Comparable,Serializable {
 
     public void setInHit(Hit hit, boolean flip) {
         this.in_hit = hit;
-        if (flip) {
-            this.reverseInHitNormal();
-        }
+        this.flipInNormal = flip;
     }
 
     public void setOutHit(Hit hit, boolean flip) {
         this.out_hit = hit;
-        if (flip) {
-            this.reverseOutHitNormal();
-        }
+        this.flipOutNormal = flip;
     }
 
     public Vector3 getOutHitNormal() {
@@ -312,7 +308,7 @@ public class Partition implements Comparable,Serializable {
                     outflip = outflip1;
                 }
                 if (inHit != null && outHit != null) {
-                    if (inHit.getHit_dist() < outHit.getHit_dist()) {
+                    if (Math.abs(inHit.getHit_dist() - outHit.getHit_dist()) > BrlcadDb.getTolerance().getDist()) {
                         parts.add(new Partition(inHit, inflip, outHit, outflip,
                                 inObliquity, outObliquity, part1.fromRegion, part1.regionID, part1.airCode));
                     }
@@ -339,6 +335,8 @@ public class Partition implements Comparable,Serializable {
             return partsL;
         }
 
+        double tol = BrlcadDb.getTolerance().getDist();
+
         List<Partition> result = new ArrayList<Partition>();
         Iterator<Partition> iter = partsL.iterator();
         while( iter.hasNext() ) {
@@ -360,34 +358,49 @@ public class Partition implements Comparable,Serializable {
 
                 logger.log(Level.FINEST, "Subtract seg: <" + inDist2 + " - " + outDist2 + ">");
 
-                if (inDist2 >= outDist1) {
+                if (inDist2 >= outDist1 - tol) {
+                    logger.log(Level.FINEST, "   segs do not overlap, continue" );
                     continue;
                 }
-                if (outDist2 <= inDist1) {
+                if (outDist2 <= inDist1 + tol) {
+                    logger.log(Level.FINEST, "   segs do not overlap, continue" );
                     continue;
                 }
 
-                if( inDist2 <= inDist1 && outDist2 >= outDist1 ) {
+                if (inDist2 <= inDist1 + tol && outDist2 >= outDist1 - tol) {
                     // part1 goes away completely
+                    logger.log(Level.FINEST, "   subtracted seg spans starting seg, so remove starting seg entirely" );
                     result.remove(index);
                     index--;
                     break;
                 }
 
-                if (inDist2 > inDist1 && outDist2 < outDist1) {
+                if (inDist2 > inDist1 + tol && outDist2 < outDist1 - tol) {
+                    logger.log(Level.FINEST, "   subtracted seg is entirely within starting seg:" );
                     Partition newPart = new Partition(part1);
-                    newPart.setInHit(part2.out_hit, true);
+                    newPart.setInHit(part2.out_hit, !part2.flipOutNormal);
                     result.add(index+1, newPart);
-                    part1.setOutHit(part2.in_hit, true);
+                    part1.setOutHit(part2.in_hit, !part2.flipInNormal);
+                    logger.log(Level.FINEST, "   result is two segs:" );
+                    logger.log(Level.FINEST, "      seg1:" );
+                    logger.log(Level.FINEST, part1.toString() );
+                    logger.log(Level.FINEST, "      seg2:" );
+                    logger.log(Level.FINEST, newPart.toString() );
                     break;
                 }
 
-                if (inDist2 > inDist1) {
-                    part1.setOutHit(part2.in_hit, true);
+                if (inDist2 > inDist1 + tol) {
+                    part1.setOutHit(part2.in_hit, !part2.flipInNormal);
+                    logger.log(Level.FINEST, "   subtracted seg starts inside staring seg" );
+                    logger.log(Level.FINEST, "      resulting seg:" );
+                    logger.log(Level.FINEST, part1.toString() );
                 }
 
-                if (outDist2 < outDist1) {
-                    part1.setInHit(part2.out_hit, true);
+                if (outDist2 < outDist1 - tol) {
+                    part1.setInHit(part2.out_hit, !part2.flipOutNormal);
+                    logger.log(Level.FINEST, "   subtracted seg ends inside staring seg" );
+                    logger.log(Level.FINEST, "      resulting seg:" );
+                    logger.log(Level.FINEST, part1.toString() );
                 }
             }
             index++;
@@ -435,22 +448,28 @@ public class Partition implements Comparable,Serializable {
         }
 
         SortedSet<Partition> result = new TreeSet<Partition>();
-        result.addAll(partsL);
-        result.addAll(partsR);
+        for( Partition part : partsL ) {
+            result.add(new Partition(part));
+        }
+        for( Partition part : partsR ) {
+            result.add(new Partition(part));
+        }
 
         Iterator<Partition> iter = result.iterator();
         if (!iter.hasNext()) {
             return null;
         }
 
+        double tol = BrlcadDb.getTolerance().getDist();
+
         Partition part1 = iter.next();
         logger.log(Level.FINEST, "Starting Partition: " + part1);
          while (iter.hasNext()) {
             Partition part2 = iter.next();
             logger.log(Level.FINEST, "  unioning :" + part2);
-            if (part2.in_hit.getHit_dist() <= part1.out_hit.getHit_dist()) {
+            if (part2.in_hit.getHit_dist() <= part1.out_hit.getHit_dist() + tol) {
                 if (part2.out_hit.getHit_dist() > part1.out_hit.getHit_dist()) {
-                    part1.setOutHit(part2.out_hit, false);
+                    part1.setOutHit(part2.out_hit, part2.flipOutNormal);
                     logger.log(Level.FINEST, "   new part1 = " + part1);
                 }
                 iter.remove();
