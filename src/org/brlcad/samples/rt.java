@@ -38,7 +38,6 @@ import org.brlcad.numerics.Vector3;
 import org.brlcad.shading.ColorTable;
 import org.brlcad.shading.Light;
 import org.brlcad.shading.Material;
-import org.brlcad.shading.NormalShader;
 import org.brlcad.shading.Shader;
 import org.brlcad.shading.Phong;
 import org.brlcad.spacePartition.PreppedDb;
@@ -50,7 +49,7 @@ import org.jscience.physics.amount.Amount;
  */
 public class rt {
 
-    private static final String usage = "Usage: rt [-s size] [-a azimuth] [-e elevation] [-o output_file] [-F frame_buffer_port] dbfile.g object1 [object2 object3 ...]";
+    private static final String usage = "Usage: rt [-R] [-b # #] [-s size] [-a azimuth] [-e elevation] [-o output_file] [-F frame_buffer_port] dbfile.g object1 [object2 object3 ...]";
 
     @SuppressWarnings("empty-statement")
     public static void main(String[] args) {
@@ -72,6 +71,8 @@ public class rt {
         boolean endOfOptions = false;
         int argNo = 0;
         int objNo = -1;
+        Integer xPixelNo = -1;
+        Integer yPixelNo = -1;
         while (argNo < args.length) {
             String arg = args[argNo];
             if (!endOfOptions) {
@@ -94,6 +95,11 @@ public class rt {
                     reportOverlaps = true;
                 } else if( "-R".equals(arg)) {
                     reportOverlaps = false;
+                } else if( "-b".equals(arg)) {
+                    argNo++;
+                    xPixelNo = Integer.valueOf(args[argNo]);
+                    argNo++;
+                    yPixelNo = Integer.valueOf(args[argNo]);
                 } else {
                     endOfOptions = true;
                     continue;
@@ -161,10 +167,6 @@ public class rt {
             Light light = new Light( gridCenter, new Color(255, 255, 255), new Color(255, 255, 255) );
             lights.add(light);
             Color backGround = new Color( 200, 200, 200 );
-            ByteBuffer buffer = null;
-            if( outputFile != null ) {
-                buffer = ByteBuffer.allocate(3 * size * size);
-            }
 
             // get colortable from _GLOBAL
             DbObject dbo = brlcadDb.getInternal("_GLOBAL");
@@ -178,6 +180,39 @@ public class rt {
             }
             OverlapHandler oh = new SimpleOverlapHandler();
             oh.setQuiet(!reportOverlaps);
+            ByteBuffer buffer = null;
+            if( outputFile != null ) {
+                buffer = ByteBuffer.allocate(3 * size * size);
+            }
+            if( xPixelNo != -1 && yPixelNo != -1 ) {
+                // just do one pixel
+                Point start = new Point(gridStart);
+                start.join(delta * xPixelNo, yDir);
+                start.join(delta * yPixelNo, xDir);
+                Ray ray = new Ray(start, rayDir);
+                Shader shader = new Phong(lights);
+//                Shader shader = new NormalShader();
+                SortedSet<Partition> parts = prepped.shootRay(ray, oh);
+                Color color = null;
+                if (parts.size() > 0) {
+                    Partition first = parts.first();
+                    Material material = prepped.getCombination(first.getFromRegion()).getMaterial();
+                    if( material == null && colorTable != null ) {
+                        Color matColor = colorTable.getColor(first.getRegionID());
+                        material = new Material("dummy", matColor);
+//                        System.out.println( "Setting color of " + first.getFromRegion() + " to " + matColor);
+                    }
+                    color = shader.shade(first, material, start);
+                } else {
+                    color = backGround;
+                }
+                byte[] bytes = new byte[3];
+                bytes[0] = (byte) color.getRed();
+                bytes[1] = (byte) color.getGreen();
+                bytes[2] = (byte) color.getBlue();
+                rt.writePixelToFrameBuffer(fbOs, xPixelNo, yPixelNo, bytes);
+                return;
+            }
             ExecutorService executor = Executors.newFixedThreadPool(cpus);
             Object lock = new Object();
             for( int row = 0 ; row < size ; row++ ) {
@@ -308,6 +343,20 @@ public class rt {
         bb.putInt(line);
         bb.putInt(pixels.length/3);
         bb.put(pixels);
+        fbOs.write(bb.array());
+    }
+
+    private static void writePixelToFrameBuffer( OutputStream fbOs, int xPixelNo, int yPixelNo, byte[] pixel) throws IOException {
+        short type = 105;
+        ByteBuffer bb = ByteBuffer.allocate(20 + 3);
+        bb.put((byte) 0x41);
+        bb.put((byte) 0xFE);
+        bb.putShort(type);
+        bb.putInt(12 + 1);
+        bb.putInt(xPixelNo);
+        bb.putInt(yPixelNo);
+        bb.putInt(1);
+        bb.put(pixel);
         fbOs.write(bb.array());
     }
 }
