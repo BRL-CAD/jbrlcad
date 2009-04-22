@@ -54,7 +54,7 @@ public class SimpleOverlapHandler implements OverlapHandler
 					if( part1.getFromRegion().equals(part2.getFromRegion()) )
 					{
 						// not really an overlap, but handle it
-						part1.setOutHit( part2.getOutHit(), false );
+						part1.setOutHit( part2.getOutHit(), part2.isFlipOutNormal() );
 						iter.remove();
 						continue;
 					}
@@ -64,7 +64,7 @@ public class SimpleOverlapHandler implements OverlapHandler
                         if( !quiet ) {
                             System.err.println("OVERLAP on Ray: " + ray + "\n\t" + part1 + "\n\t" + part2);
                         }
-						part2.setInHit( part1.getOutHit(), true );
+						part2.setInHit( part1.getOutHit(), !part1.isFlipOutNormal() );
 					}
 				}
 			}
