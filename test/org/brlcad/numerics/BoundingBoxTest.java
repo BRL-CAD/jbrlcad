@@ -121,7 +121,12 @@ public class BoundingBoxTest {
         
         // a Ray that intersects
         Ray r = new Ray( new Point( -10, 2, 2 ), new Vector3( 1, 0, 0 ));
-        double[] hits = bb.intersect(r);
+        double[] hits = null;
+        long startTime = System.currentTimeMillis();
+        for (int i=0 ; i<10000 ; i++) {
+            hits = bb.intersect(r);
+        }
+        System.out.println( "************intersect time = " + (System.currentTimeMillis() - startTime));
         assertEquals( "first hit", 9.0, hits[0], 0.00000001 );
         assertEquals( "second hit", 15.0, hits[1], 0.00000001 );
         
@@ -130,6 +135,37 @@ public class BoundingBoxTest {
         hits = bb.intersect(r);
         assertNull( "should not intersect", hits );
         
+        // a Ray that intersects the corners
+        Vector3 dir = Vector3.minus( bb.getMax(), bb.getMin() );
+        dir.normalize();
+        Point start = new Point( bb.getMin() );
+        start.join( -5.0, dir );
+        r = new Ray( start, dir );
+        hits = bb.intersect(r);
+        assertEquals( "first hit", 5.0, hits[0], 0.00000001 );
+        assertEquals( "second hit", 19.142135623730947, hits[1], 0.00000001 );
+    }
+
+    @Test
+    public void testIsect() {
+        BoundingBox bb = new BoundingBox( new Point( -1, -2, -3 ), new Point( 5, 6, 7 ) );
+
+        // a Ray that intersects
+        Ray r = new Ray(new Point(-10, 2, 2), new Vector3(1, 0, 0));
+        double[] hits = null;
+        long startTime = System.currentTimeMillis();
+        for (int i=0 ; i<10000 ; i++) {
+            hits = bb.isect2(r);
+        }
+        System.out.println( "************isect time = " + (System.currentTimeMillis() - startTime));
+        assertEquals( "first hit", 9.0, hits[0], 0.00000001 );
+        assertEquals( "second hit", 15.0, hits[1], 0.00000001 );
+
+        // a Ray that misses
+        r = new Ray( new Point( -10, 2, 2 ), new Vector3( 0, 0, 1 ));
+        hits = bb.intersect(r);
+        assertNull( "should not intersect", hits );
+
         // a Ray that intersects the corners
         Vector3 dir = Vector3.minus( bb.getMax(), bb.getMin() );
         dir.normalize();

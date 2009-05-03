@@ -147,7 +147,6 @@ public class rt {
             brlcadDb = new BrlcadDb(dbFileName);
 			prepped = new PreppedDb( brlcadDb, tlos );
             BoundingBox bb = prepped.getBoundingBox();
-            System.out.println( "BB=" + bb);
             Vector3 tmp = new Vector3(0, 0, 1);
             xDir = rayDir.crossProduct(tmp);;
             xDir.normalize();

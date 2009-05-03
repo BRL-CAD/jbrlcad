@@ -243,6 +243,10 @@ public class BoundingBox implements Serializable {
         return new Point( min );
     }
 
+    public void setMax(int i, double cutValue) {
+        this.max.set(i, cutValue);
+    }
+
     /**
      * Set the min value of the bounding box.
      *
@@ -383,6 +387,10 @@ public class BoundingBox implements Serializable {
         return ret;
     }
 
+    public void setMin(int i, double cutValue) {
+        this.min.set(i, cutValue);
+    }
+
     /**
      * Determines if a ray is in a plane.
      *
@@ -403,6 +411,56 @@ public class BoundingBox implements Serializable {
             return false;
         } else {
             return true;
+        }
+    }
+
+    public double[] isect2(Ray r) throws IllegalArgumentException {
+        if (r == null || !Ray.isValidRay(r)) {
+            throw new IllegalArgumentException("intersect() called with Ray that is either null or not valid");
+        }
+
+        double inHit = Double.NEGATIVE_INFINITY;
+        double outHit = Double.POSITIVE_INFINITY;
+
+        for (int axis=0 ; axis<3 ; axis++) {
+            double d;
+            double dirComp;
+            double dist;
+
+            d = min.get(axis);
+            dirComp = r.getDirection().get(axis);
+            dist = (d - r.getStart().get(axis)) / dirComp;
+            if (dirComp < 0.0) {
+                if (dist < outHit) {
+                    outHit = dist;
+                }
+            } else if (dirComp > 0.0) {
+                if (dist > inHit) {
+                    inHit = dist;
+                }
+            }
+
+            d = max.get(axis);
+            dirComp = r.getDirection().get(axis);
+            dist = (d - r.getStart().get(axis)) / dirComp;
+            if (dirComp < 0.0) {
+                if (dist > inHit) {
+                    inHit = dist;
+                }
+            } else if (dirComp > 0.0) {
+                if (dist < outHit) {
+                    outHit = dist;
+                }
+            }
+        }
+
+        if (inHit >= outHit) {
+            return null;
+        } else {
+            double[] hits = new double[2];
+            hits[0] = inHit;
+            hits[1] = outHit;
+            return hits;
         }
     }
 

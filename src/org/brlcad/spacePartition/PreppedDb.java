@@ -81,7 +81,6 @@ public class PreppedDb
 			PreppedObject po = dbObject.prep( null, this, m );
             this.boundingBox.extend(po.getBoundingBox());
 		}
-//		this.boundingBox = new BoundingBox( this.initialBox.getBoundingBox() );
 		
 		//start cutting initialBox
 		this.spacePartition = this.cut( this.initialBox );
@@ -135,39 +134,25 @@ public class PreppedDb
 				cutAxis = 2;
 			}
 		}
-		
+
 		BoxNode lower = new BoxNode();
 		BoxNode upper = new BoxNode();
 		
 		BoundingBox upperBB = new BoundingBox( box.getBoundingBox() );
 		BoundingBox lowerBB = new BoundingBox( box.getBoundingBox() );
-		switch( cutAxis )
-		{
-			case 0:
-				if( max.getX() - min.getX() <= BoxNode.MIN_BOX_WIDTH ) return box;
-				cutValue = (max.getX() + min.getX()) / 2.0;
-				upperBB.getMin().setX( cutValue );
-				lowerBB.getMax().setX( cutValue );
-				break;
-			case 1:
-				if( max.getY() - min.getY() <= BoxNode.MIN_BOX_WIDTH ) return box;
-				cutValue = (max.getY() + min.getY()) / 2.0;
-				upperBB.getMin().setY( cutValue );
-				lowerBB.getMax().setY( cutValue );
-				break;
-			case 2:
-				if( max.getZ() - min.getZ() <= BoxNode.MIN_BOX_WIDTH ) return box;
-				cutValue = (max.getZ() + min.getZ()) / 2.0;
-				upperBB.getMin().setZ( cutValue );
-				lowerBB.getMax().setZ( cutValue );
-				break;
-		}
+        if (max.get(cutAxis) - min.get(cutAxis) <= BoxNode.MIN_BOX_WIDTH) {
+            return box;
+        }
+        cutValue = (max.get(cutAxis) + min.get(cutAxis)) / 2.0;
+        upperBB.setMin(cutAxis, cutValue);
+        lowerBB.setMax(cutAxis, cutValue);
+        
 		lower.setBoundingBox( lowerBB );
 		upper.setBoundingBox( upperBB );
 		
 		lower.populate( box );
 		upper.populate( box );
-		
+
 		if( lower.size() == box.size() && upper.size() == box.size() )
 		{
 			return box;
@@ -283,22 +268,22 @@ public class PreppedDb
 	
 	public SortedSet<Partition> shootRay( Ray ray, OverlapHandler overlapHandler )
 	{
+
+		SortedSet<Partition> parts = new TreeSet<Partition>();
 		ray.getDirection().normalize();
 		
 		
 		// first intersect with model bounding box
-		Segment seg = this.shootBoundingBox( ray, this.boundingBox );
+        double[] hits = this.boundingBox.isect2(ray);
 		
-		if( seg == null )
+		if( hits == null )
 		{
-			return new TreeSet<Partition>();
+			return parts;
 		}
-
-		SortedSet<Partition> parts = new TreeSet<Partition>();
 		
-		double maxDist = seg.getOutHit().getHit_dist();
+		double maxDist = hits[1];
 		Point locator = new Point( ray.getStart() );
-		locator.join( BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );
+		locator.join( hits[0] + BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );
 		BitSet regbits = new BitSet( this.preppedRegionCount );
 		BitSet solidBits = new BitSet( this.preppedSolidCount );
 		RayData rayData = new RayData( locator, BoxNode.MIN_BOX_WIDTH/10.0, solidBits, regbits, BrlcadDb.getTolerance(), ray );
@@ -324,5 +309,16 @@ public class PreppedDb
 		
 		return parts;
 	}
+
+    private void printNodes(Node n) {
+        if (n==null) return;
+        if (n instanceof CutNode) {
+            CutNode c = (CutNode) n;
+            printNodes(c.getLtCutValue());
+            printNodes(c.getGteCutValue());
+        } else {
+            System.out.println(n.toString());
+        }
+    }
 }
 

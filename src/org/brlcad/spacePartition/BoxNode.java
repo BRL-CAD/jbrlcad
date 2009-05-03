@@ -142,12 +142,17 @@ public class BoxNode extends Node
 				rayData.addHits( obj.getPreppedObject(), hits );
 			}
 		}
-		Segment seg = db.shootBoundingBox( ray, this.boundingBox );
-		rayData.setDist( seg.getOutHit().getHit_dist() );
+        double [] hits = this.boundingBox.isect2(ray);
+		rayData.setDist( hits[1] );
 		Point locator = new Point( ray.getStart() );
-		locator.join( seg.getOutHit().getHit_dist() + BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );
+		locator.join( hits[1] + BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );
 		rayData.setLocator( locator );
 	}
-	
+
+    @Override
+    public String toString() {
+        return "BoxNode: " + this.boundingBox + ", contains " + this.preppedObjects.size() +
+                " objects and " + this.preppedPieces.size() + " pieces.";
+    }
 }
 

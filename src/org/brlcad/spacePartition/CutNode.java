@@ -35,5 +35,19 @@ public class CutNode extends Node
 			gteCutValue.shootRay( db, ray, rayData );
 		}
 	}
+
+    /**
+     * @return the ltCutValue
+     */
+    public Node getLtCutValue() {
+        return ltCutValue;
+    }
+
+    /**
+     * @return the gteCutValue
+     */
+    public Node getGteCutValue() {
+        return gteCutValue;
+    }
 }
 
