@@ -147,6 +147,15 @@ public class rt {
             brlcadDb = new BrlcadDb(dbFileName);
 			prepped = new PreppedDb( brlcadDb, tlos );
             BoundingBox bb = prepped.getBoundingBox();
+            if (bb == null) {
+                System.err.println( "Bounding Box is null (perhaps the object you specified is empty)");
+                System.exit(1);
+            }
+
+            if (bb.getMin() == null || bb.getMax() == null) {
+                System.err.println( "Bounding Box is null (perhaps the object you specified is empty)");
+                System.exit(1);
+            }
             Vector3 tmp = new Vector3(0, 0, 1);
             xDir = rayDir.crossProduct(tmp);;
             xDir.normalize();
@@ -288,6 +297,7 @@ public class rt {
         }
 
         public void run() {
+            try {
             byte[] bytes = new byte[3*size];
             for (int col = 0; col < size; col++) {
                 Point start = new Point(gridStart);
@@ -328,6 +338,9 @@ public class rt {
                     Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
         }
     }
 

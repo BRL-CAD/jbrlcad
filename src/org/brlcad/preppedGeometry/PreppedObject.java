@@ -143,6 +143,9 @@ public abstract class PreppedObject implements Serializable
 	 */
 	public BoundingBox getBoundingBox()
 	{
+        if (boundingBox == null) {
+            return null;
+        }
 		return new BoundingBox( boundingBox );
 	}
 	

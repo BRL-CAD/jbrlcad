@@ -49,12 +49,20 @@ public class BoundingBox implements Serializable {
      * @param bb Another BoundingBox
      */
     public BoundingBox( BoundingBox bb ) {
-        this.max = new Point( bb.getMax() );
-        this.min = new Point( bb.getMin() );
+        if (bb != null) {
+            if (bb.getMin() != null && bb.getMax() != null) {
+                this.max = new Point(bb.getMax());
+                this.min = new Point(bb.getMin());
+            }
+        }
     }
 
     public void extend(BoundingBox bb) {
         if( bb == null ) {
+            return;
+        }
+
+        if (bb.getMax() == null || bb.getMin() == null ) {
             return;
         }
 
@@ -218,6 +226,9 @@ public class BoundingBox implements Serializable {
      * @return The max value
      */
     public Point getMax() {
+        if (max == null) {
+            return null;
+        }
         return new Point( max );
     }
 
@@ -240,6 +251,9 @@ public class BoundingBox implements Serializable {
      * @return The min value
      */
     public Point getMin() {
+        if (min == null) {
+            return null;
+        }
         return new Point( min );
     }
 

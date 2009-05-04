@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import java.util.concurrent.atomic.AtomicInteger;
 import org.brlcad.numerics.BoundingBox;
 import org.brlcad.numerics.Matrix;
 import org.brlcad.numerics.Point;
@@ -79,19 +80,42 @@ public class PreppedDb
 			
 			m.unit();
 			PreppedObject po = dbObject.prep( null, this, m );
-            this.boundingBox.extend(po.getBoundingBox());
+            BoundingBox bb = po.getBoundingBox();
+            if (bb != null) {
+                this.boundingBox.extend(po.getBoundingBox());
+            }
 		}
 		
 		//start cutting initialBox
 		this.spacePartition = this.cut( this.initialBox );
+//        AtomicInteger boxCount = new AtomicInteger(0);
+//        plotBoxes(this.spacePartition, boxCount);
 	}
+
+    private void plotBoxes( Node n, AtomicInteger boxCount) {
+        if (n instanceof BoxNode) {
+            BoxNode bn = (BoxNode) n;
+            String name = "box." + boxCount.incrementAndGet();
+            System.out.println( "in " + name + " rpp " +
+                    bn.getBoundingBox().getMin().getX() + " " +
+                    bn.getBoundingBox().getMax().getX() + " " +
+                    bn.getBoundingBox().getMin().getY() + " " +
+                    bn.getBoundingBox().getMax().getY() + " " +
+                    bn.getBoundingBox().getMin().getZ() + " " +
+                    bn.getBoundingBox().getMax().getZ() );
+        } else if (n instanceof CutNode) {
+            CutNode cn = (CutNode) n;
+            plotBoxes(cn.getGteCutValue(), boxCount);
+            plotBoxes(cn.getLtCutValue(), boxCount);
+        }
+    }
 
     protected PreppedDb() {
     }
 	
 	private Node cut( BoxNode box)
 	{
-		if( box.size() < 5 )
+		if( box.size() < 15 )
 		{
 			return box;
 		}
@@ -274,7 +298,13 @@ public class PreppedDb
 		
 		
 		// first intersect with model bounding box
-        double[] hits = this.boundingBox.isect2(ray);
+        double[] hits = null;
+
+        if (this.boundingBox != null) {
+            if (this.boundingBox.getMin() != null && this.boundingBox.getMax() != null){
+                hits = this.boundingBox.isect2(ray);
+            }
+        }
 		
 		if( hits == null )
 		{
@@ -286,7 +316,7 @@ public class PreppedDb
 		locator.join( hits[0] + BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );
 		BitSet regbits = new BitSet( this.preppedRegionCount );
 		BitSet solidBits = new BitSet( this.preppedSolidCount );
-		RayData rayData = new RayData( locator, BoxNode.MIN_BOX_WIDTH/10.0, solidBits, regbits, BrlcadDb.getTolerance(), ray );
+		RayData rayData = new RayData( locator, hits[0]+BoxNode.MIN_BOX_WIDTH/10.0, solidBits, regbits, BrlcadDb.getTolerance(), ray );
 		while( rayData.getDist() < maxDist )
 		{
 			this.spacePartition.shootRay( this, ray, rayData );

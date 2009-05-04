@@ -83,7 +83,7 @@ public class Combination extends DbObject
 		}
 		
 		// new pointer that starts at the RPN expresion
-		if( rpnLength == 0 )
+		if( rpnLength == 0 && numLeaves > 0 )
 		{
 			List<Tree> list1 = new ArrayList<Tree>();
 			List<Tree> list2 = new ArrayList<Tree>();
@@ -140,6 +140,10 @@ public class Combination extends DbObject
 				list2= new ArrayList<Tree>();
 			}
 		}
+        else if (rpnLength == 0 && numLeaves == 0) {
+            // this combination has no tree
+            tree = null;
+        }
 		else
 		{
 			int tmpptr = pointer + leafBytes;
@@ -252,21 +256,19 @@ public class Combination extends DbObject
 	public PreppedObject prep( PreppedCombination reg, PreppedDb preppedDb, Matrix matrix) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
 	{
 		BoundingBox boundingBox = null;
-		PreppedCombination pc =  null;
+		PreppedCombination pc = new PreppedCombination( this );
 		boolean isRegion = this.getAttribute( "region" ) != null;
-		if( isRegion && reg == null )
-		{
-			pc =  new PreppedCombination( this );
-			boundingBox = this.tree.prep( pc, preppedDb, matrix );
-			preppedDb.addPreppedRegion( pc );
-		}
-		else
-		{
-			boundingBox = this.tree.prep( reg, preppedDb, matrix );
-			pc =  new PreppedCombination( this );
-            preppedDb.addPreppedCombination(pc);
-		}
-		pc.setBoundingBox( boundingBox );
+        if (this.tree != null) {
+            if (isRegion && reg == null) {
+                boundingBox = this.tree.prep(pc, preppedDb, matrix);
+                preppedDb.addPreppedRegion(pc);
+                pc.setBoundingBox(boundingBox);
+            } else {
+                boundingBox = this.tree.prep(reg, preppedDb, matrix);
+                preppedDb.addPreppedCombination(pc);
+                pc.setBoundingBox(boundingBox);
+            }
+        }
 		
 		return pc;
 	}

@@ -111,7 +111,11 @@ public class Tree implements Serializable
 					m.mult( this.mat );
 				}
 				this.leaf = preppedDb.getDb().getInternal( this.leafName ).prep( reg, preppedDb, m );
-				bb = new BoundingBox( this.leaf.getBoundingBox() );
+                if (this.leaf.getBoundingBox() != null) {
+                    bb = new BoundingBox(this.leaf.getBoundingBox());
+                } else {
+                    bb = null;
+                }
 				if( this.leaf instanceof PreppedCombination )
 				{
 					break;

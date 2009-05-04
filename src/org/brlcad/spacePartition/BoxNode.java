@@ -22,7 +22,7 @@ import org.brlcad.numerics.Ray;
 
 public class BoxNode extends Node
 {
-	public static final double MIN_BOX_WIDTH = 0.01;
+	public static final double MIN_BOX_WIDTH = 20.0;
 	private BoundingBox boundingBox;
 	private List<PreppedObject> preppedObjects;
 	private List<PreppedObjectPiece> preppedPieces;
@@ -147,7 +147,7 @@ public class BoxNode extends Node
 		Point locator = new Point( ray.getStart() );
 		locator.join( hits[1] + BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );
 		rayData.setLocator( locator );
-	}
+    }
 
     @Override
     public String toString() {
