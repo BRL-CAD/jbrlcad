@@ -234,7 +234,7 @@ public class BrlcadDb
                         return new Tgc( dbExt );
 					default:
 						throw new DbException( "Unrecognized minor type (" +
-												  dbExt.getMinorType() + ")" );
+												  dbExt.getMinorType() + "), for object: " + dbExt.getName() );
 				}
 			case 2:
 				return new DbAttributeOnly( dbExt );
