@@ -12,10 +12,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.brlcad.numerics.Matrix;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.preppedGeometry.PreppedObject;
-
-import org.brlcad.numerics.Matrix;
 import org.brlcad.spacePartition.PreppedDb;
 
 public abstract class DbObject implements Serializable
@@ -35,7 +34,7 @@ public abstract class DbObject implements Serializable
 	protected DbObject( DbExternal dbExt )
 	{
 		// get the object name
-		this.name = new String( dbExt.getName() );
+		this.name = dbExt.getName();
 		
 		// create an empty map of attributes
 		this.attributes = new HashMap <String, String>();

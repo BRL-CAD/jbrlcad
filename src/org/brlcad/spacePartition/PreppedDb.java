@@ -6,19 +6,6 @@
 
 
 package org.brlcad.spacePartition;
-import org.brlcad.geometry.BadGeometryException;
-import org.brlcad.geometry.BrlcadDb;
-import org.brlcad.geometry.DbException;
-import org.brlcad.geometry.DbNameNotFoundException;
-import org.brlcad.geometry.DbObject;
-import org.brlcad.geometry.Hit;
-import org.brlcad.geometry.OverlapHandler;
-import org.brlcad.geometry.Partition;
-import org.brlcad.preppedGeometry.PreppedCombination;
-import org.brlcad.preppedGeometry.PreppedObject;
-import org.brlcad.preppedGeometry.PreppedObjectPiece;
-import org.brlcad.geometry.Segment;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -27,13 +14,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
-
 import java.util.concurrent.atomic.AtomicInteger;
+
+import org.brlcad.geometry.BadGeometryException;
+import org.brlcad.geometry.BrlcadDb;
+import org.brlcad.geometry.DbException;
+import org.brlcad.geometry.DbNameNotFoundException;
+import org.brlcad.geometry.DbObject;
+import org.brlcad.geometry.Hit;
+import org.brlcad.geometry.OverlapHandler;
+import org.brlcad.geometry.Partition;
+import org.brlcad.geometry.Segment;
 import org.brlcad.numerics.BoundingBox;
 import org.brlcad.numerics.Matrix;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Ray;
 import org.brlcad.numerics.Vector3;
+import org.brlcad.preppedGeometry.PreppedCombination;
+import org.brlcad.preppedGeometry.PreppedObject;
+import org.brlcad.preppedGeometry.PreppedObjectPiece;
 
 
 
@@ -48,7 +47,7 @@ public class PreppedDb
 	private BoxNode initialBox;
 	private int preppedSolidCount = 0;
 	private int preppedRegionCount = 0;
-    private List<PreppedObjectPiece> pieces = new ArrayList<PreppedObjectPiece>();
+    private final List<PreppedObjectPiece> pieces = new ArrayList<PreppedObjectPiece>();
     public static final String DbBoundingBoxName = "DB BoundingBox";
 	
 	public PreppedDb( BrlcadDb db, String ... objs ) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
@@ -67,6 +66,12 @@ public class PreppedDb
 			try
 			{
 				dbObject = db.getInternal( obj );
+				m.unit();
+				PreppedObject po = dbObject.prep( null, this, m );
+	            BoundingBox bb = po.getBoundingBox();
+	            if (bb != null) {
+	                this.boundingBox.extend(po.getBoundingBox());
+	            }
 			}
 			catch (DbException e) {
 				e.printStackTrace();
@@ -78,12 +83,6 @@ public class PreppedDb
 				e.printStackTrace();
 			}
 			
-			m.unit();
-			PreppedObject po = dbObject.prep( null, this, m );
-            BoundingBox bb = po.getBoundingBox();
-            if (bb != null) {
-                this.boundingBox.extend(po.getBoundingBox());
-            }
 		}
 		
 		//start cutting initialBox

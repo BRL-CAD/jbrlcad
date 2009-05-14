@@ -6,16 +6,17 @@ package org.brlcad.geometry;
  */
 
 
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
-import java.util.Map;
-import java.util.HashMap;
-import java.io.IOException;
 import java.io.EOFException;
-import org.brlcad.numerics.Tolerance;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.RandomAccessFile;
 import java.util.BitSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import org.brlcad.numerics.Tolerance;
 
 public class BrlcadDb
 {
@@ -168,7 +169,7 @@ public class BrlcadDb
 			}
 			catch( Exception e1 )
 			{
-				throw new DbException( "Db has no GLOBAL object " + e1);
+				throw new DbException( "Db has no GLOBAL object ", e1);
 			}
 			return;
 		}
@@ -280,17 +281,17 @@ public class BrlcadDb
 		switch( numBytes )
 		{
 			case 1:
-				return (long)this.dbInput.readUnsignedByte();
+				return this.dbInput.readUnsignedByte();
 			case 2:
-				return (long)this.dbInput.readUnsignedShort();
+				return this.dbInput.readUnsignedShort();
 			case 4:
 				byte[] bytes = new byte[4];
 				this.dbInput.readFully( bytes );
-				longNum = (long)(bytes[0] & 0xff);
+				longNum = (bytes[0] & 0xff);
 				for( int i=1 ; i<4 ; i++ )
 				{
 					longNum = longNum << 8;
-					longNum |= (long)(bytes[i] & 0xff);
+					longNum |= (bytes[i] & 0xff);
 				}
 				return longNum;
 			case 8:
@@ -321,11 +322,11 @@ public class BrlcadDb
 		switch( numBytes )
 		{
 			case 1:
-				return (long)this.dbInput.readByte();
+				return this.dbInput.readByte();
 			case 2:
-				return (long)this.dbInput.readShort();
+				return this.dbInput.readShort();
 			case 4:
-				return (long)this.dbInput.readInt();
+				return this.dbInput.readInt();
 			case 8:
 				return this.dbInput.readLong();
 			default:
@@ -344,7 +345,7 @@ public class BrlcadDb
 	 */
 	public static long getLong( byte[] bytes, int pointer, int length )
 	{
-		long longBytes = (long)(bytes[pointer] & 0xff);
+		long longBytes = (bytes[pointer] & 0xff);
 		for( int i=1 ; i<length ; i++ )
 		{
 			longBytes = longBytes << 8;
@@ -366,7 +367,7 @@ public class BrlcadDb
 	 */
 	public static double getDouble( byte[] bytes, int pointer )
 	{
-		long longBytes = (long)(bytes[pointer] & 0xff);
+		long longBytes = (bytes[pointer] & 0xff);
 		for( int i=1 ; i<8 ; i++ )
 		{
 			longBytes = longBytes << 8;

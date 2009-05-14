@@ -6,18 +6,18 @@ package org.brlcad.geometry;
 
 
 import java.awt.Color;
-import java.util.Stack;
-import org.brlcad.numerics.Matrix;
-import org.brlcad.spacePartition.PreppedDb;
-import org.brlcad.numerics.BoundingBox;
 import java.io.IOException;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Stack;
 
+import org.brlcad.numerics.BoundingBox;
+import org.brlcad.numerics.Matrix;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.preppedGeometry.PreppedObject;
 import org.brlcad.shading.Material;
+import org.brlcad.spacePartition.PreppedDb;
 
 public class Combination extends DbObject
 {
@@ -176,31 +176,31 @@ public class Combination extends DbObject
 						stack.push( node );
 						break;
 					case union:
-						right = (Tree)stack.pop();
-						left = (Tree)stack.pop();
+						right = stack.pop();
+						left = stack.pop();
 						node = new Tree( left, right, Operator.UNION );
 						stack.push( node );
 						break;
 					case intersection:
-						right = (Tree)stack.pop();
-						left = (Tree)stack.pop();
+						right = stack.pop();
+						left = stack.pop();
 						node = new Tree( left, right, Operator.INTERSECTION );
 						stack.push( node );
 						break;
 					case subtraction:
-						right = (Tree)stack.pop();
-						left = (Tree)stack.pop();
+						right = stack.pop();
+						left = stack.pop();
 						node = new Tree( left, right, Operator.SUBTRACTION );
 						stack.push( node );
 						break;
 					case xor:
-						right = (Tree)stack.pop();
-						left = (Tree)stack.pop();
+						right = stack.pop();
+						left = stack.pop();
 						node = new Tree( left, right, Operator.XOR );
 						stack.push( node );
 						break;
 					case not:
-						right = (Tree)stack.pop();
+						right = stack.pop();
 						node = new Tree( null, right, Operator.NOT );
 						stack.push( node );
 						break;
@@ -208,7 +208,7 @@ public class Combination extends DbObject
 						throw new DbException( "Unrecognized operator in RPN expression in external form of a Combination" );
 				}
 			}
-			this.tree = (Tree)stack.pop();
+			this.tree = stack.pop();
 		}
 
         String oshader = this.getAttribute("oshader");
@@ -218,7 +218,7 @@ public class Combination extends DbObject
             if( rgbs.length == 3 ) {
                 float[] rgb = new float[3];
                 for( int i=0 ; i<3 ; i++ ) {
-                    rgb[i] = Float.valueOf(rgbs[i]) / 255.0f;
+                    rgb[i] = Float.parseFloat(rgbs[i]) / 255.0f;
                 }
                 Color color = new Color(rgb[0], rgb[1], rgb[2]);
                 this.material = new Material(oshader, color);
@@ -253,6 +253,7 @@ public class Combination extends DbObject
 	 * @para matrix	The transformation matrix to apply to this Combination
 	 * @return A PreppedRegion or a PreppedCombination as appropriate
 	 */
+	@Override
 	public PreppedObject prep( PreppedCombination reg, PreppedDb preppedDb, Matrix matrix) throws BadGeometryException, DbException, IOException, DbNameNotFoundException
 	{
 		BoundingBox boundingBox = null;
@@ -288,6 +289,7 @@ public class Combination extends DbObject
 	 * @return   a String
 	 *
 	 */
+	@Override
 	public String toString()
 	{
 		return super.toString() + " Combination:\n" + this.tree;

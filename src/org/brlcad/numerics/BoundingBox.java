@@ -117,9 +117,6 @@ public class BoundingBox implements Serializable {
                        this.max = null;
                        return;
                }
-        Double min = new Double(Double.POSITIVE_INFINITY);
-        Double max = new Double(Double.NEGATIVE_INFINITY);
-        List<Double> ret = new ArrayList<Double>();
 
                if( maxOther.getX() < this.min.getX() ||
                    maxOther.getY() < this.min.getY() ||
@@ -308,8 +305,8 @@ public class BoundingBox implements Serializable {
                     "getExtentsInDirection() called with Vector that is either null or not valid");
         }
 
-        Double min = new Double(Double.POSITIVE_INFINITY);
-        Double max = new Double(Double.NEGATIVE_INFINITY);
+        double min = Double.POSITIVE_INFINITY;
+        double max = Double.NEGATIVE_INFINITY;
         List<Double> ret = new ArrayList<Double>();
 
         // Check all 8 vertices of the bounding box
@@ -395,8 +392,8 @@ public class BoundingBox implements Serializable {
             min = dot;
         }
 
-        ret.add(min);
-        ret.add(max);
+        ret.add(Double.valueOf(min));
+        ret.add(Double.valueOf(max));
 
         return ret;
     }

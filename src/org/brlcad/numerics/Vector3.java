@@ -14,14 +14,15 @@
 
 package org.brlcad.numerics;
 
-import org.jscience.physics.amount.Amount;
-
-import javax.measure.quantity.Angle;
-import javax.measure.unit.SI;
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.io.Serializable;
+
+import javax.measure.quantity.Angle;
+import javax.measure.unit.SI;
+
+import org.jscience.physics.amount.Amount;
 
 /**
  * Vector in 3-space from point 0,0,0
@@ -213,8 +214,8 @@ public class Vector3 implements Serializable {
                             + pitch.doubleValue(SI.RADIAN));
         }
 
-        Amount<Angle> elevation = (Amount<Angle>) pitch.opposite();
-        Amount<Angle> azimuth = (Amount<Angle>) yaw.opposite();
+        Amount<Angle> elevation = pitch.opposite();
+        Amount<Angle> azimuth = yaw.opposite();
         Vector3 v = new Vector3();
         v.setFieldsFromAngles((Math.PI / 2.0) - elevation.doubleValue(SI.RADIAN),
                 azimuth.doubleValue(SI.RADIAN));
@@ -243,9 +244,11 @@ public class Vector3 implements Serializable {
             tempz = in.readDouble();
         } catch (Exception e) {
             // Catch any exception and convert to IOException
-            throw new IOException(
+            IOException ioe = new IOException(
                     "Failed to construct Vector3 from inputs read from DataInput stream: \n"
                             + e.getMessage());
+            ioe.initCause(e);
+            throw ioe;
         }
 
         if (Double.isInfinite(tempx) || Double.isNaN(tempx)) {
@@ -731,9 +734,11 @@ public class Vector3 implements Serializable {
             tempz = in.readDouble();
         } catch (Exception e) {
             // Catch any exception and convert to IOException
-            throw new IOException(
+            IOException ioe = new IOException(
                     "Failed to read updates from DataInput stream: \n"
                             + e.getMessage());
+            ioe.initCause(e);
+            throw ioe;
         }
 
         if (Double.isInfinite(tempx) || Double.isNaN(tempx)) {
@@ -970,9 +975,11 @@ public class Vector3 implements Serializable {
             out.writeDouble(z);
         } catch (Exception e) {
             // Catch any exception and convert to IOException
-            throw new IOException(
+            IOException ioe = new IOException(
                     "Failed to write outputs to DataOutput stream: \n"
                             + e.getMessage());
+            ioe.initCause(e);
+            throw ioe;
         }
     }
 
@@ -1037,7 +1044,7 @@ public class Vector3 implements Serializable {
             ang = 0.0;
         }
 
-        return (Amount<Angle>) Amount.valueOf(ang, Math.ulp(ang) * 4.0, SI.RADIAN);
+        return Amount.valueOf(ang, Math.ulp(ang) * 4.0, SI.RADIAN);
     }
 
     /**
@@ -1064,7 +1071,7 @@ public class Vector3 implements Serializable {
         Vector3 revDir = Vector3.negate(v);
         double ang = Vector3.getPhi(revDir);
 
-        return (Amount<Angle>) Amount.valueOf(ang, Math.ulp(ang) * 2.0, SI.RADIAN);
+        return Amount.valueOf(ang, Math.ulp(ang) * 2.0, SI.RADIAN);
     }
 
     /**

@@ -2,17 +2,18 @@ package org.brlcad.info;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+
 import org.brlcad.geometry.BrlcadDb;
 import org.brlcad.geometry.Combination;
 import org.brlcad.geometry.DbException;
 import org.brlcad.geometry.DbExternal;
 import org.brlcad.geometry.Operator;
 import org.brlcad.geometry.Tree;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
 
 /**
  * A class useful for obtaining information about regions in a BRL-CAD ".g" file.
@@ -23,7 +24,7 @@ public class RegionInfo {
     /**
      * Delimiter between parts of the region path name
      */
-    private String delimiter = "/";
+    private final String delimiter = "/";
 
     /**
      * Show debugging info
@@ -229,7 +230,7 @@ public class RegionInfo {
             attrs.put("regionPath", path);
             getRegionMap().put(combo.getName(), attrs);
 
-            Integer ident = Integer.parseInt( comboAttrs.get("region_id") );
+            Integer ident = Integer.valueOf( comboAttrs.get("region_id") );
             List<String> regions = getIdentMap().get(ident);
             if( regions == null ) {
                 regions = new ArrayList<String>();

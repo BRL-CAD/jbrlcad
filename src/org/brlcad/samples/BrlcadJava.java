@@ -8,13 +8,11 @@ package org.brlcad.samples;
  */
 
 
-import java.util.Arrays;
+import java.util.SortedSet;
+
 import org.brlcad.geometry.BrlcadDb;
 import org.brlcad.geometry.Partition;
 import org.brlcad.geometry.SimpleOverlapHandler;
-
-import java.util.SortedSet;
-
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Ray;
 import org.brlcad.numerics.Vector3;
@@ -41,7 +39,7 @@ public class BrlcadJava
                 // get start point
                 for( int i=0 ; i<3 ; i++ ) {
                     argNo++;
-                    start.set(i, Double.valueOf(args[argNo]));
+                    start.set(i, Double.parseDouble(args[argNo]));
                 }
                 argNo++;
                 continue;
@@ -49,7 +47,7 @@ public class BrlcadJava
                 // get direction
                 for( int i=0 ; i<3 ; i++ ) {
                     argNo++;
-                    dir.set(i, Double.valueOf(args[argNo]));
+                    dir.set(i, Double.parseDouble(args[argNo]));
                 }
                 argNo++;
                 continue;
