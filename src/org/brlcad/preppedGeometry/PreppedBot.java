@@ -323,5 +323,12 @@ public class PreppedBot extends PreppedObject
 		
 		return hits;
 	}
+
+    /**
+     * @return the theBot
+     */
+    public Bot getTheBot() {
+        return theBot;
+    }
 }
 

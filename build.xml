@@ -37,7 +37,7 @@
         <classpath refid="testclasspath"/>
         <jvmarg value="-Xdebug"/>
         <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-        <arg line=" -p 100 250 -700 -d -1 0 0 /home/jra/Projects/brlcad/db/kman.g jra"/>
+        <arg line=" -p 6028.53 3574.08 2836.81  -d -0.7424 -0.5198 -0.4226 test/test.g r1"/>
     </java>
 </target>
 

@@ -143,6 +143,11 @@ public class BoxNode extends Node
 			}
 		}
         double [] hits = this.boundingBox.isect2(ray);
+        if (hits == null) {
+            // missed
+            rayData.setDist(Double.MAX_VALUE);
+            return;
+        }
 		rayData.setDist( hits[1] );
 		Point locator = new Point( ray.getStart() );
 		locator.join( hits[1] + BoxNode.MIN_BOX_WIDTH/10.0, ray.getDirection() );

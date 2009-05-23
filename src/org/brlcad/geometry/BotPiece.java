@@ -78,7 +78,6 @@ public class BotPiece extends PreppedObjectPiece
     void subDivide(PreppedDb preppedDb) {
         subdivide( this, preppedDb );
         List<PreppedObjectPiece> pieces = preppedDb.getPieces();
-        System.out.println( pieces.size() + " Pieces");
 
         int min = Integer.MAX_VALUE;
         int max = Integer.MIN_VALUE;
@@ -99,12 +98,12 @@ public class BotPiece extends PreppedObjectPiece
             }
         }
 
-        System.out.println( count + " pieces");
-        System.out.println( "min=" + min);
-        System.out.println( "max=" + max);
-        System.out.println( "tris=" + total);
-        System.out.println( "ave=" + (total/count));
-        System.out.println( "BB=" + preppedDb.getBoundingBox());
+//        System.out.println( count + " pieces");
+//        System.out.println( "min=" + min);
+//        System.out.println( "max=" + max);
+//        System.out.println( "tris=" + total);
+//        System.out.println( "ave=" + (total/count));
+//        System.out.println( "BB=" + preppedDb.getBoundingBox());
     }
 
     private static void subdivide(BotPiece bp, PreppedDb preppedDb) {
