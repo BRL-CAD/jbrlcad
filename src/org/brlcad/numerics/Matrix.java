@@ -562,15 +562,20 @@ public class Matrix implements Serializable {
                             + this.columns + "); must be at least (3,4)");
         }
 
+        double scale = 1.0;
+        if ( rows > 3 ) {
+            scale = 1.0 / mat[3][3];
+        }
+
         double x = (mat[0][0] * v.getX()) + (mat[0][1] * v.getY())
                 + (mat[0][2] * v.getZ()) + mat[0][3];
         double y = (mat[1][0] * v.getX()) + (mat[1][1] * v.getY())
                 + (mat[1][2] * v.getZ()) + mat[1][3];
         double z = (mat[2][0] * v.getX()) + (mat[2][1] * v.getY())
                 + (mat[2][2] * v.getZ()) + mat[2][3];
-        v.setX(x);
-        v.setY(y);
-        v.setZ(z);
+        v.setX(x*scale);
+        v.setY(y*scale);
+        v.setZ(z*scale);
     }
 
     /**
@@ -592,15 +597,20 @@ public class Matrix implements Serializable {
                             + this.columns + "); must be at least (3,4)");
         }
 
+        double scale = 1.0;
+        if ( rows > 3 ) {
+            scale = 1.0 / mat[3][3];
+        }
+
         double x = (mat[0][0] * v.getX()) + (mat[0][1] * v.getY())
                 + (mat[0][2] * v.getZ());
         double y = (mat[1][0] * v.getX()) + (mat[1][1] * v.getY())
                 + (mat[1][2] * v.getZ());
         double z = (mat[2][0] * v.getX()) + (mat[2][1] * v.getY())
                 + (mat[2][2] * v.getZ());
-        v.setX(x);
-        v.setY(y);
-        v.setZ(z);
+        v.setX(x*scale);
+        v.setY(y*scale);
+        v.setZ(z*scale);
     }
 
     /**
