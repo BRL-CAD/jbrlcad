@@ -216,4 +216,18 @@ public class Complex {
 
         return str.toString();
     }
+
+    /**
+     * @param real the real to set
+     */
+    public void setReal(double real) {
+        this.real = real;
+    }
+
+    /**
+     * @param imaginary the imaginary to set
+     */
+    public void setImaginary(double imaginary) {
+        this.imaginary = imaginary;
+    }
 }

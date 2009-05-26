@@ -233,6 +233,8 @@ public class BrlcadDb
 						return new Combination( dbExt );
                     case Tgc.minorType:
                         return new Tgc( dbExt );
+                    case Torus.minorType:
+                        return new Torus(dbExt);
 					default:
 						throw new DbException( "Unrecognized minor type (" +
 												  dbExt.getMinorType() + "), for object: " + dbExt.getName() );

@@ -195,8 +195,8 @@ public class rt {
             if( xPixelNo != -1 && yPixelNo != -1 ) {
                 // just do one pixel
                 Point start = new Point(gridStart);
-                start.join(delta * xPixelNo, yDir);
-                start.join(delta * yPixelNo, xDir);
+                start.join(delta * xPixelNo, xDir);
+                start.join(delta * yPixelNo, yDir);
                 Ray ray = new Ray(start, rayDir);
                 Shader shader = new Phong(lights);
 //                Shader shader = new NormalShader();

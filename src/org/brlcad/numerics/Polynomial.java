@@ -139,8 +139,10 @@ public class Polynomial {
                             roots[rootsFound] = newRoots[i];
                             rootsFound++;
                         }
-                        if( checkRoots(roots) ) {
+                        if( checkRoots(newRoots) ) {
                             return roots;
+                        } else {
+                            System.err.println( "cubic: checkRoots returned false");
                         }
                     }
                     break;
@@ -151,8 +153,10 @@ public class Polynomial {
                             roots[rootsFound] = newRoots[i];
                             rootsFound++;
                         }
-                        if( checkRoots(roots) ) {
+                        if( checkRoots(newRoots) ) {
                             return roots;
+                        } else {
+                            System.err.println( "quartic: checkRoots returned false");
                         }
                     }
                     break;
@@ -198,16 +202,16 @@ public class Polynomial {
             double zi = roots[m].getImaginary();
 
             /* Initialize */
-            double er = this.c[0];
+            double er = this.coeff[0];
             /* ei = 0.0; */
 
             /* n=1 step.  Broken out because ei = 0.0 */
             double ei = er * zi;		/* must come before er= */
-            er = er * zr + this.c[1];
+            er = er * zr + this.coeff[1];
 
             /* Remaining steps */
             for (int n = 2; n <= this.dgr; ++n) {
-                double tr = er * zr - ei * zi + this.c[n];
+                double tr = er * zr - ei * zi + this.coeff[n];
                 double ti = er * zi + ei * zr;
                 er = tr;
                 ei = ti;
@@ -498,7 +502,7 @@ public class Polynomial {
             /* Compute H for Laguerre's method. */
             int n = this.dgr - 1;
             cH = Complex.multiply(p[1], p[1]).multiply(n*n);
-            T = Complex.multiply(p[2], p[0]).multiply(this.dgr + n);
+            T = Complex.multiply(p[2], p[0]).multiply(this.dgr * n);
             cH = cH.subtract(T);
 
             /* Calculate the next iteration for Laguerre's method.
@@ -512,10 +516,14 @@ public class Polynomial {
             p[0] = p[0].multiply(this.dgr);
             if( p1_H.amplitude() > p[1].amplitude() ) {
                 p[0] = p[0].divide(p1_H);
-                nxZ = nxZ.subtract(p[0]);
+                Complex cplx = nxZ.subtract(p[0]);
+                nxZ.setReal(cplx.getReal());
+                nxZ.setImaginary(cplx.getImaginary());
             } else {
                 p[0] = p[0].divide(p[1]);
-                nxZ = nxZ.subtract(p[0]);
+                Complex cplx = nxZ.subtract(p[0]);
+                nxZ.setReal(cplx.getReal());
+                nxZ.setImaginary(cplx.getImaginary());
             }
 
             /* Use proportional convergence test to allow very small
