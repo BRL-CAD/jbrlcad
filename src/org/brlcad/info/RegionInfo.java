@@ -165,7 +165,7 @@ public class RegionInfo {
         // Process nameSet to move further down the region path name
 
         for (String s : nameSet) {
-            if (isDebug()) printRawInfo("    (ph)", db.getDbExternal(s));
+//            if (isDebug()) printRawInfo("    (ph)", db.getDbExternal(s));
             Combination combo = new Combination(db.getDbExternal(s));
             if (isDebug()) printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
             processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
@@ -230,7 +230,11 @@ public class RegionInfo {
             attrs.put("regionPath", path);
             getRegionMap().put(combo.getName(), attrs);
 
-            Integer ident = Integer.valueOf( comboAttrs.get("region_id") );
+            String identStr = comboAttrs.get("region_id");
+            Integer ident = 0;
+            if (identStr != null) {
+                ident = Integer.valueOf(comboAttrs.get("region_id"));
+            }
             List<String> regions = getIdentMap().get(ident);
             if( regions == null ) {
                 regions = new ArrayList<String>();
