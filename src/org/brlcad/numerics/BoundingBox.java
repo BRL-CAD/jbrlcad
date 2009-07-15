@@ -516,7 +516,8 @@ public class BoundingBox implements Serializable {
             Plane3D pl = planes[i];
             dist = pl.intersect(r);
             if (dist != Double.NEGATIVE_INFINITY
-                    && dist != Double.POSITIVE_INFINITY) {
+                    && dist != Double.POSITIVE_INFINITY
+                    && !Double.isNaN(dist)) {
                 Point hitPoint = new Point(r.getStart());
                 hitPoint.join(dist, r.getDirection());
                 // move hitPoint below plane (inside BoundingBox)
