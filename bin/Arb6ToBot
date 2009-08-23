@@ -1,0 +1,5 @@
+#!/bin/csh -f
+
+set BINDIR=$0:h
+set COMMAND=$0:t
+exec ${BINDIR}/runner $COMMAND $*

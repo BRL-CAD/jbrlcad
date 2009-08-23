@@ -19,7 +19,7 @@ import org.brlcad.numerics.Vector3;
 import org.brlcad.spacePartition.PreppedDb;
 import org.brlcad.utils.ArrayCopy;
 
-public class BrlcadJava
+public class Rtshot
 {
     private static final String usage = "Usage:\n\tjava -cp build/dist/jbrlcad.jar:lib/jscience.jar" +
             " [-p x y z] [-d x y z] file.g obj1 [ obj2 obj3 ...]";

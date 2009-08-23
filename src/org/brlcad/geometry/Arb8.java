@@ -1,5 +1,6 @@
 package org.brlcad.geometry;
 
+import java.util.Arrays;
 import org.brlcad.preppedGeometry.PreppedArb8;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.numerics.Point;
@@ -99,5 +100,28 @@ public class Arb8 extends DbObject
 		}
 		return sb.toString();
 	}
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Arb8 other = (Arb8) obj;
+        if (!Arrays.deepEquals(this.points, other.points)) {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Arrays.deepHashCode(this.points);
+        return hash;
+    }
+    
 }
 

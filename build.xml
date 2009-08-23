@@ -9,6 +9,7 @@
 <property name="distdir" value="${builddir}/dist"/>
 <property name="libdir" value="${basedir}/lib"/>
 <property name="testResults" value="${builddir}/testResults"/>
+<property name="test.class" value="*"/>
 
 <target name="clean">
   <delete dir="build" quiet="true"/>
@@ -49,7 +50,7 @@
         <batchtest fork="yes" todir="${testResults}/raw">
                 <formatter type="xml"/>
                 <fileset dir="${testdir}">
-                        <include name="**/*Test*.java"/>
+                        <include name="**/${test.class}Test.java"/>
                 </fileset>
         </batchtest>
     </junit>
@@ -76,13 +77,23 @@
   <jar destfile="${distdir}/jbrlcad.jar" basedir="${classdir}"/>
 </target>
 
-<target name="test" depends="build">
+<target name="testRt" depends="build">
     <java classname="org.brlcad.samples.rt">
         <classpath>
             <pathelement location="${distdir}/jbrlcad.jar"/>
             <pathelement location="${libdir}/jscience.jar"/>
         </classpath>
         <arg line=" -s 512 -o test.pix test/test.g r1"/>
+    </java>
+</target>
+
+<target name="testArb6ToBot" depends="build">
+    <java classname="org.brlcad.samples.Arb6ToBot">
+        <classpath>
+            <pathelement location="${distdir}/jbrlcad.jar"/>
+            <pathelement location="${libdir}/jscience.jar"/>
+        </classpath>
+        <arg line=" -a 8.0 abba.asc /home/jra/Desktop/Downloads/radome.g 53_radome_fs030r 53_radome_fs030l"/>
     </java>
 </target>
 

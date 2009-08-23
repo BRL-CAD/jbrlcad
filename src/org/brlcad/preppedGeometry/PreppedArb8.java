@@ -23,7 +23,6 @@ import org.brlcad.numerics.Plane3D;
 import org.brlcad.numerics.Vector3;
 import org.brlcad.numerics.BoundingBox;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Set;
 import org.brlcad.numerics.Constants;
 import org.brlcad.utils.ArrayCopy;
@@ -34,7 +33,7 @@ public class PreppedArb8 extends PreppedObject
 	private ArbFace[] aface;
 	private Oface[] oface;
 	
-	private static final ArbInfo[] arbInfo;
+	public static final ArbInfo[] arbInfo;
 	
 	static {
 		arbInfo = new ArbInfo[6];
@@ -363,7 +362,7 @@ public class PreppedArb8 extends PreppedObject
 		// this should never get called
 		return null;
 	}
-	
+
 	private class ArbFace implements Serializable
 	{
 		Point a;
@@ -392,7 +391,7 @@ public class PreppedArb8 extends PreppedObject
 		}
 	}
 	
-	private static class ArbInfo implements Serializable
+	public static class ArbInfo implements Serializable
 	{
 		String faceName;
 		int[] faceVertices;

@@ -3,9 +3,12 @@ package org.brlcad.geometry;
 /**
  * A Bot (Bag of triangles) object. Based on the BRL-CAD BOT
  */
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Iterator;
 
+import java.util.List;
 import org.brlcad.preppedGeometry.PreppedBot;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.preppedGeometry.PreppedTriangle;
@@ -45,18 +48,24 @@ public class Bot extends DbObject {
      */
     public enum Orientation {
 
-        UNORIENTED("unoriented"),
-        COUNTER_CLOCKWISE("counter-clockwise"),
-        CLOCKWISE("clockwise");
+        UNORIENTED("unoriented", "no"),
+        COUNTER_CLOCKWISE("counter-clockwise", "rh"),
+        CLOCKWISE("clockwise", "lh");
         private final String humanReadable;
+        private final String tclString;
 
-        Orientation(String hrs) {
+        Orientation(String hrs, String tcl) {
             this.humanReadable = hrs;
+            this.tclString = tcl;
         }
 
         @Override
         public String toString() {
             return this.humanReadable;
+        }
+
+        public String toTcl() {
+            return this.tclString;
         }
     }
 
@@ -66,19 +75,25 @@ public class Bot extends DbObject {
      */
     public enum Mode {
 
-        SURFACE("Surface"),
-        SOLID("Solid"),
-        PLATE("Plate"),
-        PLATE_NOCOS("Plate (Defined LOS)");
+        SURFACE("Surface", "surf"),
+        SOLID("Solid", "volume"),
+        PLATE("Plate", "plate"),
+        PLATE_NOCOS("Plate (Defined LOS)", "plate_nocos");
         private final String humanReadable;
+        private final String tclString;
 
-        Mode(String hrs) {
+        Mode(String hrs, String tcl) {
             this.humanReadable = hrs;
+            this.tclString = tcl;
         }
 
         @Override
         public String toString() {
             return this.humanReadable;
+        }
+
+        public String toTcl() {
+            return this.tclString;
         }
     }
     // flags
@@ -210,6 +225,14 @@ public class Bot extends DbObject {
                 }
             }
         }
+    }
+
+    public void addFace(int v1, int v2, int v3) throws BadGeometryException {
+        if (v1 >= points.length || v2 >= points.length || v3 >= points.length) {
+            throw new BadGeometryException("Illegal vertex index (" + v1 + "," + v2 + "," + v3 + "), must be " + (points.length-1) + " or less");
+        }
+        faces = Arrays.copyOf(faces, faces.length+1);
+        faces[faces.length-1] = new Face(v1, v2, v3);
     }
 
     public Point getVertex(int i) {
@@ -386,6 +409,156 @@ public class Bot extends DbObject {
             prepped.addRegion(reg);
         }
         return prepped;
+    }
+
+    /**
+     * Produce a Tcl string representation of this BoT
+     * @return a String containing the Tcl representation of this BoT
+     */
+    public String toTcl() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("put {").append(getName()).
+                append("} bot mode ").append(mode.toTcl()).
+                append(" orient ").append(orientation.toTcl()).
+                append(" flags { ");
+        if ((flags & Bot.HAS_SURFACE_NORMALS) != 0) {
+            sb.append("has_normals ");
+        }
+        if ((flags & Bot.USE_FLOATS) != 0) {
+            sb.append("use_floats ");
+        }
+        if ((flags & Bot.USE_SURFACE_NORMALS) != 0) {
+            sb.append("use_normals ");
+        }
+        sb.append("} V { ");
+
+        for (Point pt : points) {
+            sb.append(" { ").append(pt.getX()).append(" ").append(pt.getY()).append(" ").append(pt.getZ()).append("}");
+        }
+        sb.append(" } F { ");
+
+        for (Face f : faces) {
+            sb.append(" { ").append(f.v[0]).append(" ").append(f.v[1]).append(" ").append(f.v[2]).append(" }");
+        }
+        sb.append(" }");
+
+        if (mode.equals(Mode.PLATE) || mode.equals(Mode.PLATE_NOCOS)) {
+            sb.append(" T {");
+            for (int face=0 ; face<thickness.length ; face++) {
+                sb.append(" ").append(thickness[face]);
+            }
+            sb.append(" }");
+        }
+
+        if ((flags & Bot.HAS_SURFACE_NORMALS) != 0 ) {
+            sb.append(" N { ");
+            for( int v=0 ; v<normals.length ; v++) {
+                Vector3 norm = normals[v];
+                sb.append(" {").append(norm.getX()).append(" ").append(norm.getY()).append(" ").append(norm.getZ()).append(" }");
+            }
+            for( int fn=0 ; fn<faceNormals.length ; fn++) {
+                Face f = faceNormals[fn];
+                sb.append(" {").append(f.v[0]).append(" ").append(f.v[1]).append(" ").append(f.v[2]).append(" }");
+            }
+            sb.append(" }");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Fuse all vertices that are within the specified distance of each other.
+     * The remaining vertex, that represents the fusion of a group of two or more
+     * vertices, will be translated to the average of the group of vertices.
+     * @param dist Any two vertices that are this distance or less apart will be fused.
+     * @return The number of vertices that have been deleted (fused).
+     */
+    public int fuseVerts(double dist) {
+        int delCount = 0;
+        Point remove = new Point(Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE);
+        List<Point> pts = new ArrayList<Point>();
+        for (Point p : points) {
+            pts.add(p);
+        }
+        int v1 = 0;
+        while (v1 < pts.size()-1) {
+            Point p1 = pts.get(v1);
+            Fusion fuse = new Fusion(p1, v1);
+            int v2 = v1+1;
+            while (v2 < pts.size()) {
+                Point p2 = pts.get(v2);
+                if (fuse.center.dist(p2) <= dist) {
+                    fuse.addPoint(p2, v2);
+                }
+                v2++;
+            }
+            if (fuse.hasDups) {
+                pts.set(v1, fuse.center);
+                // fuse v1 and v2, replace references to v2 with v1
+                // decrease references that are graeter than v2 by one
+                int v2Index = fuse.equivs.size()-1;
+                while (v2Index >= 0) {
+                    v2 = fuse.equivs.get(v2Index);
+                    for (Face f : faces) {
+                        for (int i = 0; i < 3; i++) {
+                            if (f.v[i] == v2) {
+                                f.v[i] = v1;
+                            } else if (f.v[i] > v2) {
+                                f.v[i]--;
+                            }
+                        }
+                    }
+                    // mark v2 for removal from the points array
+                    pts.set(v2, remove);
+                    v2Index--;
+                }
+                Iterator<Point> iterPt = pts.iterator();
+                while (iterPt.hasNext()) {
+                    Point pt = iterPt.next();
+                    if (pt == remove) {
+                        delCount++;
+                        iterPt.remove();
+                    }
+                }
+            }
+            v1++;
+        }
+        int deleted = points.length - pts.size();
+
+        // replace the points array
+        points = new Point[pts.size()];
+        for (int v=0 ; v<pts.size() ; v++) {
+            points[v] = pts.get(v);
+        }
+
+        return deleted;
+    }
+
+    /**
+     * A class used to hold a group of vertices that are elegible to be fused into one vertex.
+     */
+    private class Fusion {
+        public Point center;
+        public int initial;
+        public ArrayList<Integer> equivs;
+        public boolean hasDups;
+
+        public Fusion(Point pt, int vertNo) {
+            this.center = new Point(pt);
+            this.initial = vertNo;
+            this.equivs = new ArrayList<Integer>();
+            hasDups = false;
+        }
+
+        public void addPoint(Point pt, int vertNo) {
+            if (vertNo == initial || equivs.contains(vertNo)) {
+                return;
+            }
+            center.scale(equivs.size()+1.0);
+            center.plus(pt);
+            equivs.add(vertNo);
+            center.scale(1.0/(equivs.size()+1.0));
+            hasDups = true;
+        }
     }
 }
 

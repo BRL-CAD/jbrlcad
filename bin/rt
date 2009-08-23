@@ -1,8 +1,0 @@
-#!/bin/csh -f
-
-if ( !(-e ./build/dist/jbrlcad.jar) ) then
-   echo "this sctipt must be executed from the jbrlcad top level directory"
-   exit
-endif
-
-java -cp ./build/dist/jbrlcad.jar:lib/jscience.jar org.brlcad.samples.rt $*

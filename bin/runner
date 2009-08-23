@@ -1,0 +1,41 @@
+#!/bin/csh
+
+echo "In runner args = $*"
+
+# keep taking the head until that operation makes no further change
+# if the end result is the empty string, then the command started with a "/"
+set S1=$0
+set S2=$S1:h
+while ($S1 != $S2)
+    set S1=$S2
+    set S2=$S2:h
+end
+
+# set
+if ($S2 == "") then
+    # $0 is full path
+    set BINDIR=$0:h
+else
+    # $0 is a relative path
+    set BINDIR=${cwd}/${0:h}
+endif
+
+set JBRLCAD_HOME=$BINDIR:h
+
+if ( !(-e ${JBRLCAD_HOME}/build/dist/jbrlcad.jar) ) then
+    if ( -e ${JBRLCAD_HOME}/build.xml ) then
+        (cd ${JBRLCAD_HOME}; ant build)
+    else
+        echo "Unable to find jbrlcad home directory!!!"
+        exit
+    endif
+endif
+
+set CLASS=$1
+shift
+
+echo "CLASS = $CLASS"
+echo "JBRLCAD_HOME = $JBRLCAD_HOME"
+
+echo "java -cp ${JBRLCAD_HOME}/build/dist/jbrlcad.jar:${JBRLCAD_HOME}/lib/jscience.jar org.brlcad.samples.$CLASS $*"
+java -cp ${JBRLCAD_HOME}/build/dist/jbrlcad.jar:${JBRLCAD_HOME}/lib/jscience.jar org.brlcad.samples.$CLASS $*

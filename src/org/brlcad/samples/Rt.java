@@ -47,7 +47,7 @@ import org.jscience.physics.amount.Amount;
  *
  * @author jra
  */
-public class rt {
+public class Rt {
 
     private static final String usage = "Usage: rt [-R] [-b # #] [-s size] [-a azimuth] [-e elevation] [-o output_file] [-F frame_buffer_port] dbfile.g object1 [object2 object3 ...]";
 
@@ -137,11 +137,11 @@ public class rt {
                 outputFile = new FileOutputStream(outputFileName);
             }
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (UnknownHostException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             brlcadDb = new BrlcadDb(dbFileName);
@@ -218,7 +218,7 @@ public class rt {
                 bytes[0] = (byte) color.getRed();
                 bytes[1] = (byte) color.getGreen();
                 bytes[2] = (byte) color.getBlue();
-                rt.writePixelToFrameBuffer(fbOs, xPixelNo, yPixelNo, bytes);
+                Rt.writePixelToFrameBuffer(fbOs, xPixelNo, yPixelNo, bytes);
                 return;
             }
             ExecutorService executor = Executors.newFixedThreadPool(cpus);
@@ -233,17 +233,17 @@ public class rt {
                 outputFile.write(buffer.array());
             }
         } catch (InterruptedException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (BadGeometryException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (DbNameNotFoundException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (IOException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } catch (DbException ex) {
-            Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             try {
                 if( outputFile != null ) {
@@ -254,7 +254,7 @@ public class rt {
                     fbOs.close();
                 }
             } catch (IOException ex) {
-                Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }
@@ -335,7 +335,7 @@ public class rt {
                 try {
                     writeLineToFrameBuffer(fbOs, row, bytes);
                 } catch (IOException ex) {
-                    Logger.getLogger(rt.class.getName()).log(Level.SEVERE, null, ex);
+                    Logger.getLogger(Rt.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         } catch (Exception ex) {

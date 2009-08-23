@@ -18,9 +18,9 @@ import org.junit.*;
  *
  * @author jra
  */
-public class TestShoot {
+public class ShootTest {
     
-    public TestShoot() {
+    public ShootTest() {
     }
 
     @Test
