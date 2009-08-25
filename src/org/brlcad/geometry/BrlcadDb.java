@@ -53,6 +53,7 @@ public class BrlcadDb {
      * cached value of top level objects (can be cached because db is read only)
      */
     private List<String> topLevelObjects = null;
+    private Logger logger;
 
     /**
      * Constructor
@@ -65,12 +66,14 @@ public class BrlcadDb {
      *
      */
     public BrlcadDb(String dbFileName) throws FileNotFoundException, IOException, DbException {
+        this();
         this.dbFileName = dbFileName;
         this.dbInput = new RandomAccessFile(this.dbFileName, "r");
         this.scan();
     }
 
     protected BrlcadDb() {
+        this.logger = Logger.getLogger(this.getClass().getPackage().getName());
     }
 
     private void markReferences(Tree tree) {
@@ -93,6 +96,8 @@ public class BrlcadDb {
                 try {
                     DbObject dbObj = this.getInternal(entry.getKey());
                     if ( !(dbObj instanceof Combination)) {
+                        logger.severe(entry.getKey() + " expected to be a Combination, but was a " +
+                                dbObj.getClass().getSimpleName());
                         throw new DbException( entry.getKey() + " expected to be a Combination, but was a " +
                                 dbObj.getClass().getSimpleName());
                     }
@@ -177,6 +182,7 @@ public class BrlcadDb {
 
             // verify the file header
             if (!this.fileHeaderIsValid(fileHeader)) {
+                logger.severe("Invalid file header");
                 throw new IOException("Invalid file header");
             }
 
@@ -207,6 +213,7 @@ public class BrlcadDb {
                 DbObject global = this.getInternal("_GLOBAL");
                 this.title = global.getAttribute("title");
             } catch (Exception e1) {
+                logger.severe("Db has no GLOBAL object ");
                 throw new DbException("Db has no GLOBAL object ", e1);
             }
             return;
@@ -232,6 +239,7 @@ public class BrlcadDb {
 
         if (de == null) {
             // no such object
+            logger.severe("Error: " + name + " not found");
             throw new DbNameNotFoundException("Error: " + name + " not found");
         }
         long offset = de.getOffset();
@@ -254,6 +262,7 @@ public class BrlcadDb {
     private DbObject importObj(DbExternalObject dbExt) throws DbException {
         switch (dbExt.getMajorType()) {
             case 0:
+                logger.severe("Illegal major type number (0) for dbExt Object with name " + dbExt.getName());
                 throw new DbException("Illegal major type number (0)");
             case 1:
                 switch (dbExt.getMinorType()) {
@@ -270,6 +279,8 @@ public class BrlcadDb {
                     case Torus.minorType:
                         return new Torus(dbExt);
                     default:
+                        logger.severe("Unrecognized minor type (" +
+                                dbExt.getMinorType() + "), for object: " + dbExt.getName());
                         throw new DbException("Unrecognized minor type (" +
                                 dbExt.getMinorType() + "), for object: " + dbExt.getName());
                 }
@@ -277,6 +288,8 @@ public class BrlcadDb {
                 return new DbAttributeOnly(dbExt);
 
             default:
+                logger.severe("Unrecognized major type (" +
+                        dbExt.getMajorType() + ")");
                 throw new DbException("Unrecognized major type (" +
                         dbExt.getMajorType() + ")");
         }
@@ -329,12 +342,13 @@ public class BrlcadDb {
             case 8:
                 longNum = this.dbInput.readLong();
                 if (longNum < 0) {
+                    logger.severe("Database contains an unsigned long that we cannot read in Java!!");
                     throw new IOException("Database contains an unsigned long that we cannot read in Java!!");
                 }
                 return longNum;
             default:
-                throw new IOException("BrlcadDb.getLong(): Illegal length (" + numBytes +
-                        ")");
+                logger.severe("BrlcadDb.getLong(): Illegal length (" + numBytes + ")");
+                throw new IOException("BrlcadDb.getLong(): Illegal length (" + numBytes + ")");
         }
     }
 
@@ -359,8 +373,8 @@ public class BrlcadDb {
             case 8:
                 return this.dbInput.readLong();
             default:
-                throw new IOException("BrlcadDb.getLong(): Illegal length (" + numBytes +
-                        ")");
+                logger.severe("BrlcadDb.getLong(): Illegal length (" + numBytes + ")");
+                throw new IOException("BrlcadDb.getLong(): Illegal length (" + numBytes + ")");
         }
     }
 
@@ -495,5 +509,9 @@ public class BrlcadDb {
      */
     public String getTitle() {
         return title;
+    }
+
+    public String getDbFileName() {
+        return this.dbFileName;
     }
 }
