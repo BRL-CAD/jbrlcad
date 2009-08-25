@@ -34,11 +34,11 @@
     <nbjpdastart addressproperty="jpda.address" name="jbrlcad" transport="dt_socket">
         <classpath refid="testclasspath"/>
     </nbjpdastart>
-    <java classname="org.brlcad.samples.rt">
+    <java classname="org.brlcad.samples.BrlcadJava">
         <classpath refid="testclasspath"/>
         <jvmarg value="-Xdebug"/>
         <jvmarg value="-Xrunjdwp:transport=dt_socket,address=${jpda.address}"/>
-        <arg line=" -b 232 356 -F 9 -a 90 -e 0 test/test.g r1"/>
+        <arg line=" -p 263.63 182.37 179.45 -d -0.7424 -0.5198 -0.4226 test/ktank.g tank"/>
     </java>
 </target>
 
@@ -78,11 +78,12 @@
 </target>
 
 <target name="testRt" depends="build">
-    <java classname="org.brlcad.samples.rt">
+    <java classname="org.brlcad.samples.rt" fork="true">
         <classpath>
             <pathelement location="${distdir}/jbrlcad.jar"/>
             <pathelement location="${libdir}/jscience.jar"/>
         </classpath>
+        <jvmarg value="-Djava.util.logging.config.file=${testdir}/logging.config"/>
         <arg line=" -s 512 -o test.pix test/test.g r1"/>
     </java>
 </target>
@@ -93,7 +94,7 @@
             <pathelement location="${distdir}/jbrlcad.jar"/>
             <pathelement location="${libdir}/jscience.jar"/>
         </classpath>
-        <arg line=" -a 8.0 abba.asc /home/jra/Desktop/Downloads/radome.g 53_radome_fs030r 53_radome_fs030l"/>
+        <arg line=" -a 6.0 abba.asc test/radome.g 53_radome_fs030r 53_radome_fs030l"/>
     </java>
 </target>
 
