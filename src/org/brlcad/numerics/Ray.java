@@ -2,7 +2,10 @@
 
 package org.brlcad.numerics;
 
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 
 
 /**
@@ -30,13 +33,19 @@ import java.io.Serializable;
  * <li>Uses a Point and Vector3.</li>
  * </ul>
  */
-public class Ray implements Serializable {
+public class Ray implements Externalizable {
 
     static final long serialVersionUID = -6058668611916514230L;
 
     private Point start;
 
     private Vector3 direction;
+
+    /**
+     * No arg constructor for use by Externalization. DO NOT USE THIS CONSTRUCTOR
+     */
+    public Ray() {
+    }
 
     /**
      * Construct a Ray from a Point and a Vector3. New Point and Vector3 are
@@ -65,6 +74,7 @@ public class Ray implements Serializable {
      *
      * @return A String with the expected values
      */
+    @Override
     public String toString() {
         return "start: " + start + ", direction: " + direction;
     }
@@ -134,5 +144,19 @@ public class Ray implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeDouble(start.getX());
+        out.writeDouble(start.getY());
+        out.writeDouble(start.getZ());
+        out.writeDouble(direction.getX());
+        out.writeDouble(direction.getY());
+        out.writeDouble(direction.getZ());
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        start = new Point(in.readDouble(), in.readDouble(), in.readDouble());
+        direction = new Vector3(in.readDouble(), in.readDouble(), in.readDouble());
     }
 }

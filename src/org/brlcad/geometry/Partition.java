@@ -5,7 +5,10 @@ package org.brlcad.geometry;
  *
  * @author Created by Omnicore CodeGuide
  */
-import java.io.Serializable;
+import java.io.Externalizable;
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,7 +21,7 @@ import org.brlcad.numerics.Vector3;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.spacePartition.RayData;
 
-public class Partition implements Comparable,Serializable {
+public class Partition implements Comparable,Externalizable {
 
     private static final  Logger logger = Logger.getLogger(Partition.class.getName());
     private Hit in_hit;
@@ -31,6 +34,11 @@ public class Partition implements Comparable,Serializable {
     private double los;
     private int regionID;
     private int airCode;
+
+    /**
+     * No-arg constructor for use by Externalization. DO NOT USE THIS CONSTRUCTOR
+     */
+    public Partition() {}
 
     public Partition(Segment seg, String reg, int regionid, RayData rayData) {
         this.in_hit = seg.getInHit();
@@ -599,6 +607,32 @@ public class Partition implements Comparable,Serializable {
      */
     public void setAirCode(int airCode) {
         this.airCode = airCode;
+    }
+
+    public void writeExternal(ObjectOutput out) throws IOException {
+        out.writeInt(regionID);
+        out.writeInt(airCode);
+        out.writeBoolean(flipInNormal);
+        out.writeBoolean(flipOutNormal);
+        out.writeFloat(inObliquity);
+        out.writeFloat(outObliquity);
+        out.writeObject(in_hit);
+        out.writeObject(out_hit);
+        out.writeDouble(los);
+        out.writeUTF(fromRegion);
+    }
+
+    public void readExternal(ObjectInput in) throws IOException, ClassNotFoundException {
+        regionID = in.readInt();
+        airCode = in.readInt();
+        flipInNormal = in.readBoolean();
+        flipOutNormal = in.readBoolean();
+        inObliquity = in.readFloat();
+        outObliquity = in.readFloat();
+        in_hit = (Hit) in.readObject();
+        out_hit = (Hit) in.readObject();
+        los = in.readDouble();
+        fromRegion = in.readUTF();
     }
 }
 
