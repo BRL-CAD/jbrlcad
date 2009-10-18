@@ -18,6 +18,8 @@ public class BoundingBox implements Serializable {
 
     private Point max;
 
+    private BBPlane[] bbPlanes;
+
     public BoundingBox() {
     }
 
@@ -66,6 +68,7 @@ public class BoundingBox implements Serializable {
             return;
         }
 
+        bbPlanes = null;
         if( this.max == null ) {
             this.max = new Point( bb.getMax() );
         } else {
@@ -100,6 +103,7 @@ public class BoundingBox implements Serializable {
                {
                        return;
                }
+               bbPlanes = null;
                Point minOther = bb.getMin();
                Point maxOther = bb.getMax();
                if( minOther == null )
@@ -192,6 +196,7 @@ public class BoundingBox implements Serializable {
        }
 
     public void extend(Point p) {
+        bbPlanes = null;
         if( min == null ) {
             min = new Point(p);
         } else {
@@ -239,6 +244,7 @@ public class BoundingBox implements Serializable {
             throw new IllegalArgumentException(
                     "setMax() called with Point that is either null or not valid");
         }
+        bbPlanes = null;
         this.max = max;
     }
 
@@ -255,6 +261,7 @@ public class BoundingBox implements Serializable {
     }
 
     public void setMax(int i, double cutValue) {
+        bbPlanes = null;
         this.max.set(i, cutValue);
     }
 
@@ -268,6 +275,7 @@ public class BoundingBox implements Serializable {
             throw new IllegalArgumentException(
                     "setMin() called with Point that is either null or not valid");
         }
+        bbPlanes = null;
         this.min = min;
     }
 
@@ -305,8 +313,8 @@ public class BoundingBox implements Serializable {
                     "getExtentsInDirection() called with Vector that is either null or not valid");
         }
 
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
+        double tmpMin = Double.POSITIVE_INFINITY;
+        double tmpMax = Double.NEGATIVE_INFINITY;
         List<Double> ret = new ArrayList<Double>();
 
         // Check all 8 vertices of the bounding box
@@ -315,90 +323,91 @@ public class BoundingBox implements Serializable {
         Vector3 vt = new Vector3(this.min.getX(), this.min.getY(), this.min
                 .getZ());
         double dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmax, ymin, zmin)
         vt.setX(this.max.getX());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmax, ymax, zmin )
         vt.setY(this.max.getY());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmin, ymax, zmin )
         vt.setX(this.min.getX());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmin, ymax, zmax )
         vt.setZ(this.max.getZ());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmax, ymax, zmax )
         vt.setX(this.max.getX());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmax, ymin, zmax )
         vt.setY(this.min.getY());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
         // (xmin, ymin, zmax )
         vt.setX(this.min.getX());
         dot = vt.dotProduct(dir);
-        if (dot > max) {
-            max = dot;
+        if (dot > tmpMax) {
+            tmpMax = dot;
         }
-        if (dot < min) {
-            min = dot;
+        if (dot < tmpMin) {
+            tmpMin = dot;
         }
 
-        ret.add(Double.valueOf(min));
-        ret.add(Double.valueOf(max));
+        ret.add(Double.valueOf(tmpMin));
+        ret.add(Double.valueOf(tmpMax));
 
         return ret;
     }
 
     public void setMin(int i, double cutValue) {
+        bbPlanes = null;
         this.min.set(i, cutValue);
     }
 
@@ -441,6 +450,13 @@ public class BoundingBox implements Serializable {
             d = min.get(axis);
             dirComp = r.getDirection().get(axis);
             dist = (d - r.getStart().get(axis)) / dirComp;
+            if (Double.isInfinite(dist)) {
+                // ray is parallel to this plane, check if it is outside the BB
+                if (r.getStart().get(axis) < d) {
+                    // ray is outside Box
+                    return null;
+                }
+            }
             if (dirComp < 0.0) {
                 if (dist < outHit) {
                     outHit = dist;
@@ -454,6 +470,13 @@ public class BoundingBox implements Serializable {
             d = max.get(axis);
             dirComp = r.getDirection().get(axis);
             dist = (d - r.getStart().get(axis)) / dirComp;
+            if (Double.isInfinite(dist)) {
+                // ray is parallel to this plane, check if it is outside the BB
+                if (r.getStart().get(axis) > d) {
+                    // ray is outside Box
+                    return null;
+                }
+            }
             if (dirComp < 0.0) {
                 if (dist > inHit) {
                     inHit = dist;
@@ -550,6 +573,115 @@ public class BoundingBox implements Serializable {
         return (intersect(ray) != null);
     }
 
+    public String showPlanes() {
+        StringBuilder sb = new StringBuilder();
+        if (bbPlanes == null) {
+            createBBPlanes();
+        }
+        for (BBPlane pl : bbPlanes) {
+            sb.append(pl.toString());
+        }
+        return sb.toString();
+    }
+
+    public boolean intersectsCone (Ray r, double cosHalfAngle) {
+        if (r == null || !Ray.isValidRay(r)) {
+            throw new IllegalArgumentException("intersectsCone() called with Ray that is either null or not valid");
+        }
+
+        if (cosHalfAngle > 1.0 || cosHalfAngle < -1.0) {
+            throw new IllegalArgumentException("intersectsCone() called with illegal value (" +
+                    cosHalfAngle + ") for cosine of half angle");
+        }
+
+        double inHit = Double.NEGATIVE_INFINITY;
+        double outHit = Double.POSITIVE_INFINITY;
+
+        if (bbPlanes == null) {
+            createBBPlanes();
+        }
+
+        boolean miss = false;
+        double hitDist[] = new double[bbPlanes.length];
+        for (int i=0 ; i<bbPlanes.length ; i++ ) {
+            BBPlane pl = bbPlanes[i];
+            int axis = pl.getCoord().ordinal();
+            double d = pl.getValue();
+            double dirComp = r.getDirection().get(axis);
+            double dist = (d - r.getStart().get(axis)) / dirComp;
+            hitDist[i] = dist;
+            if (d == min.get(axis)) {
+                if (Double.isInfinite(dist)) {
+                    // ray is parallel to this plane, check if it is outside the BB
+                    if (r.getStart().get(axis) < d) {
+                        // ray is outside Box
+                        miss = true;
+                        continue;
+                    }
+                }
+                if (dirComp < 0.0) {
+                    if (dist < outHit) {
+                        outHit = dist;
+                    }
+                } else if (dirComp > 0.0) {
+                    if (dist > inHit) {
+                        inHit = dist;
+                    }
+                }
+            } else {
+                if (Double.isInfinite(dist)) {
+                    // ray is parallel to this plane, check if it is outside the BB
+                    if (r.getStart().get(axis) > d) {
+                        // ray is outside Box
+                        miss = true;
+                        continue;
+                    }
+                }
+                if (dirComp < 0.0) {
+                    if (dist > inHit) {
+                        inHit = dist;
+                    }
+                } else if (dirComp > 0.0) {
+                    if (dist < outHit) {
+                        outHit = dist;
+                    }
+                }
+            }
+        }
+
+        if ( !miss && !Double.isInfinite(inHit) && !Double.isInfinite(outHit) && inHit < outHit) {
+            // center ray intersects BondingBox
+            // make sure BB is not behind Ray start
+            if (outHit > 0.0) {
+                return true;
+            }
+        }
+
+        if (cosHalfAngle == 1.0) {
+            // this is not a cone, just a ray
+            return false;
+        }
+
+        // Now check PCA's of each BBPlane
+        for (int i=0 ; i<bbPlanes.length ; i++ ) {
+            BBPlane pl = bbPlanes[i];
+            double dist = hitDist[i];
+            if (Double.isInfinite(dist) || Double.isNaN(dist)) {
+                continue;
+            }
+            Point hit = new Point(r.getStart());
+            hit.join(dist, r.getDirection());
+            Point pca = pl.getPCA(hit);
+            Vector3 toPca = Vector3.minus(pca, r.getStart());
+            toPca.normalize();
+            if (toPca.dotProduct(r.getDirection()) > cosHalfAngle) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * toString() for a BoundingBox
      *
@@ -585,5 +717,157 @@ public class BoundingBox implements Serializable {
         hash = 23 * hash + (this.min != null ? this.min.hashCode() : 0);
         hash = 23 * hash + (this.max != null ? this.max.hashCode() : 0);
         return hash;
+    }
+
+    private void createBBPlanes() {
+        bbPlanes = new BBPlane[6];
+        for (int i=0 ; i<3 ; i++) {
+            bbPlanes[i*2] = new BBPlane(Coord.withOrdinal(i), true);
+            bbPlanes[i*2+1] = new BBPlane(Coord.withOrdinal(i), false);
+        }
+
+    }
+
+    private class BBEdge {
+        private Coord changingCoord;
+        private Point start;
+        private Point end;
+
+        public BBEdge (Coord changing, Point start, Point end) {
+            this.changingCoord = changing;
+            this.start = start;
+            this.end = end;
+        }
+
+        @Override
+        public String toString() {
+            return start.toString() + "->" + end.toString() + ", " + changingCoord + " is changing";
+        }
+    }
+
+    private class BBPlane {
+        private Coord coord;
+        private double value;
+        private BBEdge[] edges;
+
+        public BBPlane (Coord c, boolean isMax) {
+            coord = c;
+            if (isMax) {
+                value = max.get(c.ordinal());
+            } else {
+                value = min.get(c.ordinal());
+            }
+
+            edges = new BBEdge[4];
+            Point edgeStart;
+            Point edgeEnd;
+            Coord fixedCoord;
+            Coord changingCoord;
+            fixedCoord = Coord.withOrdinal((c.ordinal() + 1) % 3);
+            changingCoord = Coord.withOrdinal((c.ordinal() + 2) % 3);
+            edgeStart = new Point();
+            edgeStart.set(c.ordinal(), value);
+            edgeStart.set(fixedCoord.ordinal(), min.get(fixedCoord.ordinal()));
+            edgeStart.set(changingCoord.ordinal(), min.get(changingCoord.ordinal()));
+            edgeEnd = new Point(edgeStart);
+            edgeEnd.set(changingCoord.ordinal(), max.get(changingCoord.ordinal()));
+            edges[0] = new BBEdge(changingCoord, edgeStart, edgeEnd);
+
+            edgeStart = new Point();
+            edgeStart.set(c.ordinal(), value);
+            edgeStart.set(fixedCoord.ordinal(), max.get(fixedCoord.ordinal()));
+            edgeStart.set(changingCoord.ordinal(), min.get(changingCoord.ordinal()));
+            edgeEnd = new Point(edgeStart);
+            edgeEnd.set(changingCoord.ordinal(), max.get(changingCoord.ordinal()));
+            edges[1] = new BBEdge(changingCoord, edgeStart, edgeEnd);
+
+            fixedCoord = Coord.withOrdinal((c.ordinal() + 2) % 3);
+            changingCoord = Coord.withOrdinal((c.ordinal() + 1) % 3);
+            edgeStart = new Point();
+            edgeStart.set(c.ordinal(), value);
+            edgeStart.set(fixedCoord.ordinal(), min.get(fixedCoord.ordinal()));
+            edgeStart.set(changingCoord.ordinal(), min.get(changingCoord.ordinal()));
+            edgeEnd = new Point(edgeStart);
+            edgeEnd.set(changingCoord.ordinal(), max.get(changingCoord.ordinal()));
+            edges[2] = new BBEdge(changingCoord, edgeStart, edgeEnd);
+
+            edgeStart = new Point();
+            edgeStart.set(c.ordinal(), value);
+            edgeStart.set(fixedCoord.ordinal(), max.get(fixedCoord.ordinal()));
+            edgeStart.set(changingCoord.ordinal(), min.get(changingCoord.ordinal()));
+            edgeEnd = new Point(edgeStart);
+            edgeEnd.set(changingCoord.ordinal(), max.get(changingCoord.ordinal()));
+            edges[3] = new BBEdge(changingCoord, edgeStart, edgeEnd);
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder("BBPlane at " + coord + " = " + value + ":\n");
+            for (BBEdge e : edges) {
+                sb.append("\t" + e.toString() + "\n");
+            }
+            return sb.toString();
+        }
+
+        /**
+         * @return the coord
+         */
+        public Coord getCoord() {
+            return coord;
+        }
+
+        /**
+         * @return the value
+         */
+        public double getValue() {
+            return value;
+        }
+
+        /**
+         * @return the edges
+         */
+        public BBEdge[] getEdges() {
+            return edges;
+        }
+
+        private Point getPCA(Point hit) {
+            double nearest_sq = Double.MAX_VALUE;
+            Point pca = null;
+            Point pcaCanididate = new Point();
+
+            for (BBEdge edge : edges) {
+                double tmp = 0.0;
+                double d;
+                for (Coord cr : Coord.values()) {
+                    int ordinal = cr.ordinal();
+                    double t;
+                    if (cr == coord) {
+                        pcaCanididate.set(ordinal, value);
+                    } else if (cr == edge.changingCoord) {
+                        if (hit.get(ordinal) <= edge.start.get(ordinal)) {
+                            pcaCanididate.set(ordinal, edge.start.get(ordinal));
+                            d = pcaCanididate.get(ordinal) - hit.get(ordinal);
+                            tmp += d * d;
+                        } else if (hit.get(ordinal) >= edge.end.get(ordinal)) {
+                            pcaCanididate.set(ordinal, edge.end.get(ordinal));
+                            d = pcaCanididate.get(ordinal) - hit.get(ordinal);
+                            tmp += d * d;
+                        } else {
+                            pcaCanididate.set(ordinal, hit.get(ordinal));
+                        }
+                    } else {
+                        pcaCanididate.set(ordinal, edge.start.get(ordinal));
+                        d = pcaCanididate.get(ordinal) - hit.get(ordinal);
+                        tmp += d * d;
+                    }
+                }
+                if (tmp < nearest_sq) {
+                    nearest_sq = tmp;
+                    pca = new Point(pcaCanididate);
+                }
+            }
+
+            return pca;
+        }
     }
 }

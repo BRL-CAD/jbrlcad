@@ -147,7 +147,7 @@ public class BoundingBoxTest {
     }
 
     @Test
-    public void testIsect() {
+    public void testIsect2() {
         BoundingBox bb = new BoundingBox( new Point( -1, -2, -3 ), new Point( 5, 6, 7 ) );
 
         // a Ray that intersects
@@ -163,7 +163,7 @@ public class BoundingBoxTest {
 
         // a Ray that misses
         r = new Ray( new Point( -10, 2, 2 ), new Vector3( 0, 0, 1 ));
-        hits = bb.intersect(r);
+        hits = bb.isect2(r);
         assertNull( "should not intersect", hits );
 
         // a Ray that intersects the corners
@@ -172,9 +172,110 @@ public class BoundingBoxTest {
         Point start = new Point( bb.getMin() );
         start.join( -5.0, dir );
         r = new Ray( start, dir );
-        hits = bb.intersect(r);
+        hits = bb.isect2(r);
         assertEquals( "first hit", 5.0, hits[0], 0.00000001 );
         assertEquals( "second hit", 19.142135623730947, hits[1], 0.00000001 );
+    }
+
+    @Test
+    public void testConeIntersect() {
+        // Rays in the -Z direction
+        // check a Ray that intersects the BB
+        Point min = new Point(1.0, 2.0, 3.0);
+        Point max = new Point(7.0, 8.0, 9.0);
+        BoundingBox bb = new BoundingBox(min, max);
+        Point start = new Point(4.0, 5.0, 10.0);
+        Vector3 dir = new Vector3(0,0,-1);
+        Ray ray = new Ray(start, dir);
+        double halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        boolean intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
+
+        // a Ray that misses the BB, but middle of an edge is within cone
+        start = new Point(-4.0, 5.0, 10.0);
+        dir = new Vector3(0,0,-1);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
+
+        // a Ray that misses the BB, but a corner is within cone
+        start = new Point(-4.0, 8.0, 9.0);
+        dir = new Vector3(0,0,-1);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
+
+        // cone that misses
+        start = new Point(15.0, 16.0, 10.0);
+        dir = new Vector3(0,0,-1);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertFalse("should not intersect", intersects);
+
+
+        // Rays in the +X direction
+        // check a Ray that intersects the BB
+        start = new Point(-1.0, 5.0, 6.0);
+        dir = new Vector3(1,0,0);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
+
+        // a Ray that misses the BB, but middle of an edge is within cone
+        start = new Point(-1.0, 12.0, 6.0);
+        dir = new Vector3(1,0,0);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
+
+        // a Ray that misses the BB, but a corner is within cone
+        start = new Point(-1.0, 13.0, 14.0);
+        dir = new Vector3(1,0,0);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
+
+        // cone that misses
+        start = new Point(-1, 16.0, 17.0);
+        dir = new Vector3(1,0,0);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertFalse("should not intersect", intersects);
+
+        // a Ray that misses because it is behind BB
+//        System.out.println( "***************************");
+        start = new Point(8, 5.0, 6.0);
+        dir = new Vector3(1,0,0);
+        ray = new Ray(start, dir);
+        halfConeAngle = Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertFalse("should not intersect", intersects);
+
+        // a Cone with cone angle > 90 degrees
+//        System.out.println( "***************************");
+        start = new Point(-20.0, -40.0, 10.0);
+        dir = new Vector3(0,0,-1);
+        ray = new Ray(start, dir);
+        halfConeAngle = 3.0*Math.PI/4.0;
+//        System.out.println( "cone: " + ray + ", half cone angle = " + 180.0 * halfConeAngle / Math.PI + " degrees");
+        intersects = bb.intersectsCone(ray, Math.cos(halfConeAngle));
+        assertTrue("should intersect", intersects);
     }
 
 }
