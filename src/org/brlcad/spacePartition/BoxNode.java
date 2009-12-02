@@ -123,7 +123,7 @@ public class BoxNode extends Node
 			}
 			List<Segment> segs = obj.shoot( ray, rayData );
 			rayData.setBit( obj.getIndex() );
-			if( segs.size() > 0 )
+			if (segs != null && segs.size() > 0)
 			{
 				rayData.addSegs( obj, segs );
 			}
@@ -137,7 +137,7 @@ public class BoxNode extends Node
 			}
 			Set<Hit> hits = obj.shoot( ray, rayData );
 			rayData.setBit( obj.getIndex() );
-			if( hits.size() > 0 )
+			if( hits != null && hits.size() > 0 )
 			{
 				rayData.addHits( obj.getPreppedObject(), hits );
 			}

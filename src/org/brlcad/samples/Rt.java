@@ -313,8 +313,10 @@ public class Rt {
                     Material material = prepped.getCombination(first.getFromRegion()).getMaterial();
                     if( material == null && colorTable != null ) {
                         Color matColor = colorTable.getColor(first.getRegionID());
-                        material = new Material("dummy", matColor);
-//                        System.out.println( "Setting color of " + first.getFromRegion() + " to " + matColor);
+                        if (matColor != null) {
+                            material = new Material("dummy", matColor);
+//                          System.out.println( "Setting color of " + first.getFromRegion() + " to " + matColor);
+                        }
                     }
                     color = shader.shade(first, material, start);
                 } else {

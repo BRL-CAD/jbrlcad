@@ -23,24 +23,25 @@ import org.brlcad.spacePartition.RayData;
 
 public class PreppedCombination extends PreppedObject
 {
-	private Tree tree;
-	private boolean isRegion;
+    private Tree tree;
+    private boolean isRegion;
     private int regionID;
     private Material material;
 	
-	public PreppedCombination( Combination comb )
-	{
-		super( comb.getName() );
-		this.tree = comb.getTree();
-		this.index = comb.getIndex();
-		this.isRegion = comb.getAttribute( "region" ) != null;
-        if( this.isRegion ) {
-            this.regionID = Integer.parseInt(comb.getAttribute(BrlcadDb.REGION_ID_KEY));
+    public PreppedCombination(Combination comb)
+    {
+        super(comb.getName());
+        this.tree = comb.getTree();
+        this.index = comb.getIndex();
+        this.isRegion = comb.getAttribute("region") != null;
+        String regionIdStr = comb.getAttribute(BrlcadDb.REGION_ID_KEY);
+        if (this.isRegion && regionIdStr != null) {
+            this.regionID = Integer.parseInt(regionIdStr);
         } else {
             this.regionID = Integer.MIN_VALUE;
         }
         this.material = comb.getMaterial();
-	}
+    }
 
     protected PreppedCombination() {
     }

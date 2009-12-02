@@ -278,6 +278,8 @@ public class BrlcadDb {
                         return new Tgc(dbExt);
                     case Torus.minorType:
                         return new Torus(dbExt);
+                    case Ars.minorType:
+                        return new Ars(dbExt);
                     default:
                         logger.severe("Unrecognized minor type (" +
                                 dbExt.getMinorType() + "), for object: " + dbExt.getName());

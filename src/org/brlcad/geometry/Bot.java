@@ -17,6 +17,7 @@ import org.brlcad.numerics.Matrix;
 import org.brlcad.numerics.Point;
 import org.brlcad.numerics.Vector3;
 import org.brlcad.spacePartition.PreppedDb;
+import org.brlcad.utils.VertexTree;
 
 public class Bot extends DbObject {
 
@@ -110,7 +111,7 @@ public class Bot extends DbObject {
         super(dbExt);
 
         if (dbExt.getMajorType() != Bot.majorType || dbExt.getMinorType() != Bot.minorType) {
-            throw new DbException("Attempted to import an Arb8, but external is " +
+            throw new DbException("Attempted to import a BOT, but external is " +
                     " major type: " + dbExt.getMajorType() +
                     " minor type: " + dbExt.getMinorType());
         }
@@ -227,6 +228,47 @@ public class Bot extends DbObject {
         }
     }
 
+    private Bot(Ars ars, DbExternal dbExt) {
+        super(dbExt);
+
+        this.mode = Mode.SOLID;
+        this.orientation = Orientation.UNORIENTED;
+        this.flags = 0;
+
+        // create the vertices
+        VertexTree vTree = new VertexTree(BrlcadDb.tolerance.getDist());
+        Point[][] curves = ars.getCurves();
+
+        int[][] pts = new int[curves.length][];
+        for (int curve=0 ; curve < curves.length ; curve++) {
+            pts[curve] = new int[curves[curve].length];
+            for (int point=0 ; point < curves[curve].length ; point++) {
+                pts[curve][point] = vTree.addVert(curves[curve][point]);
+            }
+        }
+        this.points = vTree.getThePoints().toArray(new Point[0]);
+
+        // now build the faces
+        ArrayList<Face> faceList = new ArrayList<Face>();
+        for (int curve=0 ; curve < curves.length-1 ; curve++) {
+            for (int point=0 ; point < curves[curve].length-1 ; point++) {
+                int v1 = pts[curve][point];
+                int v2 = pts[curve][point+1];
+                int v3 = pts[curve+1][point];
+                int v4 = pts[curve+1][point+1];
+
+                if (v1 != v3 && v1 != v4 && v3 != v4) {
+                    faceList.add(new Face(v1, v3, v4));
+                }
+                if (v1 != v2 && v1 != v4 && v2 != v4) {
+                    faceList.add(new Face(v1, v2, v4));
+                }
+            }
+        }
+        this.faces = faceList.toArray(new Face[0]);
+
+    }
+
     public void addFace(int v1, int v2, int v3) throws BadGeometryException {
         if (v1 >= points.length || v2 >= points.length || v3 >= points.length) {
             throw new BadGeometryException("Illegal vertex index (" + v1 + "," + v2 + "," + v3 + "), must be " + (points.length-1) + " or less");
@@ -321,6 +363,10 @@ public class Bot extends DbObject {
         }
 
         return sb.toString();
+    }
+
+    public static Bot fromArs(Ars ars, DbExternal dbExt) {
+        return new Bot (ars, dbExt);
     }
 
     @Override
