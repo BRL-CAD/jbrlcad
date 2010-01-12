@@ -76,6 +76,16 @@ public class BrlcadDb {
         this.logger = Logger.getLogger(this.getClass().getPackage().getName());
     }
 
+    public void close() throws IOException {
+        this.directory = new HashMap<String, DirectoryEntry>();
+        this.dbFileName = "No DbFile Open";
+        this.title = "No DbFile open";
+        if (this.dbInput != null) {
+            this.dbInput.close();
+            this.dbInput = null;
+        }
+    }
+
     private void markReferences(Tree tree) {
         if (tree == null) {
             return;
