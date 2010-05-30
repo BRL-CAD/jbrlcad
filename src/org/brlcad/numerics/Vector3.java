@@ -451,10 +451,7 @@ public class Vector3 implements Serializable {
      * @return true, if magnitude is non-zero.
      */
     public boolean isNonZero() {
-        if (Double.isNaN(mag)) {
-            this.findMagnitude();
-        }
-        return (mag != 0.0);
+        return (magnitude() != 0.0);
     }
 
     /**
@@ -603,10 +600,7 @@ public class Vector3 implements Serializable {
      *         vector-magnitude is a NaN.
      */
     public double getTheta() {
-        if (Double.isNaN(mag)) {
-            this.findMagnitude();
-        }
-        return Math.acos((z / mag));
+        return Math.acos((z / magnitude()));
     }
 
     /**
@@ -616,10 +610,7 @@ public class Vector3 implements Serializable {
      *         magnitude of the vector is 0.0 or -0.0.
      */
     public double getCosTheta() {
-        if (Double.isNaN(mag)) {
-            this.findMagnitude();
-        }
-        return (z / mag);
+        return (z / magnitude());
     }
 
     /**
@@ -630,7 +621,7 @@ public class Vector3 implements Serializable {
     public double getPhi() {
         double phi = 0.0;
 
-        if ((x == 0.0) && (y == 0.0)) {
+        if (magnitude() < Constants.RT_LEN_TOL) {
             return 0.0;
         }
 
@@ -645,6 +636,7 @@ public class Vector3 implements Serializable {
                 phi = (2.0 * Math.PI) - phi;
             }
         } else {
+            // for x or y values that are exactly zero, return the exact phi
             if ((x == 0.0) && (y > 0.0)) {
                 phi = PI_BY_2;
             } else if ((x == 0.0) && (y < 0.0)) {
@@ -874,7 +866,7 @@ public class Vector3 implements Serializable {
     /**
      * Normalize the x, y, and z coordinates of the vector so that the magnitude
      * of the vector is 1.0. If the magnitude is 0.0 (the Vector is 0,0,0), then
-     * no normalization is performed.
+     * no normalization is performed. 
      */
     public void normalize() {
         findMagnitude();
@@ -910,11 +902,7 @@ public class Vector3 implements Serializable {
                     "angleBetween() called with Vector containing NaN/Infinity coordinates");
         }
 
-        if (Double.isNaN(mag)) {
-            this.findMagnitude();
-        }
-
-        return Math.acos((dotProduct(v) / (mag * v.magnitude())));
+        return Math.acos((dotProduct(v) / (magnitude() * v.magnitude())));
     }
 
     /**
@@ -1092,36 +1080,7 @@ public class Vector3 implements Serializable {
                     "getPhi() called with Vector containing NaN/Infinity coordinates");
         }
 
-        double phi = 0.0;
-
-        if ((v.x == 0.0) && (v.y == 0.0)) {
-            return 0.0;
-        }
-
-        if ((v.x != 0.0) && (v.y != 0.0)) {
-            phi = Math.asin(Math.abs(v.y)
-                    / Math.sqrt((v.x * v.x) + (v.y * v.y)));
-
-            if ((v.x < 0.0) && (v.y > 0.0)) {
-                phi = Math.PI - phi;
-            } else if ((v.x < 0.0) && (v.y < 0.0)) {
-                phi = Math.PI + phi;
-            } else if ((v.x > 0.0) && (v.y < 0.0)) {
-                phi = (2.0 * Math.PI) - phi;
-            }
-        } else {
-            if ((v.x == 0.0) && (v.y > 0.0)) {
-                phi = PI_BY_2;
-            } else if ((v.x == 0.0) && (v.y < 0.0)) {
-                phi = Math.PI + PI_BY_2;
-            } else if ((v.x > 0.0) && (v.y == 0.0)) {
-                phi = 0.0;
-            } else if ((v.x < 0.0) && (v.y == 0.0)) {
-                phi = Math.PI;
-            }
-        }
-
-        return phi;
+        return v.getPhi();
     }
 
     /**
