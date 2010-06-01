@@ -625,6 +625,11 @@ public class Vector3 implements Serializable {
             return 0.0;
         }
 
+        double noiseRatio = (x*x + y*y)/(z*z);
+        if (noiseRatio < Constants.RT_PCOEF_TOL) {
+            return 0.0;
+        }
+
         if ((x != 0.0) && (y != 0.0)) {
             phi = Math.asin(Math.abs(y) / Math.sqrt((x * x) + (y * y)));
 
