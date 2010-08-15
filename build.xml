@@ -1,5 +1,6 @@
 <project name="jbrlcad" default="build">
 
+<property name="version" value="1.0"/>
 <property name="srcdir" value="${basedir}/src"/>
 <property name="testdir" value="${basedir}/test"/>
 <property name="builddir" value="${basedir}/build"/>
@@ -75,6 +76,17 @@
 <target name="build" depends="clean,compile">
   <mkdir dir="${distdir}"/>
   <jar destfile="${distdir}/jbrlcad.jar" basedir="${classdir}"/>
+</target>
+
+<target name="mvnInstall" depends="build">
+    <exec executable="mvn" os="Linux,Unix" failonerror="true">
+        <arg value="install:install-file"/>
+        <arg value="-Dfile=${distdir}/jbrlcad.jar"/>
+        <arg value="-DgroupId=org.jbrlcad"/>
+        <arg value="-DartifactId=jbrlcad"/>
+        <arg value="-Dversion=${version}"/>
+        <arg value="-Dpackaging=jar"/>
+    </exec>
 </target>
 
 <target name="testRt" depends="build">
