@@ -90,7 +90,7 @@ public class DbExternalObject implements DbExternal
 		used += 6;
 		
 		// get the index into the fieldLength array for the object length
-		int objectWidIndex = (byte)(header[1] & OBJECT_WID_MASK) >> 6;
+		int objectWidIndex = (byte)((header[1] & OBJECT_WID_MASK & 0xFF) >> 6);
 		
 		// get the number of bytes used to store the object length
 		int objectLengthWidth = fieldLength[objectWidIndex];
@@ -108,7 +108,7 @@ public class DbExternalObject implements DbExternal
 		if( (header[1] & NAME_PRESENT) != 0 )
 		{
 			// get the index into the fieldLength array for the name length
-			int nameWidIndex = (byte)(header[1] & NAME_WID_MASK) >> 3;
+			int nameWidIndex = (byte)((header[1] & NAME_WID_MASK & 0xFF) >> 3);
 			// get the number of bytes used to store the name length
 			int nameLengthWidth = fieldLength[nameWidIndex];
 			// read the name length
@@ -131,7 +131,7 @@ public class DbExternalObject implements DbExternal
 		if( (header[2] & AFLAGS_PRESENT) != 0 )
 		{
 			// get the index into the fieldLength array for the attributes length
-			int attWidIndex = (byte)(header[2] & AFLAGS_WID_MASK) >> 6;
+			int attWidIndex = (byte)((header[2] & AFLAGS_WID_MASK & 0xFF) >> 6);
 			// get the number of bytes used to store the attribute length
 			int attLengthWidth = fieldLength[attWidIndex];
 			// read the attribute length
@@ -150,7 +150,7 @@ public class DbExternalObject implements DbExternal
 		if( (header[3] & BFLAGS_PRESENT) != 0 )
 		{
 			// get the index into the fieldLength array for the body length
-			int bodyWidIndex = (byte)(header[3] & BFLAGS_WID_MASK) >> 6;
+			int bodyWidIndex = (byte)((header[3] & BFLAGS_WID_MASK & 0xFF) >> 6);
 			// get the number of bytes used to store the body length
 			int bodyLengthWidth = fieldLength[bodyWidIndex];
 			// read the body length
