@@ -1,7 +1,5 @@
 #!/bin/csh
 
-echo "In runner args = $*"
-
 # keep taking the head until that operation makes no further change
 # if the end result is the empty string, then the command started with a "/"
 set S1=$0
@@ -22,20 +20,19 @@ endif
 
 set JBRLCAD_HOME=$BINDIR:h
 
-if ( !(-e ${JBRLCAD_HOME}/build/dist/jbrlcad.jar) ) then
-    if ( -e ${JBRLCAD_HOME}/build.xml ) then
-        (cd ${JBRLCAD_HOME}; ant build)
-    else
-        echo "Unable to find jbrlcad home directory!!!"
-        exit
-    endif
+set JAR=`ls ${JBRLCAD_HOME}/target/jbrlcad*.jar`
+if $#JAR != 1 then
+    (cd ${JBRLCAD_HOME}; mvn clean install)
+endif
+set JAR=`ls ${JBRLCAD_HOME}/target/jbrlcad*.jar`
+if $#JAR != 1 then
+    echo "Build failed, cannot run $1"
 endif
 
 set CLASS=$1
 shift
 
-echo "CLASS = $CLASS"
-echo "JBRLCAD_HOME = $JBRLCAD_HOME"
+set JSCIENCE=~/.m2/repository/org/jscience/jscience/4.3.1/jscience-4.3.1.jar
 
-echo "java -cp ${JBRLCAD_HOME}/build/dist/jbrlcad.jar:${JBRLCAD_HOME}/lib/jscience.jar org.brlcad.samples.$CLASS $*"
-java -cp ${JBRLCAD_HOME}/build/dist/jbrlcad.jar:${JBRLCAD_HOME}/lib/jscience.jar org.brlcad.samples.$CLASS $*
+# echo "java -cp ${JAR}:${JSCIENCE} org.brlcad.samples.$CLASS $*"
+java -cp ${JAR}:${JSCIENCE} org.brlcad.samples.$CLASS $*
