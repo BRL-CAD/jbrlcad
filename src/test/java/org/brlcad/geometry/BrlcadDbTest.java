@@ -20,7 +20,7 @@ public class BrlcadDbTest {
     @Test
     public void testGetTopLevelObjects() {
         try {
-            BrlcadDb db = new BrlcadDb("test/ktank.g");
+            BrlcadDb db = new BrlcadDb("src/test/resources/ktank.g");
             List<String> tlos = db.getTopLevelObjects();
             assertTrue( "expected 5 top level objects, but found " + tlos.size(), 5 == tlos.size());
         } catch (Exception ex) {

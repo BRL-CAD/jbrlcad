@@ -26,7 +26,7 @@ public class ShootTest {
     @Test
     public void testShoot() {
         try {
-            BrlcadDb brlcadDb = new BrlcadDb("test/test.g");
+            BrlcadDb brlcadDb = new BrlcadDb("src/test/resources/test.g");
 			PreppedDb prepped = new PreppedDb( brlcadDb, "r1" );
             Point start = new Point(12795.692849, 8897.447508, 8166.793304);
             Vector3 dir = new Vector3(-0.7424, -0.5198, -0.4226);

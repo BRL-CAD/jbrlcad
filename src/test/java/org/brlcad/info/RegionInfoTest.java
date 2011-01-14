@@ -21,7 +21,7 @@ public class RegionInfoTest {
     @Test
     public void ktankTest() {
         String[] rootObjects = {"tank"};
-        RegionInfo ri = new RegionInfo("test/ktank.g", rootObjects);
+        RegionInfo ri = new RegionInfo("src/test/resources/ktank.g", rootObjects);
         assertNotNull("RegionInfo Object should not be null", ri);
         Map<Integer,List<String>> idMap = ri.getIdentMap();
         assertNotNull("ident map should not be null", idMap);
