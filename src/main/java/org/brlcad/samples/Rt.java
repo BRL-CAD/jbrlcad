@@ -49,7 +49,7 @@ import org.jscience.physics.amount.Amount;
  */
 public class Rt {
 
-    private static final String usage = "Usage: rt [-R] [-b # #] [-s size] [-a azimuth] [-e elevation] [-o output_file] [-F frame_buffer_port] dbfile.g object1 [object2 object3 ...]";
+    private static final String usage = "Usage: Rt [-R] [-b # #] [-s size] [-a azimuth] [-e elevation] [-o output_file] [-F frame_buffer_port] dbfile.g object1 [object2 object3 ...]";
 
     @SuppressWarnings("empty-statement")
     public static void main(String[] args) {

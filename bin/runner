@@ -20,19 +20,23 @@ endif
 
 set JBRLCAD_HOME=$BINDIR:h
 
+# build classpath containing dependencies
+set CP=`mvn dependency:build-classpath | awk '$3 == "classpath:" {getline;print}'`
+
+# find the jbrlcad jar
 set JAR=`ls ${JBRLCAD_HOME}/target/jbrlcad*.jar`
 if $#JAR != 1 then
-    (cd ${JBRLCAD_HOME}; mvn clean install)
+    (cd ${JBRLCAD_HOME}; mvn -Dmaven.test.skip clean install)
 endif
 set JAR=`ls ${JBRLCAD_HOME}/target/jbrlcad*.jar`
 if $#JAR != 1 then
     echo "Build failed, cannot run $1"
+    exit
 endif
 
+set CP=${JAR}:$CP
 set CLASS=$1
 shift
 
-set JSCIENCE=~/.m2/repository/org/jscience/jscience/4.3.1/jscience-4.3.1.jar
-
-# echo "java -cp ${JAR}:${JSCIENCE} org.brlcad.samples.$CLASS $*"
-java -cp ${JAR}:${JSCIENCE} org.brlcad.samples.$CLASS $*
+# echo "java -cp $CP org.brlcad.samples.$CLASS $*"
+java -cp $CP org.brlcad.samples.$CLASS $*
