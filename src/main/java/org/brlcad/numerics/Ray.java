@@ -55,11 +55,11 @@ public class Ray implements Externalizable {
      * @param d The direction vector of the Ray
      */
     public Ray(Point s, Vector3 d) {
-        if (s == null || !Point.isValidPoint(s)) {
+        if (s == null || !Point.isValidTriple(s)) {
             throw new IllegalArgumentException(
                     "Point for Ray constructor either null or not valid.");
         }
-        if (d == null || !Vector3.isValidVector(d)
+        if (d == null || !Vector3.isValidTriple(d)
                 || d.magnitude() <= Double.MIN_VALUE) {
             throw new IllegalArgumentException(
                     "Vector for Ray constructor either null, not valid, or vector magnitude is zero.");
@@ -139,8 +139,8 @@ public class Ray implements Externalizable {
      * @return true, if the ray is valid
      */
     public static boolean isValidRay(Ray r) {
-        if (r == null || r.start == null || !Point.isValidPoint(r.start)
-                || r.direction == null || !Vector3.isValidVector(r.direction)) {
+        if (r == null || r.start == null || !Point.isValidTriple(r.start)
+                || r.direction == null || !Vector3.isValidTriple(r.direction)) {
             return false;
         }
         return true;

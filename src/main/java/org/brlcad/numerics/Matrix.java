@@ -159,19 +159,19 @@ public class Matrix implements Serializable {
      */
     public Matrix(Vector3 col0, Vector3 col1, Vector3 col2, Vector3 col3,
                   double scale) {
-        if (col0 == null || !Vector3.isValidVector(col0)) {
+        if (col0 == null || !Vector3.isValidTriple(col0)) {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Vector3 col0");
         }
-        if (col1 == null || !Vector3.isValidVector(col1)) {
+        if (col1 == null || !Vector3.isValidTriple(col1)) {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Vector3 col1");
         }
-        if (col2 == null || !Vector3.isValidVector(col2)) {
+        if (col2 == null || !Vector3.isValidTriple(col2)) {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Vector3 col2");
         }
-        if (col3 == null || !Vector3.isValidVector(col3)) {
+        if (col3 == null || !Vector3.isValidTriple(col3)) {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Vector3 col3");
         }
@@ -210,7 +210,7 @@ public class Matrix implements Serializable {
      * @throws IllegalArgumentException if v is null or not valid
      */
     public Matrix(Point v) {
-        if (v == null || !Point.isValidPoint(v)) {
+        if (v == null || !Point.isValidTriple(v)) {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Point");
         }
@@ -271,7 +271,7 @@ public class Matrix implements Serializable {
                             + roll.doubleValue(SI.RADIAN));
         }
 
-        if (location == null || !Point.isValidPoint(location)) {
+        if (location == null || !Point.isValidTriple(location)) {
             throw new IllegalArgumentException(
                     "Cannot construct Matrix from null or invalid Point");
         }
@@ -333,7 +333,7 @@ public class Matrix implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Quaternion");
         }
-        if (xlate == null || !Vector3.isValidVector(xlate)) {
+        if (xlate == null || !Vector3.isValidTriple(xlate)) {
             throw new IllegalArgumentException(
                     "Cannot construct new Matrix from null or invalid Vector3");
         }
@@ -552,7 +552,7 @@ public class Matrix implements Serializable {
      *                                  of rows < 3 or the number of columns < 4 in this object
      */
     public void mult(Point v) {
-        if (v == null || !Point.isValidPoint(v)) {
+        if (v == null || !Point.isValidTriple(v)) {
             throw new IllegalArgumentException(
                     "Cannot multiply null or invalid Point");
         }
@@ -587,7 +587,7 @@ public class Matrix implements Serializable {
      *                                  of rows < 3 or the number of columns < 4 in this object
      */
     public void mult(Vector3 v) {
-        if (v == null || !Vector3.isValidVector(v)) {
+        if (v == null || !Vector3.isValidTriple(v)) {
             throw new IllegalArgumentException(
                     "Cannot multiply null or invalid Vector");
         }
@@ -678,7 +678,7 @@ public class Matrix implements Serializable {
      *                                  of rows and columns in this object is not 4
      */
     public void translate(Vector3 v) {
-        if (v == null || !Vector3.isValidVector(v)) {
+        if (v == null || !Vector3.isValidTriple(v)) {
             throw new IllegalArgumentException(
                     "Cannot translate using null or invalid Vector");
         }

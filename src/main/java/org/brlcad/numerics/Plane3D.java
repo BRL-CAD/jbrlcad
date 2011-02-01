@@ -59,7 +59,7 @@ public class Plane3D implements Serializable {
      * @param norm Vector normal to the plane
      */
     public Plane3D(Vector3 norm) {
-        if (norm == null || !Vector3.isValidVector(norm)) {
+        if (norm == null || !Vector3.isValidTriple(norm)) {
             throw new IllegalArgumentException(
                     "Vector for Plane3D constructor either null or not valid.");
         }
@@ -78,11 +78,11 @@ public class Plane3D implements Serializable {
      * @param pt   Point in the plane
      */
     public Plane3D(Vector3 norm, Point pt) {
-        if (pt == null || !Point.isValidPoint(pt)) {
+        if (pt == null || !Point.isValidTriple(pt)) {
             throw new IllegalArgumentException(
                     "Point for Plane3D constructor either null or not valid.");
         }
-        if (norm == null || !Vector3.isValidVector(norm)) {
+        if (norm == null || !Vector3.isValidTriple(norm)) {
             throw new IllegalArgumentException(
                     "Vector for Plane3D constructor either null or not valid.");
         }
@@ -101,15 +101,15 @@ public class Plane3D implements Serializable {
      * @param p3 Point 3
      */
     public Plane3D(Point p1, Point p2, Point p3) {
-        if (p1 == null || !Point.isValidPoint(p1)) {
+        if (p1 == null || !Point.isValidTriple(p1)) {
             throw new IllegalArgumentException(
                     "Point 1 for Plane3D constructor either null or not valid.");
         }
-        if (p2 == null || !Point.isValidPoint(p2)) {
+        if (p2 == null || !Point.isValidTriple(p2)) {
             throw new IllegalArgumentException(
                     "Point 2 for Plane3D constructor either null or not valid.");
         }
-        if (p3 == null || !Point.isValidPoint(p3)) {
+        if (p3 == null || !Point.isValidTriple(p3)) {
             throw new IllegalArgumentException(
                     "Point 3 for Plane3D constructor either null or not valid.");
         }
@@ -134,7 +134,7 @@ public class Plane3D implements Serializable {
      * @return true, if point is above the plane
      */
     public boolean above(Point pt) {
-        if (pt == null || !Point.isValidPoint(pt)) {
+        if (pt == null || !Point.isValidTriple(pt)) {
             throw new IllegalArgumentException(
                     "above() called with Point that is either null or not valid.");
         }
@@ -153,7 +153,7 @@ public class Plane3D implements Serializable {
      * @return true, if point is below the plane
      */
     public boolean below(Point pt) {
-        if (pt == null || !Point.isValidPoint(pt)) {
+        if (pt == null || !Point.isValidTriple(pt)) {
             throw new IllegalArgumentException(
                     "below() called with Point that is either null or not valid.");
         }
@@ -172,7 +172,7 @@ public class Plane3D implements Serializable {
      * @return true, if point is in the plane
      */
     public boolean liesIn(Point pt) {
-        if (pt == null || !Point.isValidPoint(pt)) {
+        if (pt == null || !Point.isValidTriple(pt)) {
             throw new IllegalArgumentException(
                     "liesIn() called with Point that is either null or not valid.");
         }
@@ -195,7 +195,7 @@ public class Plane3D implements Serializable {
      * @return true, if point is in the plane
      */
     public boolean liesIn(Point pt, double tolerance) {
-        if (pt == null || !Point.isValidPoint(pt)) {
+        if (pt == null || !Point.isValidTriple(pt)) {
             throw new IllegalArgumentException(
                     "liesIn() called with Point that is either null or not valid.");
         }
@@ -243,7 +243,7 @@ public class Plane3D implements Serializable {
      *         distance * getNormal() is on the plane
      */
     public double distanceTo(Point pt) {
-        if (pt == null || !Point.isValidPoint(pt)) {
+        if (pt == null || !Point.isValidTriple(pt)) {
             throw new IllegalArgumentException(
                     "distanceTo() called with Point that is either null or not valid.");
         }

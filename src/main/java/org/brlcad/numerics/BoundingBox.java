@@ -31,11 +31,11 @@ public class BoundingBox implements Serializable {
      * @param b Point describing corner of the box, opposite a.
      */
     public BoundingBox(Point a, Point b) throws IllegalArgumentException {
-        if (a == null || !Point.isValidPoint(a)) {
+        if (a == null || !Point.isValidTriple(a)) {
             throw new IllegalArgumentException(
                     "Point a for BoundingBox constructor either null or not valid.");
         }
-        if (b == null || !Point.isValidPoint(b)) {
+        if (b == null || !Point.isValidTriple(b)) {
             throw new IllegalArgumentException(
                     "Point b for BoundingBox constructor either null or not valid.");
         }
@@ -240,7 +240,7 @@ public class BoundingBox implements Serializable {
      * @param max The value to set
      */
     public void setMax(Point max) throws IllegalArgumentException {
-        if (max == null || !Point.isValidPoint(max)) {
+        if (max == null || !Point.isValidTriple(max)) {
             throw new IllegalArgumentException(
                     "setMax() called with Point that is either null or not valid");
         }
@@ -271,7 +271,7 @@ public class BoundingBox implements Serializable {
      * @param min The value to set
      */
     public void setMin(Point min) throws IllegalArgumentException {
-        if (min == null || !Point.isValidPoint(min)) {
+        if (min == null || !Point.isValidTriple(min)) {
             throw new IllegalArgumentException(
                     "setMin() called with Point that is either null or not valid");
         }
@@ -287,7 +287,7 @@ public class BoundingBox implements Serializable {
      * @return true, if point is constrained inside of the bounding box
      */
     public boolean bound(Point p) throws IllegalArgumentException {
-        if (p == null || !Point.isValidPoint(p)) {
+        if (p == null || !Point.isValidTriple(p)) {
             throw new IllegalArgumentException(
                     "bound() called with Point that is either null or not valid");
         }
@@ -308,7 +308,7 @@ public class BoundingBox implements Serializable {
      *         direction
      */
     public List<Double> getExtentsInDirection(Vector3 dir) throws IllegalArgumentException {
-        if (dir == null || !Vector3.isValidVector(dir)) {
+        if (dir == null || !Vector3.isValidTriple(dir)) {
             throw new IllegalArgumentException(
                     "getExtentsInDirection() called with Vector that is either null or not valid");
         }

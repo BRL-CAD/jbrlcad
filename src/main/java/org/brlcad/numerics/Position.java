@@ -26,8 +26,8 @@ public class Position implements Serializable {
     private Amount<Length> magnitude;
     private Vector3 direction;
 
-    private static Unit myUnits = SI.METER;
-    private static UnitConverter pointScaleConverter = Point.pointUnits.getConverterTo(myUnits);
+    private static final Unit myUnits = SI.METER;
+    private static UnitConverter pointScaleConverter = Triple.units.getConverterTo(myUnits);
     public static Position ZERO = Position.fromXYZVectors(Amount.valueOf(0, Length.UNIT), Amount.valueOf(0, Length.UNIT), Amount.valueOf(0, Length.UNIT));
 
     /**

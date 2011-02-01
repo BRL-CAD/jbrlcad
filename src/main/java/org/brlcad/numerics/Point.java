@@ -2,11 +2,10 @@
 
 package org.brlcad.numerics;
 
+import java.io.Serializable;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
-import java.io.Serializable;
-import static java.lang.Math.abs;
-import static java.lang.Math.sqrt;
+
 
 /**
  * Point. <p/> <p/> <b>Source:</b> <p/>
@@ -25,22 +24,13 @@ import static java.lang.Math.sqrt;
  * </ul>
  */
 
-public class Point implements Serializable {
+public class Point extends Triple implements Serializable {
 
-    static final long serialVersionUID = 6928788732940688041L;
-
-    private static final double INITIAL_TOLERANCE = 1.0E-11;
+    static final long serialVersionUID = 6928788732940688042L;
 
     // points must always be in millimeters
     public static Unit pointUnits = SI.MILLI(SI.METER);
 
-    private double tolerance = INITIAL_TOLERANCE;
-
-    private double x = 0.0;
-
-    private double y = 0.0;
-
-    private double z = 0.0;
 
     /**
      * No argument constructor to support JavaBeans
@@ -72,6 +62,7 @@ public class Point implements Serializable {
         x = x_in;
         y = y_in;
         z = z_in;
+        mag = Double.NaN;
     }
 
     /**
@@ -84,7 +75,7 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot construct a Point from a null Point");
         }
-//        if (!isValidPoint(p)) {
+//        if (!isValidTriple(p)) {
 //            throw new IllegalArgumentException(
 //                    "Cannot construct a Point from Point with illegal coordinates");
 //        }
@@ -92,6 +83,7 @@ public class Point implements Serializable {
         x = p.x;
         y = p.y;
         z = p.z;
+        mag = Double.NaN;
     }
 
     /**
@@ -101,36 +93,7 @@ public class Point implements Serializable {
      * @return a Point representing the Position (units of millimeters)
      */
     public static Point fromPosition(Position p) {
-        return new Point(p.getPositionX().doubleValue(pointUnits), p.getPositionY().doubleValue(pointUnits), p.getPositionZ().doubleValue(pointUnits));
-    }
-
-    /**
-     * Reviews Point to determine if it is null. If Point is not null, review
-     * all coordinates of the Point to ensure that none are infinity or
-     * Not-A-Number (NaN).
-     *
-     * @param p Point to be tested
-     * @return Boolean indicating whether Point is valid or not
-     */
-    public static boolean isValidPoint(Point p) {
-        if (p == null || Double.isInfinite(p.x) || Double.isNaN(p.x)
-                || Double.isInfinite(p.y) || Double.isNaN(p.y)
-                || Double.isInfinite(p.z) || Double.isNaN(p.z)) {
-            return false;
-        }
-        return true;
-    }
-
-    public void subtract(Point p) {
-        this.x -= p.getX();
-        this.y -= p.getY();
-        this.z -= p.getZ();
-    }
-
-    public void subtract(Vector3 p) {
-        this.x -= p.getX();
-        this.y -= p.getY();
-        this.z -= p.getZ();
+        return new Point(p.getPositionX().doubleValue(units), p.getPositionY().doubleValue(units), p.getPositionZ().doubleValue(units));
     }
 
     /**
@@ -140,16 +103,6 @@ public class Point implements Serializable {
      */
     public Vector3 toVector() {
         return new Vector3(x, y, z);
-    }
-
-    /**
-     * Format a String representation of this point in the form "(x, y, z)"
-     *
-     * @return The output String
-     */
-    @Override
-    public String toString() {
-        return "(" + x + ", " + y + ", " + z + ")";
     }
 
     /**
@@ -163,207 +116,13 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot calculate distance to a null Point");
         }
-//        if (!isValidPoint(p)) {
+//        if (!isValidTriple(p)) {
 //            throw new IllegalArgumentException(
 //                    "Cannot calculate distance from Point with illegal coordinates");
 //        }
 
-        return sqrt(((x - p.x) * (x - p.x)) + ((y - p.y) * (y - p.y))
+        return Math.sqrt(((x - p.x) * (x - p.x)) + ((y - p.y) * (y - p.y))
                 + ((z - p.z) * (z - p.z)));
-    }
-
-    /**
-     * Set the X coordinate of the Point
-     *
-     * @param x The value of the X coordinate
-     */
-    public void setX(double x) {
-        if (Double.isInfinite(x) || Double.isNaN(x)) {
-            throw new IllegalArgumentException(
-                    "Cannot set Point coordinate to illegal value: " + x);
-        }
-        this.x = x;
-    }
-
-    /**
-     * Set the Y coordinate of the Point
-     *
-     * @param y The value of the Y coordinate
-     */
-    public void setY(double y) {
-        if (Double.isInfinite(y) || Double.isNaN(y)) {
-            throw new IllegalArgumentException(
-                    "Cannot set Point coordinate to illegal value: " + y);
-        }
-        this.y = y;
-    }
-
-    /**
-     * Set the Z coordinate of the Point
-     *
-     * @param z The value of the Z coordinate
-     */
-    public void setZ(double z) {
-        if (Double.isInfinite(z) || Double.isNaN(z)) {
-            throw new IllegalArgumentException(
-                    "Cannot set Point coordinate to illegal value: " + z);
-        }
-        this.z = z;
-    }
-
-    /**
-     * Get the X coordinate of this Point
-     *
-     * @return The X coordinate of this Point
-     */
-    public double getX() {
-        return (x);
-    }
-
-    /**
-     * Get the Y coordinate of this Point
-     *
-     * @return The Y coordinate of this Point
-     */
-    public double getY() {
-        return (y);
-    }
-
-    /**
-     * Get the Z coordinate of this Point
-     *
-     * @return The Z coordinate of this Point
-     */
-    public double getZ() {
-        return (z);
-    }
-
-    public double get( int index ) {
-        switch( index ) {
-            case 0:
-                return x;
-            case 1:
-                return y;
-            case 2:
-                return z;
-            default:
-                throw new IllegalArgumentException( "get(int i) called with illegal argument (" + index + ") must be 0, 1, or 2" );
-        }
-    }
-
-    public void set(int index, double d) {
-        switch( index ) {
-            case 0:
-                this.x = d;
-                break;
-            case 1:
-                this.y = d;
-                break;
-            case 2:
-                this.z = d;
-                break;
-            default:
-                throw new IllegalArgumentException( "set(int i) called with illegal argument (" + index + ") must be 0, 1, or 2" );
-        }
-    }
-
-    /**
-     * Add vector operation.
-     *
-     * @param v Vector to add.
-     * @throws IllegalArgumentException if the argument is either null or any
-     *                                  one of its coordinates is either NaN or Infinite.
-     */
-    public void plus(Vector3 v) {
-        if (v == null) {
-            throw new IllegalArgumentException("plus() called with null Vector");
-        }
-//        if (!Vector3.isValidVector(v)) {
-//            throw new IllegalArgumentException(
-//                    "plus() called with Vector containing NaN/Infinity coordinates");
-//        }
-
-        x += v.getX();
-        y += v.getY();
-        z += v.getZ();
-    }
-
-    /**
-     * Add Point operation.
-     *
-     * @param v Point to add.
-     * @throws IllegalArgumentException if the argument is either null or any
-     *                                  one of its coordinates is either NaN or Infinite.
-     */
-    public void plus(Point v) {
-        if (v == null) {
-            throw new IllegalArgumentException("plus() called with null Vector");
-        }
-//        if (!Point.isValidPoint(v)) {
-//            throw new IllegalArgumentException(
-//                    "plus() called with Vector containing NaN/Infinity coordinates");
-//        }
-
-        x += v.getX();
-        y += v.getY();
-        z += v.getZ();
-    }
-
-    /**
-     * Report the current tolerance (epsilon).
-     *
-     * @return The comparison tolerance for this Point
-     */
-    public double getTolerance() {
-        return tolerance;
-    }
-
-    /**
-     * Set the tolerance of this Point
-     *
-     * @param t Tolerance value to set
-     */
-    public void setTolerance(double t) {
-        if (Double.isInfinite(t) || Double.isNaN(t)) {
-            throw new IllegalArgumentException("Illegal value for tolerance: "
-                    + t);
-        }
-        tolerance = abs(t);
-    }
-
-    /**
-     * Test if two points are in the same place (within epsilon). The tolerance
-     * aspect applies to half-edge length of a bounding box.
-     *
-     * @param p Point to compare against
-     * @return Boolean indicating if the points are 'close' enough to call
-     *         equal.
-     */
-    public boolean isEqual(Point p) {
-        if (p == null || !isValidPoint(p)) {
-            return false;
-        }
-        return (abs(p.x - x) < tolerance) && (abs(p.y - y) < tolerance)
-                && (abs(p.z - z) < tolerance);
-    }
-
-    /**
-     * Test if two points are in the same place (within epsilon). The tolerance
-     * aspect applies to half-edge length of a bounding box.
-     *
-     * @param p1 Point to compare.
-     * @param p2 Point to compare.
-     * @return Boolean indicating if the points are 'close' enough to call
-     *         equal.
-     */
-    public static boolean isEqual(Point p1, Point p2) {
-        if (p1 == null && p2 == null) {
-            return true;
-        }
-        if (p1 == null || p2 == null) {
-            return false;
-        }
-        return p1.isEqual(p2);
     }
 
     /**
@@ -382,23 +141,6 @@ public class Point implements Serializable {
     }
 
     /**
-     * Implement hash calculation for this Point.
-     *
-     * @return An int which is the hashcode.
-     */
-    @Override
-    public int hashCode() {
-
-        int result;
-
-        result = 7 * DoubleHash.hashCode(this.x);
-        result = 13 * DoubleHash.hashCode(this.y) + result;
-        result = 17 * DoubleHash.hashCode(this.z) + result;
-
-        return result;
-    }
-
-    /**
      * Move this point by the amount specified by the supplied input Vector
      *
      * @param vector Input vector
@@ -408,7 +150,7 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "Cannot translate with a null translation vector");
         }
-        if (!Vector3.isValidVector(vector)) {
+        if (!Vector3.isValidTriple(vector)) {
             throw new IllegalArgumentException(
                     "Cannot translate using Vector3 with illegal coordinates");
         }
@@ -416,46 +158,7 @@ public class Point implements Serializable {
         x += vector.getX();
         y += vector.getY();
         z += vector.getZ();
-    }
-
-    /**
-     * Scale this point by the amount specified by the supplied scaleFactor
-     *
-     * @param scaleFactor The supplied scaling factor
-     */
-    public void scale(double scaleFactor) {
-        if (Double.isInfinite(scaleFactor) || Double.isNaN(scaleFactor)) {
-            throw new IllegalArgumentException("Illegal value of scaleFactor: "
-                    + scaleFactor);
-        }
-        x *= scaleFactor;
-        y *= scaleFactor;
-        z *= scaleFactor;
-    }
-
-    /**
-     * Scale the Point by the Vector
-     *
-     * @param dist Distance
-     * @param dir  Direction
-     */
-    public void join(double dist, Vector3 dir) {
-        if (dir == null) {
-            throw new IllegalArgumentException(
-                    "Cannot join with a null direction vector");
-        }
-//        if (!Vector3.isValidVector(dir)) {
-//            throw new IllegalArgumentException(
-//                    "Cannot join using Vector3 with illegal coordinates");
-//        }
-
-        if (Double.isInfinite(dist) || Double.isNaN(dist)) {
-            throw new IllegalArgumentException("Illegal value of dist: " + dist);
-        }
-
-        x += dist * dir.getX();
-        y += dist * dir.getY();
-        z += dist * dir.getZ();
+        mag = Double.NaN;
     }
 
     /**
@@ -472,7 +175,7 @@ public class Point implements Serializable {
             throw new IllegalArgumentException(
                     "rotate() called with null upVector");
         }
-//        if (!Vector3.isValidVector(upVector)) {
+//        if (!Vector3.isValidTriple(upVector)) {
 //            throw new IllegalArgumentException(
 //                    "rotate() called with upVector containing NaN/Infinity coordinates");
 //        }

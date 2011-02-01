@@ -77,7 +77,7 @@ public class Quaternion {
                     "Cannot construct Quaternion from NaN/Infinite value for rot: "
                             + rot.doubleValue(SI.RADIAN));
         }
-        if (axis == null || !Vector3.isValidVector(axis)) {
+        if (axis == null || !Vector3.isValidTriple(axis)) {
             throw new IllegalArgumentException(
                     "Vector for Quaternion constructor either null or not valid.");
         }
@@ -300,7 +300,7 @@ public class Quaternion {
             throw new IllegalArgumentException(
                     "setFromNormalizedAxisAngle() called with 'rot' that is Infinite/NaN");
         }
-        if (naxis == null || !Vector3.isValidVector(naxis)) {
+        if (naxis == null || !Vector3.isValidTriple(naxis)) {
             throw new IllegalArgumentException(
                     "setFromNormalizedAxisAngle() called with naxis that is either null or not valid.");
         }
@@ -347,7 +347,7 @@ public class Quaternion {
      * @return The new vector
      */
     public Vector3 mult(Vector3 in) {
-        if (in == null || !Vector3.isValidVector(in)) {
+        if (in == null || !Vector3.isValidTriple(in)) {
             throw new IllegalArgumentException(
                     "mult() called with 'in' that is either null or contains Infinite/NaN values");
         }
