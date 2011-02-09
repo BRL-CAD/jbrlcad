@@ -1,3 +1,4 @@
+package org.brlcad;
 
 import java.util.SortedSet;
 import org.brlcad.geometry.BrlcadDb;
