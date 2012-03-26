@@ -23,6 +23,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.brlcad.numerics.Tolerance;
 
+/**
+ * Object used to store and read data from a Brlcad *.g file.
+ * @author jra
+ */
 public class BrlcadDb {
 
     /** Name of the BRL-CAD db file */
@@ -53,7 +57,7 @@ public class BrlcadDb {
      * cached value of top level objects (can be cached because db is read only)
      */
     private List<String> topLevelObjects = null;
-    private Logger logger;
+    private static final Logger logger = Logger.getLogger(BrlcadDb.class.getName());
 
     /**
      * Constructor
@@ -66,14 +70,15 @@ public class BrlcadDb {
      *
      */
     public BrlcadDb(String dbFileName) throws FileNotFoundException, IOException, DbException {
-        this();
         this.dbFileName = dbFileName;
         this.dbInput = new RandomAccessFile(this.dbFileName, "r");
         this.scan();
     }
 
+    /**
+     * Zero-Argument Constructor.
+     */
     protected BrlcadDb() {
-        this.logger = Logger.getLogger(this.getClass().getPackage().getName());
     }
 
     public void close() throws IOException {
@@ -89,10 +94,15 @@ public class BrlcadDb {
     private void markReferences(Tree tree) {
         if (tree == null) {
             return;
-        }
-
-        if (tree.getOp() == Operator.LEAF) {
-            directory.get(tree.getLeafName()).incrementReferences();
+        }   
+        
+        if (tree.getOp() == Operator.LEAF) {            
+            DirectoryEntry de = directory.get(tree.getLeafName()); 
+            if(de != null){
+                de.incrementReferences();
+            } else{ 
+                logger.log(Level.SEVERE, "Non-Existent reference '" + tree.getLeafName() + "'. Skipping this object." );       
+            }
         } else {
             markReferences(tree.getLeft());
             markReferences(tree.getRight());
@@ -139,13 +149,13 @@ public class BrlcadDb {
         if (topLevelObjects == null) {
             findTopLevelObjects();
         }
-        return topLevelObjects;
+        return Collections.unmodifiableList(topLevelObjects);
     }
 
     /**
      * Sets Tolerance
      *
-     * @param    Tolerance           a  Tolerance
+     * @param    tolerance           a  Tolerance
      */
     public static void setTolerance(Tolerance tolerance) {
         BrlcadDb.tolerance = tolerance;
@@ -206,7 +216,7 @@ public class BrlcadDb {
                 String name = dbExt.getName();
                 if (name != null) {
                     if (this.directory.get(name) != null) {
-                        System.err.println("Duplicate name (" + name + ") ignored");
+                        logger.severe("Duplicate name (" + name + ") ignored");
                     } else {
 //						System.out.println( name + ": " + offset
 //							+ "; major " + dbExt.getMajorType()
@@ -347,7 +357,7 @@ public class BrlcadDb {
                 this.dbInput.readFully(bytes);
                 longNum = (bytes[0] & 0xff);
                 for (int i = 1; i < 4; i++) {
-                    longNum = longNum << 8;
+                    longNum <<= 8;
                     longNum |= (bytes[i] & 0xff);
                 }
                 return longNum;
@@ -401,7 +411,7 @@ public class BrlcadDb {
     public static long getLong(byte[] bytes, int pointer, int length) {
         long longBytes = (bytes[pointer] & 0xff);
         for (int i = 1; i < length; i++) {
-            longBytes = longBytes << 8;
+            longBytes <<= 8;
             longBytes |= ((long) bytes[pointer + i] & 0xff);
         }
 
@@ -421,7 +431,7 @@ public class BrlcadDb {
     public static double getDouble(byte[] bytes, int pointer) {
         long longBytes = (bytes[pointer] & 0xff);
         for (int i = 1; i < 8; i++) {
-            longBytes = longBytes << 8;
+            longBytes <<= 8;
             longBytes |= ((long) bytes[pointer + i] & 0xff);
         }
         return Double.longBitsToDouble(longBytes);
@@ -498,7 +508,7 @@ public class BrlcadDb {
     /**
      * Method getDbExternal
      * 
-     * @param   String which contains the name of the object to return
+     * @param name String which contains the name of the object to return
      * 
      * @return  DbExternal object for given name; null if it doesn't exist
      */
@@ -523,6 +533,10 @@ public class BrlcadDb {
         return title;
     }
 
+    /**
+     * 
+     * @return the Brlcad geometry file name
+     */
     public String getDbFileName() {
         return this.dbFileName;
     }

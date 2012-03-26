@@ -1,6 +1,7 @@
 package org.brlcad.info;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -8,10 +9,13 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.brlcad.geometry.BrlcadDb;
 import org.brlcad.geometry.Combination;
 import org.brlcad.geometry.DbException;
 import org.brlcad.geometry.DbExternal;
+import org.brlcad.geometry.DbExternalObject;
 import org.brlcad.geometry.Operator;
 import org.brlcad.geometry.Tree;
 
@@ -43,6 +47,8 @@ public class RegionInfo {
      * for regions with that ident
      */
     private Map<Integer,List<String>> identMap = null;
+    
+    private static final Logger logger = Logger.getLogger(RegionInfo.class.getName());
 
     /**
      * Constructor
@@ -50,6 +56,7 @@ public class RegionInfo {
      * @param inFileName The name of a BRL-CAD ".g" file
      * @param rootObjects The top level objects in the ".g" file that are to be processed
      */
+    
     public RegionInfo(String inFileName, String... rootObjects) {
         this.processInput(inFileName, rootObjects);
     }
@@ -57,15 +64,16 @@ public class RegionInfo {
     /**
      * write all the region info that has been obtained to std out
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     public void writeOutput() {
 
-        if( this.getRegionMap() == null ) {
+        if( this.regionMap == null ) {
             System.out.println( "No data available, call \"processInput\" method first");
             return;
         }
 
         System.out.println("Final results:");
-        for (Map.Entry<String, Map<String, String>> me : getRegionMap().entrySet()) {
+        for (Map.Entry<String, Map<String, String>> me : regionMap.entrySet()) {
             if ( ! me.getValue().containsKey("aircode")) {
                 System.out.print(me.getKey());
                 for (Map.Entry<String, String> me_inside : me.getValue().entrySet()) {
@@ -77,7 +85,7 @@ public class RegionInfo {
         }
 
         System.out.println( "IdentMap:");
-        for( Map.Entry<Integer,List<String>> me : getIdentMap().entrySet()) {
+        for( Map.Entry<Integer,List<String>> me : identMap.entrySet()) {
             System.out.println( "ident " + me.getKey() + ":");
             for( String region : me.getValue() ) {
                 System.out.println( "\t" + region);
@@ -117,21 +125,24 @@ public class RegionInfo {
                 if (isDebug()) {
                     printRawInfo("    (pi)", rootDbExt);
                 }
-                Combination rootCombo = new Combination(rootDbExt);
-
-                // Assume that rootCombo now represents the top of an implied hierarchy
-                // (i.e., tree) of smaller trees, each of which contains a combination
-                // of combinations and/or components which contain regions.  Recursively
-                // process the hierarchy using this "root node" as the start.
-
-                if (isDebug()) {
-                    printComboInfo("    (pi->ph)", rootCombo, "");
+                Combination rootCombo = new Combination(rootDbExt);               
+                Map<String, String> comboAttrs = rootCombo.getAttributes();
+                if (comboAttrs != null && comboAttrs.containsKey("region")) {
+                        // This Root Combination is a region; save the region data contained
+                        addRegionData(rootCombo, null, null);
+                } else {
+                    // Assume that rootCombo now represents the top of an implied hierarchy
+                    // (i.e., tree) of smaller trees, each of which contains a combination
+                    // of combinations and/or components which contain regions.  Recursively
+                    // process the hierarchy using this "root node" as the start.
+                    if (isDebug()) {
+                        printComboInfo("    (pi->ph)", rootCombo, "");
+                    }
+                    processHierarchy(db, rootCombo.getTree(), objectName);                    
                 }
-                processHierarchy(db, rootCombo.getTree(), objectName);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.log(Level.WARNING, e.getMessage(), e);
         }
     }
 
@@ -145,12 +156,15 @@ public class RegionInfo {
      * @param regionMap Map of regions' attributes as built up from processing
      * @throws geometry.DbException Thrown when there's an error in reading the file
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr") //Allow use of 'println' statements when 'isDebug() == true'
     private void processHierarchy(BrlcadDb db, Tree tree, String parentPath) throws DbException {
 
         // If any parameter is null, return immediately
 
-        if (db == null || tree == null || parentPath == null || getRegionMap() == null) {
-            if (isDebug()) System.out.println("    (ph) return immed");
+        if (db == null || tree == null || parentPath == null || regionMap == null) {
+            if (isDebug()) {
+                System.out.println("    (ph) return immed");
+            }
             return;
         }
 
@@ -159,7 +173,9 @@ public class RegionInfo {
         // are not regions--the names of these are returned in nameSet.
 
         Set<String> nameSet = new HashSet<String>();
-        if (isDebug()) printTreeInfo("    (ph->pt)", tree, parentPath);
+        if (isDebug()) {
+            printTreeInfo("    (ph->pt)", tree, parentPath);
+        }
         processTree(db, tree, parentPath, nameSet);
 
         // Process nameSet to move further down the region path name
@@ -167,7 +183,9 @@ public class RegionInfo {
         for (String s : nameSet) {
 //            if (isDebug()) printRawInfo("    (ph)", db.getDbExternal(s));
             Combination combo = new Combination(db.getDbExternal(s));
-            if (isDebug()) printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
+            if (isDebug()) {
+                printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
+            }
             processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
         }
     }
@@ -186,72 +204,92 @@ public class RegionInfo {
      * @param nameSet
      * @throws geometry.DbException
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr") //Allow use of 'println' statements when 'isDebug() == true'
     private void processTree(BrlcadDb db, Tree tree, String parentPath,
             Set<String> nameSet) throws DbException {
 
         // If any parameter is null, return immediately
 
-        if (db == null || tree == null || parentPath == null || getRegionMap() == null
+        if (db == null || tree == null || parentPath == null || regionMap == null
                 || nameSet == null) {
-            if (isDebug()) System.out.println("    (pt) return immed");
+            if (isDebug()) {
+                System.out.println("    (pt) return immed");
+            }
             return;
         }
 
         // If current tree is not a leaf, ignore it and process left and right branches
 
         if (tree.getOp() != Operator.LEAF) {
-            if (isDebug()) printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
+            if (isDebug()) {
+                printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
+            }
             processTree(db, tree.getLeft(), parentPath, nameSet);
-            if (isDebug()) printTreeInfo("    (pt->pt right)", tree.getRight(), parentPath);
+            if (isDebug()) {
+                printTreeInfo("    (pt->pt right)", tree.getRight(), parentPath);
+            }
             processTree(db, tree.getRight(), parentPath, nameSet);
             return;
-        }
-
-        // Current tree is a leaf.  Get the data about the leaf from the BRL-CAD
-        // file and process as either (1) the name of another group or (2) a region
-
-        Combination combo = new Combination(db.getDbExternal(tree.getLeafName()));
-        Map<String, String> comboAttrs = combo.getAttributes();
-
-        if (comboAttrs.containsKey("region")) {
-
-            // This Combination is a region; save the data contained in the node,
-            // along with pathing, to the results map (remove any leading delimiter
-            // before saving)
-
-            if (isDebug()) System.out.println("(Region) Name: " + combo.getName()
-                    + "; Path: " + parentPath + delimiter + combo.getName()
-                    + "; RegionID: " + comboAttrs.get("region_id")
-                    + "; LOS: " + comboAttrs.get("los")
-                    + "; MatID: " + comboAttrs.get("material_id")
-                    + "; AirCode: " + comboAttrs.get("aircode"));
-            Map<String, String> attrs = new TreeMap<String, String>(comboAttrs);
-            String path = parentPath + delimiter + combo.getName();
-            attrs.put("regionPath", path);
-            getRegionMap().put(combo.getName(), attrs);
-
-            String identStr = comboAttrs.get("region_id");
-            Integer ident = 0;
-            if (identStr != null) {
-                ident = Integer.valueOf(comboAttrs.get("region_id"));
-            }
-            List<String> regions = getIdentMap().get(ident);
-            if( regions == null ) {
-                regions = new ArrayList<String>();
-                getIdentMap().put(ident, regions);
-            }
-            regions.add(path);
-
+        } 
+        DbExternalObject leafDbext = db.getDbExternal(tree.getLeafName());
+        if (leafDbext.getMajorType() == 1 && leafDbext.getMinorType() == 31) {
+            // Current tree is a leaf.  Get the data about the leaf from the BRL-CAD
+            // file and process as either (1) the name of another group or (2) a region
+            Combination combo = new Combination(leafDbext);
+            addRegionData(combo, parentPath, nameSet);
         } else {
-
-            // This Combination is not a region; save the name of the combo as
-            // part of the nameSet so it can be processed further
-
-            if (isDebug()) printComboInfo("    (pt-save-name)", combo, parentPath);
-            nameSet.add(combo.getName());
+            // This Leaf Combination is not a region; 
+            logger.log(Level.INFO, "Attempted to import combination '" + leafDbext.getName() + "', but external is "
+                    + " major type: " + leafDbext.getMajorType()
+                    +       " minor type: " + leafDbext.getMinorType());
         }
     }
 
+    @SuppressWarnings("UseOfSystemOutOrSystemErr") //Allow use of 'println' statements when 'isDebug() == true'
+    private void addRegionData(Combination combo, String parentPath, Set<String> namesOfNonRegionCombinations){
+        Map<String, String> comboAttrs = combo.getAttributes();
+        if (comboAttrs.containsKey("region")) {
+
+                // This Combination is a region; save the data contained in the node,
+                // along with pathing, to the results map (remove any leading delimiter
+                // before saving)
+                if (isDebug()) {
+                    System.out.println("(Region) Name: " + combo.getName()
+                            + "; Path: " + (parentPath != null ?  parentPath + delimiter : "") + combo.getName()
+                            + "; RegionID: " + comboAttrs.get("region_id")
+                            + "; LOS: " + comboAttrs.get("los")
+                            + "; MatID: " + comboAttrs.get("material_id")
+                            + "; AirCode: " + comboAttrs.get("aircode"));
+                }
+                Map<String, String> attrs = new TreeMap<String, String>(comboAttrs);
+                String path = (parentPath != null ?  parentPath + delimiter : "") + combo.getName();
+                attrs.put("regionPath", path);
+                regionMap.put(combo.getName(), attrs);
+
+                String identStr = comboAttrs.get("region_id");
+                Integer ident = 0;
+                if (identStr != null) {
+                    ident = Integer.valueOf(comboAttrs.get("region_id"));
+                }
+                List<String> regions = identMap.get(ident);
+                if (regions == null) {
+                    regions = new ArrayList<String>();
+                    identMap.put(ident, regions);
+                }
+                regions.add(path);
+
+            } else {
+
+                // This Combination is not a region; save the name of the combo as
+                // part of the nameSet so it can be processed further
+                if (isDebug()) {
+                    printComboInfo("    (pt-save-name)", combo, parentPath);
+                }
+                if(namesOfNonRegionCombinations != null){
+                    namesOfNonRegionCombinations.add(combo.getName());
+                }
+            }
+    }
 
     /**
      * Print info from a BRL-CAD Tree
@@ -259,11 +297,10 @@ public class RegionInfo {
      * @param combo BRL-CAD object from which data is printed
      * @param path Current path to get to this combo (used for regions)
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void printTreeInfo(String where, Tree tree, String path) {
         StringBuilder sb = new StringBuilder();
-        sb.append(where + " Tree Name: '" + tree.getLeafName() + "'"
-                + "; Tree: " + tree.toString()
-                + "; Path: '" + path + "'");
+        sb.append(where).append(" Tree Name: '").append(tree.getLeafName()).append("'" + "; Tree: ").append(tree.toString()).append("; Path: '").append(path).append("'");
         System.out.println(sb.toString());
         System.out.flush();
     }
@@ -275,11 +312,13 @@ public class RegionInfo {
      * @param combo BRL-CAD object from which data is printed
      * @param path Current path to get to this combo (used for regions)
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void printComboInfo(String where, Combination combo, String path) {
         StringBuilder sb = new StringBuilder();
-        sb.append(where + " Combo Name: " + combo.getName()
-                + "; Tree: " + combo.getTree().toString()
-                + "; Path: '" + path + "'");
+        sb.append(where).append(" Combo Name: ")
+                .append(combo.getName()).append("; Tree: ")
+                .append(combo.getTree().toString())
+                .append("; Path: '").append(path).append("'");
         System.out.println(sb.toString());
         System.out.flush();
     }
@@ -290,11 +329,14 @@ public class RegionInfo {
      * @param where Location from where this info is being printed
      * @param dbExt BRL-CAD object from which data is printed
      */
+    @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private void printRawInfo(String where, DbExternal dbExt) {
         StringBuilder sb = new StringBuilder();
-        sb.append(where + " Raw Name: " + dbExt.getName()
-                + "; Raw attrs: '" + bytesToString(dbExt.getAttributes()) + "'"
-                + "; Raw body: '" + bytesToString(dbExt.getBody()) + "'");
+        sb.append(where).append(" Raw Name: ")
+                .append(dbExt.getName()).append("; Raw attrs: '")
+                .append(bytesToString(dbExt.getAttributes()))
+                .append("'" + "; Raw body: '")
+                .append(bytesToString(dbExt.getBody())).append("'");
         System.out.println(sb.toString());
         System.out.flush();
     }
@@ -330,18 +372,18 @@ public class RegionInfo {
     }
 
     /**
-     * @return the regionMap
+     * @return the regionMap(UnmodifiableMap)
      */
     public Map<String, Map<String, String>> getRegionMap() {
-        return regionMap;
+        return Collections.unmodifiableMap(regionMap);
     }
 
     /**
-     * getIdentMap returns the map if region ident numbers to lists of path names for regions that have that ident number
+     * getIdentMap returns the map(UnmodifiableMap) if region ident numbers to lists of path names for regions that have that ident number
      * 
      * @return the identMap
      */
     public Map<Integer, List<String>> getIdentMap() {
-        return identMap;
+        return Collections.unmodifiableMap(identMap);
     }
 }
