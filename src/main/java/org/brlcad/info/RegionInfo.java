@@ -120,7 +120,8 @@ public class RegionInfo {
             for(String objectName : rootObjects) {
                 DbExternal rootDbExt = db.getDbExternal(objectName);
                 if (rootDbExt == null) {
-                    throw new DbException("'" + objectName + "' is not a BRL-CAD top component.");
+                    logger.warning("'" + objectName + "' is not valid a BRL-CAD top component. Object will be skipped");
+                    continue;
                 }
                 if (isDebug()) {
                     printRawInfo("    (pi)", rootDbExt);
@@ -181,12 +182,17 @@ public class RegionInfo {
         // Process nameSet to move further down the region path name
 
         for (String s : nameSet) {
-//            if (isDebug()) printRawInfo("    (ph)", db.getDbExternal(s));
-            Combination combo = new Combination(db.getDbExternal(s));
-            if (isDebug()) {
-                printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
+            DbExternalObject object = db.getDbExternal(s);
+            if (object != null) {
+                Combination combo = new Combination(db.getDbExternal(s));
+                if (isDebug()) {
+                    printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
+                }
+                processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
+            } else {
+                logger.warning("DbExternalObject '" + s + "' does not exist. Object will be skipped");
+                continue;
             }
-            processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
         }
     }
 
@@ -232,16 +238,20 @@ public class RegionInfo {
             return;
         } 
         DbExternalObject leafDbext = db.getDbExternal(tree.getLeafName());
-        if (leafDbext.getMajorType() == 1 && leafDbext.getMinorType() == 31) {
-            // Current tree is a leaf.  Get the data about the leaf from the BRL-CAD
-            // file and process as either (1) the name of another group or (2) a region
-            Combination combo = new Combination(leafDbext);
-            addRegionData(combo, parentPath, nameSet);
+        if (leafDbext != null) {
+            if (leafDbext.getMajorType() == 1 && leafDbext.getMinorType() == 31) {
+                // Current tree is a leaf.  Get the data about the leaf from the BRL-CAD
+                // file and process as either (1) the name of another group or (2) a region
+                Combination combo = new Combination(leafDbext);
+                addRegionData(combo, parentPath, nameSet);
+            } else {
+                // This Leaf Combination is not a region; 
+                logger.log(Level.INFO, "Attempted to import combination '" + leafDbext.getName() + "', but external is "
+                        + " major type: " + leafDbext.getMajorType()
+                        + " minor type: " + leafDbext.getMinorType());
+            }
         } else {
-            // This Leaf Combination is not a region; 
-            logger.log(Level.INFO, "Attempted to import combination '" + leafDbext.getName() + "', but external is "
-                    + " major type: " + leafDbext.getMajorType()
-                    +       " minor type: " + leafDbext.getMinorType());
+            logger.warning("DbExternalObject '" + tree.getLeafName() + "' does not exist. Object will be skipped");
         }
     }
 
