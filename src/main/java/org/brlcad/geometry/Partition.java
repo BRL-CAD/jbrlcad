@@ -9,14 +9,10 @@ import java.io.Externalizable;
 import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.brlcad.numerics.Matrix;
 import org.brlcad.numerics.Vector3;
 import org.brlcad.preppedGeometry.PreppedCombination;
 import org.brlcad.spacePartition.RayData;
@@ -33,7 +29,8 @@ public class Partition implements Comparable,Externalizable {
     private String fromRegion;
     private double los;
     private int regionID;
-    private int airCode;
+    private int airCode;    
+    private Matrix muvesToOrca = null;
 
     /**
      * No-arg constructor for use by Externalization. DO NOT USE THIS CONSTRUCTOR
@@ -75,6 +72,7 @@ public class Partition implements Comparable,Externalizable {
         this.outObliquity = part.outObliquity;
         this.los = part.los;
         this.regionID = part.regionID;
+        this.muvesToOrca = part.muvesToOrca;
     }
 
     private void reverseInHitNormal() {
@@ -608,6 +606,22 @@ public class Partition implements Comparable,Externalizable {
     public void setAirCode(int airCode) {
         this.airCode = airCode;
     }
+    
+    /**
+     * 
+     * @return MUVES to ORCA Translation Matrix
+     */
+    public Matrix getMuvesToOrca() {
+        return muvesToOrca;
+    }
+
+    /**
+     * 
+     * @param muvesToOrca sets MUVES to ORCA Translation Matrix 
+     */
+    public void setMuvesToOrca(Matrix muvesToOrca) {
+        this.muvesToOrca = muvesToOrca;
+    }    
 
     public void writeExternal(ObjectOutput out) throws IOException {
         out.writeInt(regionID);

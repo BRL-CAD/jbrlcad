@@ -5,7 +5,7 @@
     <groupId>org.brlcad</groupId>
     <artifactId>jbrlcad</artifactId>
     <packaging>jar</packaging>
-    <version>1.1</version>
+     <version>1.2-SNAPSHOT</version>
     <name>jbrlcad</name>
     <description>A partial implementation of BRL-CAD in java</description>
     <url>http://brlcad.org</url>

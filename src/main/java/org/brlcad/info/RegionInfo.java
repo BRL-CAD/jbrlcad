@@ -1,23 +1,9 @@
 package org.brlcad.info;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.brlcad.geometry.BrlcadDb;
-import org.brlcad.geometry.Combination;
-import org.brlcad.geometry.DbException;
-import org.brlcad.geometry.DbExternal;
-import org.brlcad.geometry.DbExternalObject;
-import org.brlcad.geometry.Operator;
-import org.brlcad.geometry.Tree;
+import org.brlcad.geometry.*;
 
 /**
  * A class useful for obtaining information about regions in a BRL-CAD ".g" file.
@@ -227,14 +213,31 @@ public class RegionInfo {
         // If current tree is not a leaf, ignore it and process left and right branches
 
         if (tree.getOp() != Operator.LEAF) {
-            if (isDebug()) {
-                printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
+            if(tree.getOp() == Operator.UNION || tree.getOp() == Operator.INTERSECTION || tree.getOp() == Operator.XOR){         
+                //Add both left and right branches of the tree.
+                if (isDebug()) {
+                    printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
+                }
+                processTree(db, tree.getLeft(), parentPath, nameSet);
+                if (isDebug()) {
+                    printTreeInfo("    (pt->pt right)", tree.getRight(), parentPath);
+                }
+                processTree(db, tree.getRight(), parentPath, nameSet);                
+            }else if(tree.getOp() == Operator.SUBTRACTION){  
+                //Add ONLY the left branch, exclude the right branch since it is subtracted from the left
+                if (isDebug()) {
+                    printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
+                }
+                processTree(db, tree.getLeft(), parentPath, nameSet);
+                //Log warning message stating that the Combination to be subracted will be excluded.
+                if(tree.getRight() != null){
+                    logger.warning("DbExternalObject '" + tree.getRight().getLeafName() + "' is a subtraction from " + tree.getLeft().getLeafName() + " and will be excluded");
+                }                
             }
-            processTree(db, tree.getLeft(), parentPath, nameSet);
-            if (isDebug()) {
-                printTreeInfo("    (pt->pt right)", tree.getRight(), parentPath);
+            else{
+                //Also ignore Operator.NOT since it is to be excluded. Log warning Message
+                logger.warning("DbObject '" + tree.getLeafName() + "' uses operator " + tree.getOp() + " and will be excluded");
             }
-            processTree(db, tree.getRight(), parentPath, nameSet);
             return;
         } 
         DbExternalObject leafDbext = db.getDbExternal(tree.getLeafName());
