@@ -5,7 +5,7 @@
     <groupId>org.brlcad</groupId>
     <artifactId>jbrlcad</artifactId>
     <packaging>jar</packaging>
-     <version>1.2-SNAPSHOT</version>
+     <version>1.2</version>
     <name>jbrlcad</name>
     <description>A partial implementation of BRL-CAD in java</description>
     <url>http://brlcad.org</url>
@@ -60,23 +60,9 @@
     </dependencies>
 
     <distributionManagement>
-
         <repository>
-            <id>releases</id>
-            <name>Release Repository</name>
-            <url>
-                http://joy.arl.army.mil:8080/nexus/content/repositories/releases/
-            </url>
+            <id>arl</id>
+            <url>https://vcs.wadechandler.com/mvn/arl/repository</url>
         </repository>
-
-
-        <snapshotRepository>
-            <id>snapshots</id>
-            <name>Snapshot Repository</name>
-            <url>
-                http://joy.arl.army.mil:8080/nexus/content/repositories/snapshots
-            </url>
-        </snapshotRepository>
-
     </distributionManagement>
 </project>
