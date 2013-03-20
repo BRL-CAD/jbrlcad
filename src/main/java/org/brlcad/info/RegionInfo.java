@@ -248,6 +248,8 @@ public class RegionInfo {
                 Combination combo = new Combination(leafDbext);
                 addRegionData(combo, parentPath, nameSet);
             } else {
+                String name = tree.getLeafName();
+                addSolidData(parentPath, name);
                 // This Leaf Combination is not a region; 
                 logger.log(Level.INFO, "Attempted to import combination '" + leafDbext.getName() + "', but external is "
                         + " major type: " + leafDbext.getMajorType()
@@ -258,6 +260,34 @@ public class RegionInfo {
         }
     }
 
+        @SuppressWarnings("UseOfSystemOutOrSystemErr") //Allow use of 'println' statements when 'isDebug() == true'
+    private void addSolidData(String parentPath, String leafName){
+
+        // This Combination is a region; save the data contained in the node,
+        // along with pathing, to the results map (remove any leading delimiter
+        // before saving)
+        if (isDebug()) {
+            System.out.println("(Region) Name: " + leafName
+                    + "; Path: " + (parentPath != null ?  parentPath + delimiter : "") + leafName
+                    + "; RegionID: 0"
+                    + "; LOS: 100"
+                    + "; MatID: 0"
+                    + "; AirCode: 0");
+        }
+        Map<String, String> attrs = new TreeMap<String, String>();
+        String path = (parentPath != null ?  parentPath + delimiter : "") + leafName;
+        attrs.put("regionPath", path);
+        regionMap.put(leafName, attrs);
+
+        Integer ident = 0;
+        List<String> regions = identMap.get(ident);
+        if (regions == null) {
+            regions = new ArrayList<String>();
+            identMap.put(ident, regions);
+        }
+        regions.add(path);
+    }
+    
     @SuppressWarnings("UseOfSystemOutOrSystemErr") //Allow use of 'println' statements when 'isDebug() == true'
     private void addRegionData(Combination combo, String parentPath, Set<String> namesOfNonRegionCombinations){
         Map<String, String> comboAttrs = combo.getAttributes();
