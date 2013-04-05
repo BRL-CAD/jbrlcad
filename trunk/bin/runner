@@ -1,0 +1,42 @@
+#!/bin/csh
+
+# keep taking the head until that operation makes no further change
+# if the end result is the empty string, then the command started with a "/"
+set S1=$0
+set S2=$S1:h
+while ($S1 != $S2)
+    set S1=$S2
+    set S2=$S2:h
+end
+
+# set
+if ($S2 == "") then
+    # $0 is full path
+    set BINDIR=$0:h
+else
+    # $0 is a relative path
+    set BINDIR=${cwd}/${0:h}
+endif
+
+set JBRLCAD_HOME=$BINDIR:h
+
+# build classpath containing dependencies
+set CP=`mvn dependency:build-classpath | awk '$3 == "classpath:" {getline;print}'`
+
+# find the jbrlcad jar
+set JAR=`ls ${JBRLCAD_HOME}/target/jbrlcad*.jar`
+if $#JAR != 1 then
+    (cd ${JBRLCAD_HOME}; mvn -Dmaven.test.skip clean install)
+endif
+set JAR=`ls ${JBRLCAD_HOME}/target/jbrlcad*.jar`
+if $#JAR != 1 then
+    echo "Build failed, cannot run $1"
+    exit
+endif
+
+set CP=${JAR}:$CP
+set CLASS=$1
+shift
+
+# echo "java -cp $CP org.brlcad.samples.$CLASS $*"
+java -cp $CP org.brlcad.samples.$CLASS $*
