@@ -5,17 +5,17 @@
 
 package org.brlcad.numerics;
 
-import java.io.Serializable;
 import javax.measure.unit.SI;
 import javax.measure.unit.Unit;
+import java.io.Serializable;
 
 /**
- *
  * @author jra
  */
 public abstract class Triple implements Serializable {
 
-    private static final double INITIAL_TOLERANCE = 1.0E-11;
+    private static final long serialVersionUID = -4880011665146636047L;
+    public static final double INITIAL_TOLERANCE = 1e-7; // revised to match BRL-CAD's VUNITIZE_TOL
 
     // units must always be  millimeters
     public static final Unit units = SI.MILLI(SI.METER);
@@ -99,8 +99,8 @@ public abstract class Triple implements Serializable {
         return (z);
     }
 
-    public double get( int index ) {
-        switch( index ) {
+    public double get(int index) {
+        switch (index) {
             case 0:
                 return x;
             case 1:
@@ -108,12 +108,12 @@ public abstract class Triple implements Serializable {
             case 2:
                 return z;
             default:
-                throw new IllegalArgumentException( "get(int i) called with illegal argument (" + index + ") must be 0, 1, or 2" );
+                throw new IllegalArgumentException("get(int i) called with illegal argument (" + index + ") must be 0, 1, or 2");
         }
     }
 
     public void set(int index, double d) {
-        switch( index ) {
+        switch (index) {
             case 0:
                 this.x = d;
                 break;
@@ -124,7 +124,7 @@ public abstract class Triple implements Serializable {
                 this.z = d;
                 break;
             default:
-                throw new IllegalArgumentException( "set(int i) called with illegal argument (" + index + ") must be 0, 1, or 2" );
+                throw new IllegalArgumentException("set(int i) called with illegal argument (" + index + ") must be 0, 1, or 2");
         }
         mag = Double.NaN;
     }
@@ -149,6 +149,7 @@ public abstract class Triple implements Serializable {
 
     /**
      * Subtract a Triple
+     *
      * @param p The Triple to subtract
      */
     public void subtract(Triple p) {
@@ -160,6 +161,7 @@ public abstract class Triple implements Serializable {
 
     /**
      * Subtract a Triple
+     *
      * @param p The Triple to subtract
      */
     public void minus(Triple p) {
@@ -248,9 +250,9 @@ public abstract class Triple implements Serializable {
     }
 
     public void squareElements() {
-        x = x*x;
-        y = y*y;
-        z = z*z;
+        x = x * x;
+        y = y * y;
+        z = z * z;
 
         this.mag = Double.NaN;
     }

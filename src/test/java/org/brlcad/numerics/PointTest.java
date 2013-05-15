@@ -1,7 +1,8 @@
 package org.brlcad.numerics;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Test framework for the Point class
@@ -13,7 +14,7 @@ import static org.junit.Assert.*;
 
 public class PointTest {
 
-    double tolerance = 0.0000001;
+    double tolerance = Vector3.INITIAL_TOLERANCE;
 
     public PointTest() {
     }
@@ -118,9 +119,9 @@ public class PointTest {
     public void testTolerance() {
         Point p = new Point(0, 0, 0);
 
-        assertEquals(0.00000000001, p.getTolerance(), 0.00000000000001);
+        assertEquals(Vector3.INITIAL_TOLERANCE, p.getTolerance(), Vector3.INITIAL_TOLERANCE);
         p.setTolerance(3.14159);
-        assertEquals(3.14159, p.getTolerance(), 0.000000000001);
+        assertEquals(3.14159, p.getTolerance(), Vector3.INITIAL_TOLERANCE);
     }
 
     @Test

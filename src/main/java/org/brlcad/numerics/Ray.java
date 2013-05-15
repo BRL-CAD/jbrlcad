@@ -57,12 +57,12 @@ public class Ray implements Externalizable {
     public Ray(Point s, Vector3 d) {
         if (s == null || !Point.isValidTriple(s)) {
             throw new IllegalArgumentException(
-                    "Point for Ray constructor either null or not valid.");
+                    "Point for Ray constructor either null or not valid. Point = " + s);
         }
         if (d == null || !Vector3.isValidTriple(d)
-                || d.magnitude() <= Double.MIN_VALUE) {
+                || d.magnitude() < Triple.INITIAL_TOLERANCE) {
             throw new IllegalArgumentException(
-                    "Vector for Ray constructor either null, not valid, or vector magnitude is zero.");
+                    "Vector for Ray constructor either null, not valid, or vector magnitude is near zero. Vector = " + d);
         }
         start = new Point(s);
         direction = new Vector3(d);
@@ -139,11 +139,9 @@ public class Ray implements Externalizable {
      * @return true, if the ray is valid
      */
     public static boolean isValidRay(Ray r) {
-        if (r == null || r.start == null || !Point.isValidTriple(r.start)
-                || r.direction == null || !Vector3.isValidTriple(r.direction)) {
-            return false;
-        }
-        return true;
+        return !(r == null || r.start == null || !Point.isValidTriple(r.start)
+                || r.direction == null || !Vector3.isValidTriple(r.direction)
+                || r.direction.magnitude() < Triple.INITIAL_TOLERANCE);
     }
 
     public void writeExternal(ObjectOutput out) throws IOException {
