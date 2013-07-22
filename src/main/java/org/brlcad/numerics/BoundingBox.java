@@ -291,9 +291,9 @@ public class BoundingBox implements Serializable {
             throw new IllegalArgumentException(
                     "bound() called with Point that is either null or not valid");
         }
-        if (p.getX() < max.getX() && p.getX() > min.getX()
-                && p.getY() < max.getY() && p.getY() > min.getY()
-                && p.getZ() < max.getZ() && p.getZ() > min.getZ()) {
+        if (p.getX() <= max.getX() && p.getX() >= min.getX()
+                && p.getY() <= max.getY() && p.getY() >= min.getY()
+                && p.getZ() <= max.getZ() && p.getZ() >= min.getZ()) {
             return true;
         }
         return false;

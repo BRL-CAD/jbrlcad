@@ -4,6 +4,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 import java.util.List;
+import org.junit.Assert;
 
 /**
  * Test framework for the BoundingBox class
@@ -175,6 +176,15 @@ public class BoundingBoxTest {
         hits = bb.isect2(r);
         assertEquals( "first hit", 5.0, hits[0], 0.00000001 );
         assertEquals( "second hit", 19.142135623730947, hits[1], 0.00000001 );
+    }
+    
+    @Test
+    public void testFlatBoxIntersect() {
+        BoundingBox bb = new BoundingBox( new Point( 0, 0, 0 ), new Point( 6, 6, 0 ) );
+        // a Ray that intersects
+        Ray r = new Ray(new Point(3, 3, -10), new Vector3(0, 0, 1));
+        //Should intersect the Flatbox
+        Assert.assertTrue(bb.doesIntersect(r));
     }
 
     @Test

@@ -426,6 +426,9 @@ public class PartitionTest {
     }
 
     private class MockPreppedCombination extends PreppedCombination {
-
+        @Override
+        public String getName(){
+            return "Name";
+        }
     }
 }
