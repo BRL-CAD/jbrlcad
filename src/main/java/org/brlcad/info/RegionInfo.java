@@ -1,5 +1,6 @@
 package org.brlcad.info;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -95,11 +96,11 @@ public class RegionInfo {
 
         this.regionMap = new TreeMap<String, Map<String, String>>();
         this.identMap = new HashMap<Integer, List<String>>();
-
+        BrlcadDb db = null;
         try {
             // Open, read, and get pointers to objects in a BRL-CAD file
 
-            BrlcadDb db = new BrlcadDb(inFileName);
+            db = new BrlcadDb(inFileName);
 
             // Get the data for the root object.  If it isn't a BRL-CAD Component,
             // then throw an exception and quit
@@ -127,9 +128,18 @@ public class RegionInfo {
                     }
                     processHierarchy(db, rootCombo.getTree(), objectName);                    
                 }
-            }
+            }            
         } catch (Exception e) {
             logger.log(Level.WARNING, e.getMessage(), e);
+        }finally{
+            if(db != null){
+                try {
+                    //Close the file stream, otherwise we may eventually get an exception "Too many open files..."
+                    db.close();                    
+                } catch (IOException ex) {
+                    //Swallow exception
+                }
+            }
         }
     }
 
