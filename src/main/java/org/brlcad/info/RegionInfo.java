@@ -8,7 +8,7 @@ import org.brlcad.geometry.*;
 
 /**
  * A class useful for obtaining information about regions in a BRL-CAD ".g" file.
- * 
+ *
  */
 public class RegionInfo {
 
@@ -34,18 +34,27 @@ public class RegionInfo {
      * for regions with that ident
      */
     private Map<Integer,List<String>> identMap = null;
-    
+
     private static final Logger logger = Logger.getLogger(RegionInfo.class.getName());
 
     /**
      * Constructor
      *
-     * @param inFileName The name of a BRL-CAD ".g" file
+     * @param inFileName The name of a BRL-CAD ".g" file from which the region data will be read
      * @param rootObjects The top level objects in the ".g" file that are to be processed
      */
-    
     public RegionInfo(String inFileName, String... rootObjects) {
         this.processInput(inFileName, rootObjects);
+    }
+
+    /**
+     * Constructor
+     *
+     * @param db An open BrlcadDb object from which the region data will be read.
+     * @param rootObjects The top level objects for which region/idents data is to be loaded.
+     */
+    public RegionInfo(BrlcadDb db, String... rootObjects) {
+        this.processInput(db, rootObjects);
     }
 
     /**
@@ -82,6 +91,8 @@ public class RegionInfo {
 
 
     /**
+     * Load regionmap and identsmap, region properties...
+     *
      * Open the BRL-CAD db (.g file), get the info about the root object, then
      * start the process of traversing the implied tree of BRL-CAD objects (each
      * of which is a tree in itself)
@@ -93,53 +104,77 @@ public class RegionInfo {
      * and where Map<String, Map> is a map of the region name to it's attributes
      */
     private void processInput(String inFileName, String... rootObjects) {
-
-        this.regionMap = new TreeMap<String, Map<String, String>>();
-        this.identMap = new HashMap<Integer, List<String>>();
         BrlcadDb db = null;
         try {
             // Open, read, and get pointers to objects in a BRL-CAD file
-
             db = new BrlcadDb(inFileName);
-
-            // Get the data for the root object.  If it isn't a BRL-CAD Component,
-            // then throw an exception and quit
-            for(String objectName : rootObjects) {
-                DbExternal rootDbExt = db.getDbExternal(objectName);
-                if (rootDbExt == null) {
-                    logger.warning("'" + objectName + "' is not valid a BRL-CAD top component. Object will be skipped");
-                    continue;
-                }
-                if (isDebug()) {
-                    printRawInfo("    (pi)", rootDbExt);
-                }
-                Combination rootCombo = new Combination(rootDbExt);               
-                Map<String, String> comboAttrs = rootCombo.getAttributes();
-                if (comboAttrs != null && comboAttrs.containsKey("region")) {
-                        // This Root Combination is a region; save the region data contained
-                        addRegionData(rootCombo, null, null);
-                } else {
-                    // Assume that rootCombo now represents the top of an implied hierarchy
-                    // (i.e., tree) of smaller trees, each of which contains a combination
-                    // of combinations and/or components which contain regions.  Recursively
-                    // process the hierarchy using this "root node" as the start.
-                    if (isDebug()) {
-                        printComboInfo("    (pi->ph)", rootCombo, "");
-                    }
-                    processHierarchy(db, rootCombo.getTree(), objectName);                    
-                }
-            }            
+            processInput(db, rootObjects);
         } catch (Exception e) {
             logger.log(Level.WARNING, e.getMessage(), e);
         }finally{
             if(db != null){
                 try {
                     //Close the file stream, otherwise we may eventually get an exception "Too many open files..."
-                    db.close();                    
+                    db.close();
                 } catch (IOException ex) {
                     //Swallow exception
                 }
             }
+        }
+    }
+
+    /**
+     * Load regionmap and identsmap, region properties...
+     *
+     * Get the info about the root object(s), then
+     * start the process of traversing the implied tree of BRL-CAD objects (each
+     * of which is a tree in itself)
+     * @param rootObjects Name of the top level objects to process
+     */
+    private void processInput(BrlcadDb db, String... rootObjects) {
+        try {
+            this.regionMap = new TreeMap<String, Map<String, String>>();
+            this.identMap = new HashMap<Integer, List<String>>();
+
+            if (rootObjects == null || rootObjects.length == 0) {
+                //then assume intent is to process all top level objects.
+                rootObjects = db.getTopLevelObjects().toArray(new String[]{});
+            }
+
+            // Get the data for the root object.  If it isn't a BRL-CAD Component,
+            // then throw an exception and quit
+            for (String objectName : rootObjects) {
+                try {
+                    DbExternal rootDbExt = db.getDbExternal(objectName);
+                    if (rootDbExt == null) {
+                        logger.warning("'" + objectName + "' is not valid a BRL-CAD top component. Object will be skipped");
+                        continue;
+                    }
+                    if (isDebug()) {
+                        printRawInfo("    (pi)", rootDbExt);
+                    }
+                    Combination rootCombo = new Combination(rootDbExt);
+                    Map<String, String> comboAttrs = rootCombo.getAttributes();
+                    if (comboAttrs != null && comboAttrs.containsKey("region")) {
+                        // This Root Combination is a region; save the region data contained
+                        addRegionData(rootCombo, null, null);
+                    } else {
+                    // Assume that rootCombo now represents the top of an implied hierarchy
+                        // (i.e., tree) of smaller trees, each of which contains a combination
+                        // of combinations and/or components which contain regions.  Recursively
+                        // process the hierarchy using this "root node" as the start.
+                        if (isDebug()) {
+                            printComboInfo("    (pi->ph)", rootCombo, "");
+                        }
+                        processHierarchy(db, rootCombo.getTree(), objectName);
+                    }
+                } catch (Exception e) {
+                    //log error and continue to process next object.
+                    logger.log(Level.WARNING, e.getMessage(), e);
+                }
+            }
+        } catch (Exception e) {
+            logger.log(Level.WARNING, e.getMessage(), e);
         }
     }
 
@@ -178,16 +213,20 @@ public class RegionInfo {
         // Process nameSet to move further down the region path name
 
         for (String s : nameSet) {
-            DbExternalObject object = db.getDbExternal(s);
-            if (object != null) {
-                Combination combo = new Combination(db.getDbExternal(s));
-                if (isDebug()) {
-                    printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
+            try {
+                DbExternalObject object = db.getDbExternal(s);
+                if (object != null) {
+                    Combination combo = new Combination(db.getDbExternal(s));
+                    if (isDebug()) {
+                        printComboInfo("    (ph->ph)", combo, parentPath + delimiter + s);
+                    }
+                    processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
+                } else {
+                    logger.warning("DbExternalObject '" + s + "' does not exist. Object will be skipped");
                 }
-                processHierarchy(db, combo.getTree(), parentPath + delimiter + s);
-            } else {
-                logger.warning("DbExternalObject '" + s + "' does not exist. Object will be skipped");
-                continue;
+            } catch (Exception e) {
+                //log error and continue to process next object.
+                logger.log(Level.WARNING, e.getMessage(), e);
             }
         }
     }
@@ -223,7 +262,7 @@ public class RegionInfo {
         // If current tree is not a leaf, ignore it and process left and right branches
 
         if (tree.getOp() != Operator.LEAF) {
-            if(tree.getOp() == Operator.UNION || tree.getOp() == Operator.INTERSECTION || tree.getOp() == Operator.XOR){         
+            if(tree.getOp() == Operator.UNION || tree.getOp() == Operator.INTERSECTION || tree.getOp() == Operator.XOR){
                 //Add both left and right branches of the tree.
                 if (isDebug()) {
                     printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
@@ -232,8 +271,8 @@ public class RegionInfo {
                 if (isDebug()) {
                     printTreeInfo("    (pt->pt right)", tree.getRight(), parentPath);
                 }
-                processTree(db, tree.getRight(), parentPath, nameSet);                
-            }else if(tree.getOp() == Operator.SUBTRACTION){  
+                processTree(db, tree.getRight(), parentPath, nameSet);
+            }else if(tree.getOp() == Operator.SUBTRACTION){
                 //Add ONLY the left branch, exclude the right branch since it is subtracted from the left
                 if (isDebug()) {
                     printTreeInfo("    (pt->pt left)", tree.getLeft(), parentPath);
@@ -242,14 +281,14 @@ public class RegionInfo {
                 //Log warning message stating that the Combination to be subracted will be excluded.
                 if(tree.getRight() != null){
                     logger.warning("DbExternalObject '" + tree.getRight().getLeafName() + "' is a subtraction from " + tree.getLeft().getLeafName() + " and will be excluded");
-                }                
+                }
             }
             else{
                 //Also ignore Operator.NOT since it is to be excluded. Log warning Message
                 logger.warning("DbObject '" + tree.getLeafName() + "' uses operator " + tree.getOp() + " and will be excluded");
             }
             return;
-        } 
+        }
         DbExternalObject leafDbext = db.getDbExternal(tree.getLeafName());
         if (leafDbext != null) {
             if (leafDbext.getMajorType() == 1 && leafDbext.getMinorType() == 31) {
@@ -260,7 +299,7 @@ public class RegionInfo {
             } else {
                 String name = tree.getLeafName();
                 addSolidData(parentPath, name);
-                // This Leaf Combination is not a region; 
+                // This Leaf Combination is not a region;
                 logger.log(Level.INFO, "Attempted to import combination '" + leafDbext.getName() + "', but external is "
                         + " major type: " + leafDbext.getMajorType()
                         + " minor type: " + leafDbext.getMinorType());
@@ -297,7 +336,7 @@ public class RegionInfo {
         }
         regions.add(path);
     }
-    
+
     @SuppressWarnings("UseOfSystemOutOrSystemErr") //Allow use of 'println' statements when 'isDebug() == true'
     private void addRegionData(Combination combo, String parentPath, Set<String> namesOfNonRegionCombinations){
         Map<String, String> comboAttrs = combo.getAttributes();
@@ -433,7 +472,7 @@ public class RegionInfo {
 
     /**
      * getIdentMap returns the map(UnmodifiableMap) if region ident numbers to lists of path names for regions that have that ident number
-     * 
+     *
      * @return the identMap
      */
     public Map<Integer, List<String>> getIdentMap() {
